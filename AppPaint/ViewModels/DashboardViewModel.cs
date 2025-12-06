@@ -55,14 +55,28 @@ public partial class DashboardViewModel : BaseViewModel
             var profileService = scope.ServiceProvider.GetRequiredService<IProfileService>();
 
             // Load all data
-            var templates = await templateService.GetAllTemplatesAsync();
+            var allTemplates = await templateService.GetAllTemplatesAsync();
             var allShapes = await shapeService.GetAllShapesAsync();
             var profiles = await profileService.GetAllProfilesAsync();
 
+            // Filter: Only count DRAWINGS (IsTemplate = false), NOT shape templates
+            var drawings = allTemplates.Where(t => !t.IsTemplate).ToList();
+            
+            // Only count shapes that belong to drawings (not templates)
+            var drawingIds = drawings.Select(d => d.Id).ToHashSet();
+            var drawingShapes = allShapes.Where(s => s.TemplateId.HasValue && drawingIds.Contains(s.TemplateId.Value)).ToList();
+
             // Calculate statistics
-            TotalDrawings = templates.Count;
-            TotalShapes = allShapes.Count;
+            TotalDrawings = drawings.Count;
+            TotalShapes = drawingShapes.Count;
             TotalProfiles = profiles.Count;
+
+            System.Diagnostics.Debug.WriteLine($"📊 Dashboard Stats:");
+            System.Diagnostics.Debug.WriteLine($"   Total templates in DB: {allTemplates.Count}");
+            System.Diagnostics.Debug.WriteLine($"   Drawings (IsTemplate=false): {drawings.Count}");
+            System.Diagnostics.Debug.WriteLine($"   Shape Templates (IsTemplate=true): {allTemplates.Count(t => t.IsTemplate)}");
+            System.Diagnostics.Debug.WriteLine($"   Total shapes: {allShapes.Count}");
+            System.Diagnostics.Debug.WriteLine($"   Shapes in drawings: {drawingShapes.Count}");
 
             // Average shapes per drawing
             if (TotalDrawings > 0)
@@ -75,14 +89,14 @@ public partial class DashboardViewModel : BaseViewModel
                 AverageShapesPerDrawing = "0";
             }
 
-            // Shape type distribution
-            CalculateShapeTypeDistribution(allShapes);
+            // Shape type distribution (only from drawings, not templates)
+            CalculateShapeTypeDistribution(drawingShapes);
 
-            // Recent drawings (top 10)
+            // Recent drawings (top 10, only drawings not templates)
             RecentDrawings.Clear();
-            foreach (var template in templates.OrderByDescending(t => t.CreatedAt).Take(10))
+            foreach (var drawing in drawings.OrderByDescending(t => t.CreatedAt).Take(10))
             {
-                RecentDrawings.Add(template);
+                RecentDrawings.Add(drawing);
             }
 
             System.Diagnostics.Debug.WriteLine($"✅ Dashboard loaded: {TotalDrawings} drawings, {TotalShapes} shapes, {TotalProfiles} profiles");
@@ -90,7 +104,7 @@ public partial class DashboardViewModel : BaseViewModel
         catch (Exception ex)
         {
             ErrorMessage = $"Error loading dashboard: {ex.Message}";
-            System.Diagnostics.Debug.WriteLine($"Error loading dashboard: {ex}");
+            System.Diagnostics.Debug.WriteLine($"❌ Error loading dashboard: {ex}");
         }
         finally
         {
