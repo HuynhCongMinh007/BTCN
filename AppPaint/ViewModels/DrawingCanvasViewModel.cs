@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using AppPaint.Services;
 using Data.Models;
@@ -69,13 +69,75 @@ public partial class DrawingCanvasViewModel : BaseViewModel
 
     public override async void OnNavigatedTo(object? parameter = null)
   {
- base.OnNavigatedTo(parameter);
+        base.OnNavigatedTo(parameter);
 
-        if (parameter is int templateId)
+  // Handle DrawingNavigationParameters (with ProfileId + DrawingId)
+  if (parameter is AppPaint.Models.DrawingNavigationParameters navParams)
   {
-       await LoadTemplateAsync(templateId);
+     // Load Profile settings first
+            await LoadProfileSettingsAsync(navParams.ProfileId);
+  
+            // Then load drawing if specified
+      if (navParams.DrawingId.HasValue)
+   {
+      await LoadTemplateAsync(navParams.DrawingId.Value);
+      }
+    }
+        // Fallback: Handle old int parameter (just drawingId)
+   else if (parameter is int templateId)
+        {
+    await LoadTemplateAsync(templateId);
+        }
+        // No parameter: New blank canvas with default settings
+      else
+    {
+            System.Diagnostics.Debug.WriteLine("New blank canvas - using default settings");
   }
- }
+    }
+
+    /// <summary>
+    /// Load and apply Profile settings
+    /// </summary>
+    private async System.Threading.Tasks.Task LoadProfileSettingsAsync(int profileId)
+    {
+      try
+        {
+    IsBusy = true;
+    
+   using var scope = App.Services.CreateScope();
+  var profileService = scope.ServiceProvider.GetRequiredService<IProfileService>();
+            
+        var profile = await profileService.GetProfileByIdAsync(profileId);
+      if (profile != null)
+ {
+           // Apply Profile settings to ViewModel
+     CanvasWidth = profile.DefaultCanvasWidth;
+          CanvasHeight = profile.DefaultCanvasHeight;
+    SelectedColor = profile.DefaultStrokeColor;
+       FillColor = profile.DefaultFillColor;
+       BackgroundColor = profile.DefaultBackgroundColor;
+      StrokeThickness = profile.DefaultStrokeThickness;
+           
+        System.Diagnostics.Debug.WriteLine($"✅ Applied Profile '{profile.Name}' settings:");
+     System.Diagnostics.Debug.WriteLine($"   Canvas: {CanvasWidth}x{CanvasHeight}");
+       System.Diagnostics.Debug.WriteLine($"   Stroke Color: {SelectedColor}");
+      System.Diagnostics.Debug.WriteLine($"   Background: {BackgroundColor}");
+     }
+            else
+    {
+       System.Diagnostics.Debug.WriteLine($"❌ Profile {profileId} not found");
+      }
+        }
+  catch (Exception ex)
+ {
+     ErrorMessage = $"Error loading profile: {ex.Message}";
+     System.Diagnostics.Debug.WriteLine($"Error loading profile: {ex}");
+  }
+        finally
+        {
+  IsBusy = false;
+        }
+    }
 
     [RelayCommand]
     private async Task LoadTemplateAsync(int templateId)
