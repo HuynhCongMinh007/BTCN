@@ -28,8 +28,10 @@ public sealed partial class DrawingsPage : Page
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-    base.OnNavigatedTo(e);
-     ViewModel.OnNavigatedTo(e.Parameter);
+        base.OnNavigatedTo(e);
+        
+        // Pass false to load DRAWINGS (IsTemplate = false), not templates!
+        ViewModel.OnNavigatedTo(false);
     }
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
