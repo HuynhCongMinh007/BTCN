@@ -37,23 +37,33 @@ public sealed partial class ShellPage : Page
 
     private async System.Threading.Tasks.Task LoadThemeAsync()
     {
-  try
+        try
         {
- // Create a scope for scoped services
-     using var scope = App.Services.CreateScope();
- var themeService = scope.ServiceProvider.GetRequiredService<IThemeService>();
-  
-        var savedTheme = await themeService.GetSavedThemeAsync();
-   
-   // Update toggle switch based on theme
-   ThemeToggle.IsOn = savedTheme == ElementTheme.Dark;
-   
-    // Apply theme
+    // Temporarily unsubscribe to prevent event loop
+    ThemeToggle.Toggled -= ThemeToggle_Toggled;
+     
+   // Create a scope for scoped services
+      using var scope = App.Services.CreateScope();
+         var themeService = scope.ServiceProvider.GetRequiredService<IThemeService>();
+
+   var savedTheme = await themeService.GetSavedThemeAsync();
+
+  // Update toggle switch based on theme
+            ThemeToggle.IsOn = savedTheme == ElementTheme.Dark;
+
+   // Apply theme
       themeService.ApplyTheme(savedTheme);
- }
+
+   System.Diagnostics.Debug.WriteLine($"✅ Loaded saved theme: {savedTheme}");
+    }
         catch (Exception ex)
+ {
+      System.Diagnostics.Debug.WriteLine($"❌ Error loading theme: {ex.Message}");
+     }
+        finally
    {
-     System.Diagnostics.Debug.WriteLine($"Error loading theme: {ex.Message}");
+            // Re-subscribe after loading
+  ThemeToggle.Toggled += ThemeToggle_Toggled;
         }
     }
 
@@ -127,22 +137,29 @@ if (selectedItem != null)
     }
 
     private async void ThemeToggle_Toggled(object sender, RoutedEventArgs e)
-{
-   try
-        {
+    {
+        try
+   {
+   // Prevent event loop during initialization
+  if (!this.IsLoaded) return;
+       
       var theme = ThemeToggle.IsOn ? ElementTheme.Dark : ElementTheme.Light;
   
-     // Create a scope for scoped services
-       using var scope = App.Services.CreateScope();
-    var themeService = scope.ServiceProvider.GetRequiredService<IThemeService>();
-     
- await themeService.SetThemeAsync(theme);
+   System.Diagnostics.Debug.WriteLine($"🎨 Theme toggle changed: IsOn={ThemeToggle.IsOn}, Theme={theme}");
+  
+      // Create a scope for scoped services
+   using var scope = App.Services.CreateScope();
+  var themeService = scope.ServiceProvider.GetRequiredService<IThemeService>();
+ 
+   await themeService.SetThemeAsync(theme);
+
+   System.Diagnostics.Debug.WriteLine($"✅ Theme applied: {theme}");
+        }
+ catch (Exception ex)
+  {
+    System.Diagnostics.Debug.WriteLine($"❌ Error setting theme: {ex.Message}");
    }
-      catch (Exception ex)
-   {
-      System.Diagnostics.Debug.WriteLine($"Error setting theme: {ex.Message}");
- }
-  }
+    }
 
     /// <summary>
     /// Navigate to DrawingCanvasPage from anywhere in the app
