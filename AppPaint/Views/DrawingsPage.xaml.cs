@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.UI.Xaml.Media;
 using AppPaint.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Data.Models;
@@ -42,59 +43,72 @@ public sealed partial class DrawingsPage : Page
 
     private void OnLoadTemplateRequested(object? sender, int templateId)
     {
-        // Navigate to DrawingCanvas with drawing ID
-  // TODO: Also need to get ProfileId from drawing
-        Frame.Navigate(typeof(DrawingCanvasPage), templateId);
+     // Navigate using Shell's main frame
+        NavigateToDrawingCanvas(templateId);
     }
 
     private void LoadDrawing_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button button && button.Tag is DrawingTemplate drawing)
         {
-            // Navigate to DrawingCanvasPage with drawing
-            Frame.Navigate(typeof(DrawingCanvasPage), drawing.Id);
+       // Navigate using Shell's main frame
+            NavigateToDrawingCanvas(drawing.Id);
         }
     }
 
     private async void DeleteDrawing_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button button && button.Tag is DrawingTemplate drawing)
+   if (sender is Button button && button.Tag is DrawingTemplate drawing)
         {
-       await ShowDeleteConfirmationAndDelete(drawing);
-        }
+            await ShowDeleteConfirmationAndDelete(drawing);
+ }
     }
 
     private async Task ShowDeleteConfirmationAndDelete(DrawingTemplate drawing)
     {
         var dialog = new ContentDialog
-        {
+  {
   XamlRoot = this.XamlRoot,
-      Title = "Delete Drawing?",
-  Content = $"Are you sure you want to delete '{drawing.Name}'?\n\n" +
- $"This will delete {drawing.Shapes.Count} shape(s).\n\n" +
-  $"This action cannot be undone.",
-       PrimaryButtonText = "Delete",
-  CloseButtonText = "Cancel",
-  DefaultButton = ContentDialogButton.Close
-        };
+        Title = "Delete Drawing?",
+          Content = $"Are you sure you want to delete '{drawing.Name}'?\n\n" +
+    $"This will delete {drawing.Shapes.Count} shape(s).\n\n" +
+   $"This action cannot be undone.",
+     PrimaryButtonText = "Delete",
+      CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Close
+};
 
  var result = await dialog.ShowAsync();
 
- if (result == ContentDialogResult.Primary)
+        if (result == ContentDialogResult.Primary)
         {
-   // Execute delete command
-      await ViewModel.DeleteTemplateCommand.ExecuteAsync(drawing);
+     // Execute delete command
+        await ViewModel.DeleteTemplateCommand.ExecuteAsync(drawing);
      
-   // Show success message
-       var successDialog = new ContentDialog
-            {
-        XamlRoot = this.XamlRoot,
-           Title = "Deleted",
-     Content = $"'{drawing.Name}' has been deleted successfully.",
-    CloseButtonText = "OK"
+            // Show success message
+var successDialog = new ContentDialog
+  {
+ XamlRoot = this.XamlRoot,
+      Title = "Deleted",
+         Content = $"'{drawing.Name}' has been deleted successfully.",
+       CloseButtonText = "OK"
    };
-    await successDialog.ShowAsync();
-        }
+            await successDialog.ShowAsync();
+   }
+    }
+
+    private void NavigateToDrawingCanvas(int? drawingId)
+    {
+ // Get MainWindow via static property
+        if (App.MainWindow is MainWindow mainWindow)
+        {
+        // Get ShellPage from RootFrame
+   if (mainWindow.Content is Frame rootFrame && rootFrame.Content is ShellPage shellPage)
+   {
+    // Use ShellPage's public method
+    shellPage.NavigateToDrawingCanvas(drawingId);
+}
+     }
     }
 
     private async void RefreshButton_Click(object sender, RoutedEventArgs e)
