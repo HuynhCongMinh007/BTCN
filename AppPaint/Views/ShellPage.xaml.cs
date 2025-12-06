@@ -132,19 +132,23 @@ _breadcrumbs.Add((tag, title));
 
     /// <summary>
     /// Navigate to DrawingCanvasPage from anywhere in the app
-  /// </summary>
-  public void NavigateToDrawingCanvas(int? drawingId)
+    /// </summary>
+    public void NavigateToDrawingCanvas(object? parameter)
     {
-   ContentFrame.Navigate(typeof(DrawingCanvasPage), drawingId);
-   UpdateBreadcrumb("DrawingCanvas", "Draw Canvas");
-    
-    // Update NavigationView selection
-    var drawingItem = NavView.MenuItems
+        System.Diagnostics.Debug.WriteLine($"🚀 ShellPage.NavigateToDrawingCanvas called with parameter: {parameter?.GetType().Name ?? "null"}");
+   
+ ContentFrame.Navigate(typeof(DrawingCanvasPage), parameter);
+ System.Diagnostics.Debug.WriteLine("✅ ContentFrame.Navigate called");
+      
+        UpdateBreadcrumb("DrawingCanvas", "Draw Canvas");
+        
+        // Update NavigationView selection
+   var drawingItem = NavView.MenuItems
        .OfType<NavigationViewItem>()
      .FirstOrDefault(item => item.Tag?.ToString() == "DrawingCanvas");
-   if (drawingItem != null)
-   {
-       NavView.SelectedItem = drawingItem;
-   }
+  if (drawingItem != null)
+      {
+      NavView.SelectedItem = drawingItem;
+        }
     }
 }
