@@ -10,49 +10,49 @@
     Title="AppPaint">
 
     <Window.SystemBackdrop>
-      <MicaBackdrop Kind="BaseAlt"/>
- </Window.SystemBackdrop>
+        <MicaBackdrop Kind="BaseAlt"/>
+    </Window.SystemBackdrop>
 
     <Grid>
         <Grid.RowDefinitions>
-       <RowDefinition Height="48"/>
-   <RowDefinition Height="*"/>
+            <RowDefinition Height="48"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-  <!-- Custom Title Bar with Fluent Design -->
-        <Grid x:Name="AppTitleBar" 
-      Grid.Row="0" 
-            Background="Transparent">
-     <Grid.ColumnDefinitions>
-         <ColumnDefinition Width="Auto"/>
-       <ColumnDefinition Width="*"/>
- <ColumnDefinition Width="Auto"/>
-   </Grid.ColumnDefinitions>
+        <!-- Custom Title Bar with Fluent Design -->
+        <Grid x:Name="AppTitleBar"
+              Grid.Row="0"
+              Background="Transparent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-   <!-- App Icon & Title -->
-   <StackPanel Grid.Column="0" 
-  Orientation="Horizontal"
-  Spacing="12"
-      Margin="16,0,0,0"
-      VerticalAlignment="Center">
-     <Image Source="/Assets/Square44x44Logo.png" 
-        Width="20" Height="20"/>
-     <TextBlock Text="AppPaint"
-Style="{StaticResource CaptionTextBlockStyle}"
-     FontWeight="SemiBold"
-   VerticalAlignment="Center"/>
-  </StackPanel>
+            <!-- App Icon & Title -->
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        Spacing="12"
+                        Margin="16,0,0,0"
+                        VerticalAlignment="Center">
+                <Image Source="/Assets/Square44x44Logo.png"
+                       Width="20" Height="20"/>
+                <TextBlock Text="AppPaint"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
 
-   <!-- Subtitle -->
-    <TextBlock Grid.Column="1"
-    Text="Professional Drawing Application"
-     Style="{StaticResource CaptionTextBlockStyle}"
-     VerticalAlignment="Center"
-  Margin="12,0,0,0"
-      Opacity="0.7"/>
+            <!-- Subtitle -->
+            <TextBlock Grid.Column="1"
+                       Text="Professional Drawing Application"
+                       Style="{StaticResource CaptionTextBlockStyle}"
+                       VerticalAlignment="Center"
+                       Margin="12,0,0,0"
+                       Opacity="0.7"/>
         </Grid>
 
-   <!-- Navigation Frame -->
-  <Frame x:Name="RootFrame" Grid.Row="1"/>
+        <!-- Navigation Frame -->
+        <Frame x:Name="RootFrame" Grid.Row="1"/>
     </Grid>
 </Window>
