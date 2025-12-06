@@ -441,66 +441,66 @@ public sealed partial class DrawingCanvasPage : Page
         double left = Canvas.GetLeft(shape);
         double top = Canvas.GetTop(shape);
         double width = 0;
-  double height = 0;
+        double height = 0;
 
         if (shape is Line line)
         {
-    left = Math.Min(line.X1, line.X2) - 5;
-        top = Math.Min(line.Y1, line.Y2) - 5;
-            width = Math.Abs(line.X2 - line.X1) + 10;
-    height = Math.Abs(line.Y2 - line.Y1) + 10;
-}
-    else if (shape is Rectangle rect)
-    {
-            width = rect.Width;
-            height = rect.Height;
+            left = Math.Min(line.X1, line.X2) - 5;
+  top = Math.Min(line.Y1, line.Y2) - 5;
+    width = Math.Abs(line.X2 - line.X1) + 10;
+        height = Math.Abs(line.Y2 - line.Y1) + 10;
         }
-        else if (shape is Ellipse ellipse)
-  {
-          width = ellipse.Width;
-          height = ellipse.Height;
-    }
-      else if (shape is Polygon polygon)
+        else if (shape is Rectangle rect)
         {
-            var bounds = GetPolygonBounds(polygon.Points);
-          left = bounds.Left - 5;
- top = bounds.Top - 5;
-            width = bounds.Width + 10;
-            height = bounds.Height + 10;
+ width = rect.Width;
+   height = rect.Height;
+ }
+   else if (shape is Ellipse ellipse)
+        {
+     width = ellipse.Width;
+    height = ellipse.Height;
         }
+ else if (shape is Polygon polygon)
+ {
+            var bounds = GetPolygonBounds(polygon.Points);
+     left = bounds.Left;
+   top = bounds.Top;
+       width = bounds.Width;
+      height = bounds.Height;
+}
 
         _selectionBorder = new Border
-        {
-     Width = width,
-       Height = height,
-        BorderBrush = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Blue),
-            BorderThickness = new Thickness(2),
-   CornerRadius = new CornerRadius(2),
-     IsHitTestVisible = false
-      };
+ {
+    Width = width,
+  Height = height,
+    BorderBrush = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Blue),
+   BorderThickness = new Thickness(2),
+            CornerRadius = new CornerRadius(2),
+IsHitTestVisible = false
+     };
 
         Canvas.SetLeft(_selectionBorder, left);
-        Canvas.SetTop(_selectionBorder, top);
+ Canvas.SetTop(_selectionBorder, top);
         DrawingCanvas.Children.Add(_selectionBorder);
 
-        // Add resize handle (bottom-right corner)
-      if (!(shape is Line)) // Lines don't need resize handles
-        {
-   _resizeHandle = new Ellipse
+     // Add resize handle (bottom-right corner) - NOT for Lines
+     if (!(shape is Line))
+ {
+ _resizeHandle = new Ellipse
      {
-     Width = 12,
-    Height = 12,
-      Fill = new SolidColorBrush(Microsoft.UI.Colors.Blue),
-        Stroke = new SolidColorBrush(Microsoft.UI.Colors.White),
- StrokeThickness = 2
-          };
-    Canvas.SetLeft(_resizeHandle, left + width - 6);
-      Canvas.SetTop(_resizeHandle, top + height - 6);
-       Canvas.SetZIndex(_resizeHandle, 1000);
-    DrawingCanvas.Children.Add(_resizeHandle);
+       Width = 12,
+       Height = 12,
+    Fill = new SolidColorBrush(Microsoft.UI.Colors.Blue),
+ Stroke = new SolidColorBrush(Microsoft.UI.Colors.White),
+      StrokeThickness = 2
+       };
+   Canvas.SetLeft(_resizeHandle, left + width - 6);
+       Canvas.SetTop(_resizeHandle, top + height - 6);
+  Canvas.SetZIndex(_resizeHandle, 1000);
+       DrawingCanvas.Children.Add(_resizeHandle);
 
-         _resizeHandle.PointerPressed += ResizeHandle_PointerPressed;
-        }
+  _resizeHandle.PointerPressed += ResizeHandle_PointerPressed;
+ }
     }
 
     private Rect GetPolygonBounds(Microsoft.UI.Xaml.Media.PointCollection points)
@@ -737,85 +737,124 @@ public sealed partial class DrawingCanvasPage : Page
 
     private void DrawingCanvas_PointerMoved(object sender, PointerRoutedEventArgs e)
     {
-        var currentPoint = e.GetCurrentPoint(DrawingCanvas).Position;
+  var currentPoint = e.GetCurrentPoint(DrawingCanvas).Position;
 
         // Handle shape resizing
         if (_isResizingShape && _selectedShape != null)
+      {
+   var deltaX = currentPoint.X - _dragStartPoint.X;
+            var deltaY = currentPoint.Y - _dragStartPoint.Y;
+
+            ResizeShape(_selectedShape, deltaX, deltaY);
+
+            // Update selection border and resize handle
+            if (_selectionBorder != null && _resizeHandle != null)
+            {
+           var left = 0.0;
+            var top = 0.0;
+ var width = 0.0;
+       var height = 0.0;
+
+        if (_selectedShape is Polygon polygon)
         {
-      var deltaX = currentPoint.X - _dragStartPoint.X;
-     var deltaY = currentPoint.Y - _dragStartPoint.Y;
-
-     ResizeShape(_selectedShape, deltaX, deltaY);
-
-   // Update selection border and resize handle
-    if (_selectionBorder != null && _resizeHandle != null)
-  {
-      var left = Canvas.GetLeft(_selectedShape);
-       var top = Canvas.GetTop(_selectedShape);
-    var width = GetShapeWidth(_selectedShape);
-      var height = GetShapeHeight(_selectedShape);
-
-  _selectionBorder.Width = width;
-     _selectionBorder.Height = height;
-        Canvas.SetLeft(_selectionBorder, left);
-      Canvas.SetTop(_selectionBorder, top);
-
-    Canvas.SetLeft(_resizeHandle, left + width - 6);
-      Canvas.SetTop(_resizeHandle, top + height - 6);
-}
-
-  e.Handled = true;
-            return;
-   }
-
-   // Handle shape dragging
-     if (_isDraggingShape && _selectedShape != null)
-   {
-  var deltaX = currentPoint.X - _dragStartPoint.X;
- var deltaY = currentPoint.Y - _dragStartPoint.Y;
-
-      MoveShape(_selectedShape, _shapeStartPosition.X + deltaX, _shapeStartPosition.Y + deltaY);
-         
-  // Update selection border and resize handle
-      if (_selectionBorder != null)
-       {
-     Canvas.SetLeft(_selectionBorder, Canvas.GetLeft(_selectedShape));
-      Canvas.SetTop(_selectionBorder, Canvas.GetTop(_selectedShape));
-   }
-      if (_resizeHandle != null)
-       {
-var left = Canvas.GetLeft(_selectedShape);
-  var top = Canvas.GetTop(_selectedShape);
-  var width = GetShapeWidth(_selectedShape);
-    var height = GetShapeHeight(_selectedShape);
-           Canvas.SetLeft(_resizeHandle, left + width - 6);
- Canvas.SetTop(_resizeHandle, top + height - 6);
+           var bounds = GetPolygonBounds(polygon.Points);
+      left = bounds.Left;
+                top = bounds.Top;
+  width = bounds.Width;
+        height = bounds.Height;
      }
-         
-e.Handled = true;
+   else
+     {
+       left = Canvas.GetLeft(_selectedShape);
+    top = Canvas.GetTop(_selectedShape);
+        width = GetShapeWidth(_selectedShape);
+  height = GetShapeHeight(_selectedShape);
+    }
+
+         _selectionBorder.Width = width;
+           _selectionBorder.Height = height;
+   Canvas.SetLeft(_selectionBorder, left);
+          Canvas.SetTop(_selectionBorder, top);
+
+  Canvas.SetLeft(_resizeHandle, left + width - 6);
+  Canvas.SetTop(_resizeHandle, top + height - 6);
+            }
+
+      e.Handled = true;
             return;
     }
 
+ // Handle shape dragging
+   if (_isDraggingShape && _selectedShape != null)
+      {
+            var deltaX = currentPoint.X - _dragStartPoint.X;
+            var deltaY = currentPoint.Y - _dragStartPoint.Y;
+
+     MoveShape(_selectedShape, _shapeStartPosition.X + deltaX, _shapeStartPosition.Y + deltaY);
+
+          // Update selection border and resize handle
+            if (_selectionBorder != null)
+            {
+       if (_selectedShape is Line line)
+{
+           var left = Math.Min(line.X1, line.X2) - 5;
+   var top = Math.Min(line.Y1, line.Y2) - 5;
+        Canvas.SetLeft(_selectionBorder, left);
+          Canvas.SetTop(_selectionBorder, top);
+     }
+           else if (_selectedShape is Polygon polygon)
+            {
+      var bounds = GetPolygonBounds(polygon.Points);
+          Canvas.SetLeft(_selectionBorder, bounds.Left);
+    Canvas.SetTop(_selectionBorder, bounds.Top);
+
+           if (_resizeHandle != null)
+ {
+      Canvas.SetLeft(_resizeHandle, bounds.Left + bounds.Width - 6);
+       Canvas.SetTop(_resizeHandle, bounds.Top + bounds.Height - 6);
+        }
+            }
+ else
+       {
+         Canvas.SetLeft(_selectionBorder, Canvas.GetLeft(_selectedShape));
+              Canvas.SetTop(_selectionBorder, Canvas.GetTop(_selectedShape));
+
+            if (_resizeHandle != null)
+        {
+       var left = Canvas.GetLeft(_selectedShape);
+    var top = Canvas.GetTop(_selectedShape);
+          var width = GetShapeWidth(_selectedShape);
+    var height = GetShapeHeight(_selectedShape);
+         Canvas.SetLeft(_resizeHandle, left + width - 6);
+      Canvas.SetTop(_resizeHandle, top + height - 6);
+       }
+             }
+         }
+
+   e.Handled = true;
+    return;
+        }
+
         if (!_isDrawing) return;
-   if (ViewModel.SelectedShapeType == ShapeType.Polygon) return;
+        if (ViewModel.SelectedShapeType == ShapeType.Polygon) return;
 
         // Clamp to canvas bounds
- currentPoint.X = Math.Max(0, Math.Min(DrawingCanvas.Width, currentPoint.X));
-   currentPoint.Y = Math.Max(0, Math.Min(DrawingCanvas.Height, currentPoint.Y));
+     currentPoint.X = Math.Max(0, Math.Min(DrawingCanvas.Width, currentPoint.X));
+        currentPoint.Y = Math.Max(0, Math.Min(DrawingCanvas.Height, currentPoint.Y));
 
-  // Remove previous preview
-        if (_previewShape != null)
-     {
-       DrawingCanvas.Children.Remove(_previewShape);
-     }
-
- // Create preview shape
-     _previewShape = CreateShape(_startPoint, currentPoint, ViewModel.SelectedShapeType, true);
-   if (_previewShape != null)
+        // Remove previous preview
+      if (_previewShape != null)
         {
-DrawingCanvas.Children.Add(_previewShape);
+     DrawingCanvas.Children.Remove(_previewShape);
         }
-}
+
+   // Create preview shape
+        _previewShape = CreateShape(_startPoint, currentPoint, ViewModel.SelectedShapeType, true);
+        if (_previewShape != null)
+        {
+            DrawingCanvas.Children.Add(_previewShape);
+ }
+    }
 
     private void DrawingCanvas_PointerReleased(object sender, PointerRoutedEventArgs e)
     {
@@ -1586,14 +1625,20 @@ DrawingCanvas.Children.Add(_previewShape);
 
     private Point GetShapePosition(UIShape shape)
     {
-   if (shape is Line line)
-      {
-  return new Point(Math.Min(line.X1, line.X2), Math.Min(line.Y1, line.Y2));
-  }
+        if (shape is Line line)
+        {
+   return new Point(Math.Min(line.X1, line.X2), Math.Min(line.Y1, line.Y2));
+ }
+    else if (shape is Polygon polygon)
+    {
+       // For Triangle and Polygon, get bounds position
+      var bounds = GetPolygonBounds(polygon.Points);
+       return new Point(bounds.Left, bounds.Top);
+}
         else
-  {
-     return new Point(Canvas.GetLeft(shape), Canvas.GetTop(shape));
-        }
+        {
+        return new Point(Canvas.GetLeft(shape), Canvas.GetTop(shape));
+      }
 }
 
     private void MoveShape(UIShape shape, double newX, double newY)
@@ -1744,7 +1789,7 @@ rect.Height = newHeight;
   ellipse.Height = newHeight;
     _dragStartPoint.X += deltaX;
   _dragStartPoint.Y += deltaY;
-   }
+ }
    else if (shape is Polygon polygon)
   {
     var bounds = GetPolygonBounds(polygon.Points);
