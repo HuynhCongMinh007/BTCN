@@ -124,18 +124,6 @@
                                   Glyph="&#xE8F1;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-
-                <NavigationViewItemSeparator/>
-
-                <!-- Profile -->
-                <NavigationViewItem Content="Profile" 
-                                    Tag="Profile"
-                                    ToolTipService.ToolTip="Manage profile and settings">
-                    <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                  Glyph="&#xE77B;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
             </NavigationView.MenuItems>
 
             <!-- Content Frame with Animation -->
