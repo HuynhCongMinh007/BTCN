@@ -112,30 +112,19 @@ public sealed partial class DrawingCanvasPage : Page
     /// </summary>
     private void Shapes_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        // ONLY render shapes loaded from DB when opening existing drawing
-        // DO NOT render newly created shapes (they're already on canvas)
+        // When shapes are loaded from DB, render them
         if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && e.NewItems != null)
         {
-            // Check if this is initial load or user-created shape
-            // If CurrentTemplateId was just set (opening existing drawing), render shapes
-        // Otherwise, skip (user just drew the shape, already on canvas)
-     if (ViewModel.CurrentTemplateId.HasValue)
-            {
-     foreach (Data.Models.Shape shape in e.NewItems)
-     {
-     // Only render if this shape is not already on canvas (from DB load)
-   if (!IsShapeAlreadyOnCanvas(shape))
-        {
-      RenderShapeOnCanvas(shape);
-      }
-   }
-         }
+   foreach (Data.Models.Shape shape in e.NewItems)
+   {
+       RenderShapeOnCanvas(shape);
+            }
         }
-        else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
- {
-     // Clear and re-render all shapes
+   else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+   {
+      // Clear and re-render all shapes
             RenderShapesFromViewModel();
-   }
+ }
     }
 
     private bool IsShapeAlreadyOnCanvas(Data.Models.Shape shape)
@@ -922,59 +911,48 @@ DrawingCanvas.Children.Add(_previewShape);
     private void FinishPolygonButton_Click(object sender, RoutedEventArgs e)
     {
         if (_polygonPoints.Count < 3)
-        {
-            System.Diagnostics.Debug.WriteLine("Need at least 3 points to create polygon");
-            return;
+ {
+      System.Diagnostics.Debug.WriteLine("Need at least 3 points to create polygon");
+   return;
         }
 
         // Remove preview markers and lines
-        foreach (var line in _polygonPreviewLines)
-        {
-            DrawingCanvas.Children.Remove(line);
-        }
-        _polygonPreviewLines.Clear();
+   foreach (var line in _polygonPreviewLines)
+    {
+   DrawingCanvas.Children.Remove(line);
+ }
+   _polygonPreviewLines.Clear();
 
-        // Remove markers (small circles)
-        var markersToRemove = DrawingCanvas.Children
-                  .OfType<Ellipse>()
-            .Where(e => e.Width == 8 && e.Height == 8)
-         .ToList();
+ // Remove markers (small circles)
+   var markersToRemove = DrawingCanvas.Children
+  .OfType<Ellipse>()
+  .Where(e => e.Width == 8 && e.Height == 8)
+       .ToList();
         foreach (var marker in markersToRemove)
-        {
-            DrawingCanvas.Children.Remove(marker);
-        }
+    {
+      DrawingCanvas.Children.Remove(marker);
+  }
 
-        // Create final polygon
-        var polygon = DrawingService.CreatePolygon(
-      _polygonPoints,
-       ViewModel.SelectedColor,
-       ViewModel.StrokeThickness,
-   ViewModel.IsFilled,
-    ViewModel.StrokeStyle,
-         ViewModel.FillColor
-     );
-
-        DrawingCanvas.Children.Add(polygon);
-
-        // Save to database
-        var pointsJson = DrawingService.PointsToJson(_polygonPoints);
+        // DON'T add polygon to canvas - let Shapes_CollectionChanged do it
+   // Save to database
+     var pointsJson = DrawingService.PointsToJson(_polygonPoints);
         var shape = new Data.Models.Shape
-        {
-            ShapeType = ShapeType.Polygon,
-            PointsData = pointsJson,
-            Color = ViewModel.SelectedColor,
-            StrokeThickness = ViewModel.StrokeThickness,
-            IsFilled = ViewModel.IsFilled,
-            FillColor = ViewModel.IsFilled ? ViewModel.FillColor : null,
-            TemplateId = ViewModel.CurrentTemplateId,
+  {
+  ShapeType = ShapeType.Polygon,
+      PointsData = pointsJson,
+       Color = ViewModel.SelectedColor,
+   StrokeThickness = ViewModel.StrokeThickness,
+  IsFilled = ViewModel.IsFilled,
+   FillColor = ViewModel.IsFilled ? ViewModel.FillColor : null,
+     TemplateId = ViewModel.CurrentTemplateId,
             CreatedAt = DateTime.Now
-        };
+  };
 
         ViewModel.AddShapeCommand.ExecuteAsync(shape);
 
-        // Reset
+ // Reset
         _polygonPoints.Clear();
-        FinishPolygonButton.Visibility = Visibility.Collapsed;
+ FinishPolygonButton.Visibility = Visibility.Collapsed;
     }
 
     private void OnClearCanvasRequested(object? sender, EventArgs e)
