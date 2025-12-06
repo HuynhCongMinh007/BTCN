@@ -2,65 +2,72 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System;
+using System.Collections.ObjectModel;
 
 namespace AppPaint.Views;
 
 public sealed partial class ManagementPage : Page
 {
-    public ManagementPage()
+    // Breadcrumb items
+  public ObservableCollection<string> BreadcrumbItems { get; } = new()
     {
+        "Home",
+    "Management"
+    };
+
+    public ManagementPage()
+  {
         this.InitializeComponent();
         
-        // Set default selection to Profiles
-        if (ManagementNav.MenuItems.Count > 0)
-     {
-            ManagementNav.SelectedItem = ManagementNav.MenuItems[0];
-        }
-  }
+        // Load initial tabs
+    ProfilesFrame.Navigate(typeof(ProfilePage));
+        DrawingsFrame.Navigate(typeof(DrawingsPage));
+        TemplatesFrame.Navigate(typeof(TemplateManagerPage));
+    }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
- 
-        // Navigate to default page (Profiles)
-        if (ContentFrame.Content == null)
-        {
-        ContentFrame.Navigate(typeof(ProfilePage));
+        
+        // Check if specific tab requested
+        if (e.Parameter is string tabName)
+   {
+  SelectTab(tabName);
         }
-    }
-
-    private void ManagementNav_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
-    {
-     if (args.SelectedItem is NavigationViewItem item)
+        else
         {
- string tag = item.Tag?.ToString() ?? "";
-            
-  Type? pageType = tag switch
-            {
-          "Profiles" => typeof(ProfilePage),
-    "Drawings" => typeof(DrawingsPage), // ✅ Use DrawingsPage for saved drawings
-     "Templates" => typeof(TemplateManagerPage), // Will create TemplatesPage later for shape presets
-      "Dashboard" => typeof(DashboardPage), // Will create DashboardPage later
-                _ => null
-       };
-
-    if (pageType != null && ContentFrame.CurrentSourcePageType != pageType)
-      {
-      ContentFrame.Navigate(pageType);
+       // Default to Profiles tab
+            ManagementTabView.SelectedIndex = 0;
      }
-        }
     }
 
-    private void ManagementNav_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
+    private void ManagementTabView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-    if (ContentFrame.CanGoBack)
+        if (ManagementTabView.SelectedItem is TabViewItem selectedTab)
         {
-         ContentFrame.GoBack();
-        }
-     else if (Frame.CanGoBack)
+ string tabHeader = selectedTab.Header?.ToString() ?? "";
+  
+   // Update breadcrumb
+    if (BreadcrumbItems.Count > 2)
+ {
+      BreadcrumbItems.RemoveAt(2);
+         }
+   BreadcrumbItems.Add(tabHeader);
+ 
+            System.Diagnostics.Debug.WriteLine($"📍 Management Tab: {tabHeader}");
+ }
+    }
+
+  private void SelectTab(string tabName)
+    {
+int index = tabName?.ToLower() switch
         {
-            // Go back to previous page (likely MainPage)
-            Frame.GoBack();
-      }
+        "profiles" => 0,
+    "drawings" => 1,
+     "templates" => 2,
+ _ => 0
+        };
+        
+        ManagementTabView.SelectedIndex = index;
     }
 }
