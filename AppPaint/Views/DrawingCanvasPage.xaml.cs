@@ -25,6 +25,7 @@ public sealed partial class DrawingCanvasPage : Page
     private List<Point> _polygonPoints = new();
     private List<Line> _polygonPreviewLines = new();
     private bool _isDrawing = false;
+    private bool _isToolbarExpanded = true;
 
     public DrawingCanvasPage()
     {
@@ -350,38 +351,36 @@ double.TryParse(parts[1], out double height))
    }
     }
 
+    private void ToggleToolbarButton_Click(object sender, RoutedEventArgs e)
+    {
+   _isToolbarExpanded = !_isToolbarExpanded;
+  
+     // Toggle toolbar content visibility
+     ToolbarContent.Visibility = _isToolbarExpanded ? Visibility.Visible : Visibility.Collapsed;
+      
+        // Update button icon
+   var button = sender as Button;
+   if (button?.Content is FontIcon icon)
+   {
+        // E700 = GlobalNavigationButton (hamburger)
+        // E76C = ChevronUp
+       icon.Glyph = _isToolbarExpanded ? "\uE76C" : "\uE700";
+   }
+  
+ System.Diagnostics.Debug.WriteLine($"Toolbar {(_isToolbarExpanded ? "expanded" : "collapsed")}");
+ }
+
     private void BackgroundColorPicker_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
     {
    var color = args.NewColor;
-      ViewModel.BackgroundColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+        ViewModel.BackgroundColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
      
-    // Update canvas background brush
+        // Update canvas background brush
   CanvasBackgroundBrush.Color = color;
   
   // Update button preview color
    BackgroundColorPreview.Color = color;
     
     System.Diagnostics.Debug.WriteLine($"Background color changed: {ViewModel.BackgroundColor}");
-    }
-
- private void ToolsToggle_Click(object sender, RoutedEventArgs e)
-    {
-  ToolsSection.Visibility = ToolsSection.Visibility == Visibility.Visible 
-  ? Visibility.Collapsed 
-   : Visibility.Visible;
-    }
-
-    private void BrushesToggle_Click(object sender, RoutedEventArgs e)
-  {
- BrushesSection.Visibility = BrushesSection.Visibility == Visibility.Visible 
-     ? Visibility.Collapsed 
- : Visibility.Visible;
-    }
-
-    private void CanvasToggle_Click(object sender, RoutedEventArgs e)
-    {
-        CanvasSection.Visibility = CanvasSection.Visibility == Visibility.Visible 
-    ? Visibility.Collapsed 
-  : Visibility.Visible;
     }
 }
