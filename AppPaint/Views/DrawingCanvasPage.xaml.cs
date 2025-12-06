@@ -44,6 +44,9 @@ public sealed partial class DrawingCanvasPage : Page
         // Subscribe to events
         ViewModel.NavigateBackRequested += OnNavigateBackRequested;
         ViewModel.ClearCanvasRequested += OnClearCanvasRequested;
+        
+        // Subscribe to ViewModel property changes
+        ViewModel.PropertyChanged += ViewModel_PropertyChanged;
 
         this.InitializeComponent();
 
@@ -55,15 +58,11 @@ public sealed partial class DrawingCanvasPage : Page
         // Keyboard events
         this.KeyDown += DrawingCanvasPage_KeyDown;
         this.KeyUp += DrawingCanvasPage_KeyUp;
-        
+      
         // Thickness slider event
-        StrokeThicknessSlider.ValueChanged += StrokeThicknessSlider_ValueChanged;
-        
-        // Fill checkbox event
-     FillCheckBox.Checked += FillCheckBox_CheckChanged;
-        FillCheckBox.Unchecked += FillCheckBox_CheckChanged;
+  StrokeThicknessSlider.ValueChanged += StrokeThicknessSlider_ValueChanged;
     }
-
+    
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
@@ -77,6 +76,7 @@ public sealed partial class DrawingCanvasPage : Page
         // Unsubscribe
         ViewModel.NavigateBackRequested -= OnNavigateBackRequested;
         ViewModel.ClearCanvasRequested -= OnClearCanvasRequested;
+        ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
 
         ViewModel.OnNavigatedFrom();
     }
@@ -485,48 +485,23 @@ _selectedShape.Stroke = new SolidColorBrush(color);
 
     private void FillColorPicker_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
     {
-        var color = args.NewColor;
-   ViewModel.FillColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+   var color = args.NewColor;
+        ViewModel.FillColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
         
         // Update preview button
-        if (FillColorPreview != null)
-  {
-   FillColorPreview.Color = color;
- }
+    if (FillColorPreview != null)
+        {
+     FillColorPreview.Color = color;
+        }
         
         // If shape is selected and filled, update its fill color
-     if (_selectedShape != null && _isSelectMode && ViewModel.IsFilled)
-  {
-   _selectedShape.Fill = new SolidColorBrush(color);
-     System.Diagnostics.Debug.WriteLine($"Updated selected shape fill color: {ViewModel.FillColor}");
+        if (_selectedShape != null && _isSelectMode && ViewModel.IsFilled)
+        {
+            _selectedShape.Fill = new SolidColorBrush(color);
+       System.Diagnostics.Debug.WriteLine($"Updated selected shape fill color: {ViewModel.FillColor}");
         }
-   
+        
         System.Diagnostics.Debug.WriteLine($"Fill color changed: {ViewModel.FillColor}");
-    }
-
-    private void FillCheckBox_CheckChanged(object sender, RoutedEventArgs e)
-    {
-      if (_selectedShape != null && _isSelectMode)
-   {
-     if (ViewModel.IsFilled)
-  {
-      // Apply fill color from ViewModel
-       var fillColor = DrawingService.ParseColor(ViewModel.FillColor);
-          _selectedShape.Fill = new SolidColorBrush(fillColor);
-          System.Diagnostics.Debug.WriteLine($"Shape filled with color: {ViewModel.FillColor}");
-          }
-       else
-    {
-           // Remove fill
-    _selectedShape.Fill = null;
-    System.Diagnostics.Debug.WriteLine("Shape fill removed");
-     }
-        }
-        else
-    {
-       // Just updating ViewModel for new shapes
-  System.Diagnostics.Debug.WriteLine($"Fill checkbox changed: {ViewModel.IsFilled}");
-        }
     }
 
     private void DrawingCanvas_PointerMoved(object sender, PointerRoutedEventArgs e)
@@ -605,6 +580,7 @@ _selectedShape.Stroke = new SolidColorBrush(color);
             ShapeType.Circle => DrawingService.CreateEllipse(start, end, strokeColor, thickness, true, isFilled, strokeStyle, fillColor),
             ShapeType.Oval => DrawingService.CreateEllipse(start, end, strokeColor, thickness, false, isFilled, strokeStyle, fillColor),
             ShapeType.Triangle => DrawingService.CreateTriangle(start, end, strokeColor, thickness, isFilled, strokeStyle, fillColor),
+            ShapeType.Polygon => null, // Handled in polygon special case
             _ => null
         };
     }
@@ -790,5 +766,35 @@ System.Diagnostics.Debug.WriteLine($"Stroke style changed: {style}");
         {
             _isShiftPressed = false;
         }
+    }
+
+private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+{
+    if (e.PropertyName == nameof(ViewModel.IsFilled))
+    {
+        OnIsFilledChanged();
+    }
+}
+
+    private void OnIsFilledChanged()
+ {
+        System.Diagnostics.Debug.WriteLine($"IsFilled changed to: {ViewModel.IsFilled}");
+ 
+        if (_selectedShape != null && _isSelectMode)
+   {
+    if (ViewModel.IsFilled)
+     {
+        // Apply fill color from ViewModel
+     var fillColor = DrawingService.ParseColor(ViewModel.FillColor);
+_selectedShape.Fill = new SolidColorBrush(fillColor);
+       System.Diagnostics.Debug.WriteLine($"Shape filled with color: {ViewModel.FillColor}");
+      }
+       else
+ {
+  // Remove fill
+     _selectedShape.Fill = null;
+   System.Diagnostics.Debug.WriteLine("Shape fill removed");
+       }
+  }
     }
 }
