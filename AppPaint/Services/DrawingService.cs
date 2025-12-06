@@ -172,17 +172,49 @@ public class DrawingService
     }
 
     /// <summary>
-    /// Create a Rectangle shape
+    /// Create a Rectangle shape with optimizations
     /// </summary>
-    public static Rectangle CreateRectangle(Point start, Point end, string strokeColor, double thickness, bool isFilled, string strokeStyle = "Solid", string? fillColor = null)
+    public static Rectangle CreateRectangle(Point start, Point end, string strokeColor, double thickness, bool isFilled, string strokeStyle = "Solid", string? fillColor = null, bool snapToSquare = false, double cornerRadius = 0)
     {
+        // Snap to square (equal width/height) if enabled (Shift key)
+        if (snapToSquare)
+        {
+            end = SnapToSquare(start, end);
+        }
+
+        double width = Math.Abs(end.X - start.X);
+        double height = Math.Abs(end.Y - start.Y);
+
+        // Validate minimum size - skip too small rectangles
+        if (width < 1 || height < 1)
+        {
+            // Return minimal rectangle for very small sizes
+            var minRect = new Rectangle
+            {
+                Width = Math.Max(width, 1),
+                Height = Math.Max(height, 1),
+                Stroke = GetBrush(strokeColor),
+                StrokeThickness = thickness,
+                Opacity = 0.5,
+                RadiusX = 0,
+                RadiusY = 0
+            };
+            Canvas.SetLeft(minRect, Math.Min(start.X, end.X));
+            Canvas.SetTop(minRect, Math.Min(start.Y, end.Y));
+            return minRect;
+        }
+
         var rect = new Rectangle
         {
-            Width = Math.Abs(end.X - start.X),
-            Height = Math.Abs(end.Y - start.Y),
-            Stroke = new SolidColorBrush(ParseColor(strokeColor)),
+            Width = width,
+            Height = height,
+            Stroke = GetBrush(strokeColor), // Use cached brush for performance
             StrokeThickness = thickness,
-            StrokeDashArray = GetStrokeDashArray(strokeStyle)
+            StrokeDashArray = GetStrokeDashArray(strokeStyle),
+            StrokeLineJoin = PenLineJoin.Round, // Smooth corners
+            RadiusX = cornerRadius,
+            RadiusY = cornerRadius,
+            UseLayoutRounding = false // Anti-aliasing
         };
 
         Canvas.SetLeft(rect, Math.Min(start.X, end.X));
@@ -190,10 +222,63 @@ public class DrawingService
 
         if (isFilled && !string.IsNullOrEmpty(fillColor))
         {
-            rect.Fill = new SolidColorBrush(ParseColor(fillColor));
+            rect.Fill = GetBrush(fillColor); // Use cached brush
         }
 
         return rect;
+    }
+
+    /// <summary>
+    /// Snap rectangle to square (equal width and height)
+    /// Useful when holding Shift key
+    /// </summary>
+    public static Point SnapToSquare(Point start, Point end)
+    {
+        double width = Math.Abs(end.X - start.X);
+        double height = Math.Abs(end.Y - start.Y);
+        double size = Math.Max(width, height);
+
+        // Maintain drag direction
+        double newX = start.X + (end.X > start.X ? size : -size);
+        double newY = start.Y + (end.Y > start.Y ? size : -size);
+
+        return new Point(newX, newY);
+    }
+
+    /// <summary>
+    /// Get rectangle dimensions
+    /// </summary>
+    public static (double Width, double Height) GetRectangleDimensions(Point start, Point end)
+    {
+        return (Math.Abs(end.X - start.X), Math.Abs(end.Y - start.Y));
+    }
+
+    /// <summary>
+    /// Get rectangle area
+    /// </summary>
+    public static double GetRectangleArea(Point start, Point end)
+    {
+        var (width, height) = GetRectangleDimensions(start, end);
+        return width * height;
+    }
+
+    /// <summary>
+    /// Get rectangle perimeter
+    /// </summary>
+    public static double GetRectanglePerimeter(Point start, Point end)
+    {
+        var (width, height) = GetRectangleDimensions(start, end);
+        return 2 * (width + height);
+    }
+
+    /// <summary>
+    /// Format rectangle info for display
+    /// </summary>
+    public static string GetRectangleInfo(Point start, Point end)
+    {
+        var (width, height) = GetRectangleDimensions(start, end);
+        double area = width * height;
+        return $"W: {width:F1}px  H: {height:F1}px  A: {area:F0}px²";
     }
 
     /// <summary>
