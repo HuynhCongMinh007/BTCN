@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using Data.Models;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using UIShape = Microsoft.UI.Xaml.Shapes.Shape;
 
 namespace AppPaint.Views;
@@ -766,6 +767,266 @@ System.Diagnostics.Debug.WriteLine($"Stroke style changed: {style}");
         {
             _isShiftPressed = false;
         }
+    }
+
+    private async void SaveButton_Click(object sender, RoutedEventArgs e)
+    {
+ // Show dialog to input template name
+        var dialog = new ContentDialog
+        {
+  XamlRoot = this.XamlRoot,
+     Title = "Save Drawing",
+    PrimaryButtonText = "Save",
+     CloseButtonText = "Cancel",
+        DefaultButton = ContentDialogButton.Primary
+  };
+
+ // Create input textbox
+ var stackPanel = new StackPanel { Spacing = 12 };
+        
+        stackPanel.Children.Add(new TextBlock 
+{ 
+   Text = "Enter a name for your drawing:", 
+    FontWeight = Microsoft.UI.Text.FontWeights.SemiBold 
+  });
+
+      var nameTextBox = new TextBox
+{
+   PlaceholderText = "My Drawing",
+ Text = ViewModel.TemplateName,
+  MaxLength = 200
+  };
+        
+ // Auto-generate name if "New Drawing"
+   if (ViewModel.TemplateName == "New Drawing")
+  {
+       nameTextBox.Text = $"Drawing {DateTime.Now:yyyy-MM-dd HH-mm}";
+}
+
+        stackPanel.Children.Add(nameTextBox);
+      
+  // Count shapes on canvas
+      int canvasShapeCount = DrawingCanvas.Children.OfType<UIShape>().Count();
+    
+        // Additional info
+    stackPanel.Children.Add(new TextBlock
+{
+   Text = $"Canvas Size: {ViewModel.CanvasWidth}x{ViewModel.CanvasHeight}",
+     FontSize = 12,
+      Opacity = 0.7
+  });
+  
+  stackPanel.Children.Add(new TextBlock
+ {
+   Text = $"Shapes on canvas: {canvasShapeCount}",
+    FontSize = 12,
+  Opacity = 0.7
+        });
+
+   dialog.Content = stackPanel;
+
+  // Show dialog
+   var result = await dialog.ShowAsync();
+
+   if (result == ContentDialogResult.Primary)
+   {
+    var name = nameTextBox.Text.Trim();
+            
+  if (string.IsNullOrEmpty(name))
+       {
+       // Show error
+        var errorDialog = new ContentDialog
+      {
+      XamlRoot = this.XamlRoot,
+   Title = "Error",
+    Content = "Please enter a name for your drawing.",
+  CloseButtonText = "OK"
+    };
+    await errorDialog.ShowAsync();
+     return;
+      }
+
+    // Update template name
+   ViewModel.TemplateName = name;
+            
+ // Save template and all shapes from canvas
+    await SaveTemplateWithCanvasShapes();
+
+  // Show success message
+   var successDialog = new ContentDialog
+            {
+    XamlRoot = this.XamlRoot,
+    Title = "Success",
+          Content = $"Drawing '{name}' saved with {canvasShapeCount} shapes!",
+       CloseButtonText = "OK"
+    };
+            await successDialog.ShowAsync();
+        }
+ }
+
+    private async Task SaveTemplateWithCanvasShapes()
+    {
+        try
+        {
+    ViewModel.IsBusy = true;
+
+       using var scope = App.Services.CreateScope();
+          var templateService = scope.ServiceProvider.GetRequiredService<ITemplateService>();
+            var shapeService = scope.ServiceProvider.GetRequiredService<IShapeService>();
+
+            // Create or update template
+      DrawingTemplate template;
+        if (ViewModel.CurrentTemplateId.HasValue)
+ {
+       // Update existing template
+  var existingTemplate = await templateService.GetTemplateByIdAsync(ViewModel.CurrentTemplateId.Value);
+                if (existingTemplate != null)
+      {
+                 existingTemplate.Name = ViewModel.TemplateName;
+             existingTemplate.Width = ViewModel.CanvasWidth;
+            existingTemplate.Height = ViewModel.CanvasHeight;
+        existingTemplate.BackgroundColor = ViewModel.BackgroundColor;
+          template = await templateService.UpdateTemplateAsync(existingTemplate);
+   }
+          else
+       {
+template = await CreateNewTemplate(templateService);
+       }
+     }
+            else
+      {
+           template = await CreateNewTemplate(templateService);
+        }
+
+ViewModel.CurrentTemplateId = template.Id;
+
+ // Clear old shapes if updating
+            if (template.Shapes.Any())
+       {
+     foreach (var oldShape in template.Shapes.ToList())
+   {
+     await shapeService.DeleteShapeAsync(oldShape.Id);
+          }
+   }
+
+        // Save all shapes from canvas to database
+        var canvasShapes = DrawingCanvas.Children.OfType<UIShape>().ToList();
+     foreach (var uiShape in canvasShapes)
+     {
+                var shape = ConvertUIShapeToDataModel(uiShape, template.Id);
+      if (shape != null)
+      {
+        await shapeService.CreateShapeAsync(shape);
+                }
+      }
+
+  System.Diagnostics.Debug.WriteLine($"Saved template '{template.Name}' with {canvasShapes.Count} shapes");
+   }
+   catch (Exception ex)
+        {
+         ViewModel.ErrorMessage = $"Error saving: {ex.Message}";
+            System.Diagnostics.Debug.WriteLine($"Save error: {ex}");
+     }
+        finally
+        {
+ ViewModel.IsBusy = false;
+        }
+    }
+
+    private async Task<DrawingTemplate> CreateNewTemplate(ITemplateService templateService)
+    {
+        var template = new DrawingTemplate
+        {
+        Name = ViewModel.TemplateName,
+  Width = ViewModel.CanvasWidth,
+            Height = ViewModel.CanvasHeight,
+            BackgroundColor = ViewModel.BackgroundColor
+        };
+        return await templateService.CreateTemplateAsync(template);
+    }
+
+    private Data.Models.Shape? ConvertUIShapeToDataModel(UIShape uiShape, int templateId)
+    {
+        var shape = new Data.Models.Shape
+     {
+       TemplateId = templateId,
+ CreatedAt = DateTime.Now
+   };
+
+        // Get stroke properties
+        if (uiShape.Stroke is SolidColorBrush strokeBrush)
+        {
+     var color = strokeBrush.Color;
+            shape.Color = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+        }
+
+      shape.StrokeThickness = uiShape.StrokeThickness;
+
+        // Get fill properties
+   shape.IsFilled = uiShape.Fill != null;
+        if (uiShape.Fill is SolidColorBrush fillBrush)
+  {
+         var fillColor = fillBrush.Color;
+      shape.FillColor = $"#{fillColor.R:X2}{fillColor.G:X2}{fillColor.B:X2}";
+   }
+
+  // Convert based on shape type
+        if (uiShape is Line line)
+        {
+  shape.ShapeType = ShapeType.Line;
+       var points = new List<Point> 
+    { 
+         new Point(line.X1, line.Y1), 
+new Point(line.X2, line.Y2) 
+          };
+            shape.PointsData = DrawingService.PointsToJson(points);
+        }
+        else if (uiShape is Microsoft.UI.Xaml.Shapes.Rectangle rect)
+        {
+            shape.ShapeType = ShapeType.Rectangle;
+ double left = Canvas.GetLeft(rect);
+   double top = Canvas.GetTop(rect);
+    var points = new List<Point>
+    {
+     new Point(left, top),
+       new Point(left + rect.Width, top + rect.Height)
+         };
+     shape.PointsData = DrawingService.PointsToJson(points);
+        }
+        else if (uiShape is Ellipse ellipse)
+        {
+            double left = Canvas.GetLeft(ellipse);
+    double top = Canvas.GetTop(ellipse);
+            
+      // Detect if it's a circle (width == height)
+            bool isCircle = Math.Abs(ellipse.Width - ellipse.Height) < 0.1;
+ shape.ShapeType = isCircle ? ShapeType.Circle : ShapeType.Oval;
+   
+   var points = new List<Point>
+         {
+       new Point(left, top),
+   new Point(left + ellipse.Width, top + ellipse.Height)
+          };
+         shape.PointsData = DrawingService.PointsToJson(points);
+        }
+  else if (uiShape is Microsoft.UI.Xaml.Shapes.Polygon polygon)
+        {
+     // Check if it's a triangle (3 points) or polygon
+    shape.ShapeType = polygon.Points.Count == 3 ? ShapeType.Triangle : ShapeType.Polygon;
+  
+            var points = new List<Point>();
+       foreach (var point in polygon.Points)
+            {
+     points.Add(point);
+        }
+     shape.PointsData = DrawingService.PointsToJson(points);
+        }
+     else
+    {
+       return null; // Unknown shape type
+        }
+
+  return shape;
     }
 
 private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
