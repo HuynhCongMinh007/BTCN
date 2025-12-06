@@ -941,166 +941,231 @@ System.Diagnostics.Debug.WriteLine($"Stroke style changed: {style}");
 
     private async void SaveButton_Click(object sender, RoutedEventArgs e)
     {
- // Show dialog to input template name
-        var dialog = new ContentDialog
+        // Count shapes on canvas FIRST
+        int canvasShapeCount = DrawingCanvas.Children.OfType<UIShape>().Count();
+        
+    // Check if we're updating existing drawing or creating new
+  bool isUpdating = ViewModel.CurrentTemplateId.HasValue;
+        string dialogTitle = isUpdating ? "Update Drawing" : "Save Drawing";
+  string dialogMessage = isUpdating 
+            ? $"Update '{ViewModel.TemplateName}'?" 
+         : "Enter a name for your drawing:";
+
+        // Show dialog to confirm save/update
+   var dialog = new ContentDialog
         {
-  XamlRoot = this.XamlRoot,
-     Title = "Save Drawing",
-    PrimaryButtonText = "Save",
-     CloseButtonText = "Cancel",
-        DefaultButton = ContentDialogButton.Primary
-  };
+            XamlRoot = this.XamlRoot,
+   Title = dialogTitle,
+    PrimaryButtonText = isUpdating ? "Update" : "Save",
+            CloseButtonText = "Cancel",
+       DefaultButton = ContentDialogButton.Primary
+ };
 
- // Create input textbox
- var stackPanel = new StackPanel { Spacing = 12 };
-        
+    // Create input panel
+        var stackPanel = new StackPanel { Spacing = 12 };
+
         stackPanel.Children.Add(new TextBlock 
-{ 
-   Text = "Enter a name for your drawing:", 
-    FontWeight = Microsoft.UI.Text.FontWeights.SemiBold 
-  });
+        { 
+   Text = dialogMessage,
+            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold 
+ });
 
-      var nameTextBox = new TextBox
-{
-   PlaceholderText = "My Drawing",
- Text = ViewModel.TemplateName,
-  MaxLength = 200
-  };
-        
- // Auto-generate name if "New Drawing"
-   if (ViewModel.TemplateName == "New Drawing")
-  {
-       nameTextBox.Text = $"Drawing {DateTime.Now:yyyy-MM-dd HH-mm}";
-}
-
-        stackPanel.Children.Add(nameTextBox);
-      
-  // Count shapes on canvas
-      int canvasShapeCount = DrawingCanvas.Children.OfType<UIShape>().Count();
-    
-        // Additional info
-    stackPanel.Children.Add(new TextBlock
-{
-   Text = $"Canvas Size: {ViewModel.CanvasWidth}x{ViewModel.CanvasHeight}",
-     FontSize = 12,
-      Opacity = 0.7
-  });
-  
-  stackPanel.Children.Add(new TextBlock
+        TextBox? nameTextBox = null;
+     if (!isUpdating)
  {
-   Text = $"Shapes on canvas: {canvasShapeCount}",
-    FontSize = 12,
-  Opacity = 0.7
+            // Only show textbox for new drawings
+      nameTextBox = new TextBox
+       {
+PlaceholderText = "My Drawing",
+                Text = ViewModel.TemplateName == "New Drawing" 
+        ? $"Drawing {DateTime.Now:yyyy-MM-dd HH-mm}" 
+     : ViewModel.TemplateName,
+  MaxLength = 200
+   };
+    stackPanel.Children.Add(nameTextBox);
+     }
+      else
+     {
+            // Show current name (read-only) for updates
+       stackPanel.Children.Add(new TextBlock
+        {
+       Text = $"Name: {ViewModel.TemplateName}",
+      Opacity = 0.7
+      });
+ }
+
+        // Additional info
+        stackPanel.Children.Add(new TextBlock
+        {
+    Text = $"Canvas Size: {ViewModel.CanvasWidth}x{ViewModel.CanvasHeight}",
+      FontSize = 12,
+ Opacity = 0.7
         });
 
-   dialog.Content = stackPanel;
+        stackPanel.Children.Add(new TextBlock
+ {
+       Text = $"Shapes on canvas: {canvasShapeCount}",
+      FontSize = 12,
+   Opacity = 0.7
+        });
 
-  // Show dialog
-   var result = await dialog.ShowAsync();
-
-   if (result == ContentDialogResult.Primary)
+        if (isUpdating)
    {
-    var name = nameTextBox.Text.Trim();
-            
-  if (string.IsNullOrEmpty(name))
-       {
-       // Show error
-        var errorDialog = new ContentDialog
-      {
-      XamlRoot = this.XamlRoot,
-   Title = "Error",
-    Content = "Please enter a name for your drawing.",
-  CloseButtonText = "OK"
-    };
-    await errorDialog.ShowAsync();
-     return;
+      stackPanel.Children.Add(new TextBlock
+   {
+    Text = $"⚠️ This will overwrite the existing drawing.",
+       Foreground = new SolidColorBrush(Microsoft.UI.Colors.Orange),
+    FontSize = 12,
+FontWeight = Microsoft.UI.Text.FontWeights.SemiBold
+       });
+ }
+
+        dialog.Content = stackPanel;
+
+        // Show dialog
+     var result = await dialog.ShowAsync();
+
+        if (result == ContentDialogResult.Primary)
+        {
+ string name = ViewModel.TemplateName;
+
+            // Get name from textbox if creating new
+   if (!isUpdating && nameTextBox != null)
+     {
+        name = nameTextBox.Text.Trim();
+       
+    if (string.IsNullOrEmpty(name))
+    {
+          // Show error
+         var errorDialog = new ContentDialog
+   {
+             XamlRoot = this.XamlRoot,
+     Title = "Error",
+              Content = "Please enter a name for your drawing.",
+         CloseButtonText = "OK"
+           };
+      await errorDialog.ShowAsync();
+   return;
+    }
+
+   // Update template name
+   ViewModel.TemplateName = name;
       }
 
-    // Update template name
-   ViewModel.TemplateName = name;
-            
- // Save template and all shapes from canvas
-    await SaveTemplateWithCanvasShapes();
+    // Save/Update template and all shapes from canvas
+       await SaveTemplateWithCanvasShapes();
 
-  // Show success message
-   var successDialog = new ContentDialog
-            {
-    XamlRoot = this.XamlRoot,
-    Title = "Success",
-          Content = $"Drawing '{name}' saved with {canvasShapeCount} shapes!",
+       // Show success message
+       string successMessage = isUpdating 
+     ? $"'{name}' updated successfully with {canvasShapeCount} shapes!"
+       : $"'{name}' saved successfully with {canvasShapeCount} shapes!";
+
+            var successDialog = new ContentDialog
+        {
+  XamlRoot = this.XamlRoot,
+ Title = "Success",
+       Content = successMessage,
        CloseButtonText = "OK"
-    };
-            await successDialog.ShowAsync();
-        }
- }
+         };
+    await successDialog.ShowAsync();
+  }
+    }
 
     private async Task SaveTemplateWithCanvasShapes()
     {
-        try
-        {
+   try
+   {
     ViewModel.IsBusy = true;
 
-       using var scope = App.Services.CreateScope();
-          var templateService = scope.ServiceProvider.GetRequiredService<ITemplateService>();
-            var shapeService = scope.ServiceProvider.GetRequiredService<IShapeService>();
+   using var scope = App.Services.CreateScope();
+            var templateService = scope.ServiceProvider.GetRequiredService<ITemplateService>();
+       var shapeService = scope.ServiceProvider.GetRequiredService<IShapeService>();
 
-            // Create or update template
-      DrawingTemplate template;
-        if (ViewModel.CurrentTemplateId.HasValue)
- {
-       // Update existing template
-  var existingTemplate = await templateService.GetTemplateByIdAsync(ViewModel.CurrentTemplateId.Value);
-                if (existingTemplate != null)
-      {
-                 existingTemplate.Name = ViewModel.TemplateName;
-             existingTemplate.Width = ViewModel.CanvasWidth;
-            existingTemplate.Height = ViewModel.CanvasHeight;
-        existingTemplate.BackgroundColor = ViewModel.BackgroundColor;
+     // Determine if creating new or updating existing
+ DrawingTemplate template;
+        bool isUpdating = ViewModel.CurrentTemplateId.HasValue;
+
+        if (isUpdating)
+        {
+ // UPDATE existing template
+      System.Diagnostics.Debug.WriteLine($"📝 Updating existing drawing ID: {ViewModel.CurrentTemplateId.Value}");
+         
+   var existingTemplate = await templateService.GetTemplateByIdAsync(ViewModel.CurrentTemplateId.Value);
+            if (existingTemplate != null)
+   {
+          // Update template properties
+    existingTemplate.Name = ViewModel.TemplateName;
+       existingTemplate.Width = ViewModel.CanvasWidth;
+        existingTemplate.Height = ViewModel.CanvasHeight;
+   existingTemplate.BackgroundColor = ViewModel.BackgroundColor;
+  existingTemplate.ModifiedAt = DateTime.Now;
+  
           template = await templateService.UpdateTemplateAsync(existingTemplate);
-   }
-          else
-       {
-template = await CreateNewTemplate(templateService);
+    System.Diagnostics.Debug.WriteLine($"✅ Updated template: {template.Name}");
+         }
+     else
+    {
+      // Template not found, create new one instead
+  System.Diagnostics.Debug.WriteLine($"⚠️ Template {ViewModel.CurrentTemplateId.Value} not found, creating new");
+     template = await CreateNewTemplate(templateService);
+       isUpdating = false;
        }
-     }
-            else
-      {
-           template = await CreateNewTemplate(templateService);
-        }
+    }
+        else
+        {
+  // CREATE new template
+            System.Diagnostics.Debug.WriteLine($"📝 Creating new drawing: {ViewModel.TemplateName}");
+      template = await CreateNewTemplate(templateService);
+   }
 
 ViewModel.CurrentTemplateId = template.Id;
 
- // Clear old shapes if updating
-            if (template.Shapes.Any())
-       {
+        // Clear old shapes if updating (to avoid duplicates)
+   if (isUpdating && template.Shapes != null && template.Shapes.Any())
+ {
+   System.Diagnostics.Debug.WriteLine($"🗑️ Clearing {template.Shapes.Count} old shapes");
      foreach (var oldShape in template.Shapes.ToList())
    {
-     await shapeService.DeleteShapeAsync(oldShape.Id);
-          }
-   }
+         await shapeService.DeleteShapeAsync(oldShape.Id);
+      }
+        }
 
         // Save all shapes from canvas to database
-        var canvasShapes = DrawingCanvas.Children.OfType<UIShape>().ToList();
-     foreach (var uiShape in canvasShapes)
-     {
-                var shape = ConvertUIShapeToDataModel(uiShape, template.Id);
-      if (shape != null)
-      {
-        await shapeService.CreateShapeAsync(shape);
-                }
-      }
+  var canvasShapes = DrawingCanvas.Children.OfType<UIShape>().ToList();
+ System.Diagnostics.Debug.WriteLine($"💾 Saving {canvasShapes.Count} shapes to database");
+     
+        int savedCount = 0;
+  foreach (var uiShape in canvasShapes)
+  {
+   var shape = ConvertUIShapeToDataModel(uiShape, template.Id);
+   if (shape != null)
+    {
+       await shapeService.CreateShapeAsync(shape);
+      savedCount++;
+       }
+ }
 
-  System.Diagnostics.Debug.WriteLine($"Saved template '{template.Name}' with {canvasShapes.Count} shapes");
+ System.Diagnostics.Debug.WriteLine($"✅ {(isUpdating ? "Updated" : "Saved")} template '{template.Name}' with {savedCount} shapes");
    }
    catch (Exception ex)
-        {
-         ViewModel.ErrorMessage = $"Error saving: {ex.Message}";
-            System.Diagnostics.Debug.WriteLine($"Save error: {ex}");
-     }
-        finally
-        {
- ViewModel.IsBusy = false;
-        }
+   {
+ ViewModel.ErrorMessage = $"Error saving: {ex.Message}";
+  System.Diagnostics.Debug.WriteLine($"❌ Save error: {ex}");
+        
+     // Show error dialog
+      var errorDialog = new ContentDialog
+      {
+ XamlRoot = this.XamlRoot,
+       Title = "Error",
+      Content = $"Failed to save drawing:\n{ex.Message}",
+   CloseButtonText = "OK"
+        };
+       await errorDialog.ShowAsync();
+ }
+    finally
+ {
+   ViewModel.IsBusy = false;
+}
     }
 
     private async Task<DrawingTemplate> CreateNewTemplate(ITemplateService templateService)
