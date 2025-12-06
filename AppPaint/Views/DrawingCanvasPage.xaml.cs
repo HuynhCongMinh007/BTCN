@@ -66,16 +66,22 @@ public sealed partial class DrawingCanvasPage : Page
     
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
- System.Diagnostics.Debug.WriteLine($"📍 DrawingCanvasPage.OnNavigatedTo - Parameter: {e.Parameter?.GetType().Name ?? "null"}");
+        System.Diagnostics.Debug.WriteLine($"📍 DrawingCanvasPage.OnNavigatedTo - Parameter: {e.Parameter?.GetType().Name ?? "null"}");
   
         base.OnNavigatedTo(e);
-  ViewModel.OnNavigatedTo(e.Parameter);
+     ViewModel.OnNavigatedTo(e.Parameter);
         
-      System.Diagnostics.Debug.WriteLine("✅ ViewModel.OnNavigatedTo called");
+  System.Diagnostics.Debug.WriteLine("✅ ViewModel.OnNavigatedTo called");
  
  // Subscribe to ViewModel.Shapes collection changes to render shapes
 ViewModel.Shapes.CollectionChanged += Shapes_CollectionChanged;
-        
+
+  // Subscribe to ViewModel property changes for background color
+        ViewModel.PropertyChanged += ViewModel_BackgroundChanged;
+ 
+        // Apply background color from ViewModel (from Profile)
+   ApplyBackgroundColor();
+  
   // Render existing shapes if any
   RenderShapesFromViewModel();
     }
@@ -85,10 +91,11 @@ ViewModel.Shapes.CollectionChanged += Shapes_CollectionChanged;
         base.OnNavigatedFrom(e);
 
         // Unsubscribe
-   ViewModel.Shapes.CollectionChanged -= Shapes_CollectionChanged;
+        ViewModel.Shapes.CollectionChanged -= Shapes_CollectionChanged;
+   ViewModel.PropertyChanged -= ViewModel_BackgroundChanged;
+   ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
         ViewModel.NavigateBackRequested -= OnNavigateBackRequested;
         ViewModel.ClearCanvasRequested -= OnClearCanvasRequested;
-    ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
 
         ViewModel.OnNavigatedFrom();
     }
@@ -869,67 +876,33 @@ System.Diagnostics.Debug.WriteLine($"Stroke style changed: {style}");
     }
     }
 
-    private void CanvasSizeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (sender is ComboBox comboBox && comboBox.SelectedItem is ComboBoxItem item)
-        {
-            var size = item.Tag?.ToString() ?? "800x600";
-            var parts = size.Split('x');
-
-            if (parts.Length == 2 &&
-              double.TryParse(parts[0], out double width) &&
-                double.TryParse(parts[1], out double height))
-            {
-                ViewModel.CanvasWidth = width;
-                ViewModel.CanvasHeight = height;
-                ViewModel.SelectedCanvasSize = size;
-
-                System.Diagnostics.Debug.WriteLine($"Canvas size changed: {width}x{height}");
-            }
-        }
-    }
-
     private void ToggleToolbarButton_Click(object sender, RoutedEventArgs e)
     {
         _isToolbarExpanded = !_isToolbarExpanded;
 
-        // Toggle toolbar content visibility
-        ToolbarContent.Visibility = _isToolbarExpanded ? Visibility.Visible : Visibility.Collapsed;
+      // Toggle toolbar content visibility
+    ToolbarContent.Visibility = _isToolbarExpanded ? Visibility.Visible : Visibility.Collapsed;
 
         // Update button icon
         var button = sender as Button;
         if (button?.Content is FontIcon icon)
         {
-            // E700 = GlobalNavigationButton (hamburger)
+    // E700 = GlobalNavigationButton (hamburger)
             // E76C = ChevronUp
             icon.Glyph = _isToolbarExpanded ? "\uE76C" : "\uE700";
         }
 
-        System.Diagnostics.Debug.WriteLine($"Toolbar {(_isToolbarExpanded ? "expanded" : "collapsed")}");
+ System.Diagnostics.Debug.WriteLine($"Toolbar {(_isToolbarExpanded ? "expanded" : "collapsed")}");
     }
 
-    private void BackgroundColorPicker_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
+    private void StrokeThicknessSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
     {
-        var color = args.NewColor;
-        ViewModel.BackgroundColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
-
-        // Update canvas background brush
-        CanvasBackgroundBrush.Color = color;
-
-        // Update button preview color
-        BackgroundColorPreview.Color = color;
-
-        System.Diagnostics.Debug.WriteLine($"Background color changed: {ViewModel.BackgroundColor}");
-    }
-
- private void StrokeThicknessSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
- {
         if (_selectedShape != null && _isSelectMode)
-   {
-   _selectedShape.StrokeThickness = e.NewValue;
- System.Diagnostics.Debug.WriteLine($"Updated selected shape thickness: {e.NewValue}");
-  }
+    {
+            _selectedShape.StrokeThickness = e.NewValue;
+    System.Diagnostics.Debug.WriteLine($"Updated selected shape thickness: {e.NewValue}");
     }
+  }
 
     private void DrawingCanvasPage_KeyUp(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
     {
@@ -1313,5 +1286,35 @@ _selectedShape.Fill = new SolidColorBrush(fillColor);
    System.Diagnostics.Debug.WriteLine("Shape fill removed");
        }
   }
+    }
+
+    /// <summary>
+    /// Handle ViewModel property changes (specifically for BackgroundColor)
+  /// </summary>
+  private void ViewModel_BackgroundChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ViewModel.BackgroundColor))
+        {
+    ApplyBackgroundColor();
+  }
+    }
+
+  /// <summary>
+    /// Apply background color from ViewModel to UI
+    /// </summary>
+    private void ApplyBackgroundColor()
+    {
+        try
+  {
+ var color = DrawingService.ParseColor(ViewModel.BackgroundColor);
+     CanvasBackgroundBrush.Color = color;
+  BackgroundColorPreview.Color = color;
+          
+      System.Diagnostics.Debug.WriteLine($"✅ Applied background color: {ViewModel.BackgroundColor}");
+  }
+        catch (Exception ex)
+   {
+        System.Diagnostics.Debug.WriteLine($"❌ Error applying background color: {ex.Message}");
+        }
     }
 }
