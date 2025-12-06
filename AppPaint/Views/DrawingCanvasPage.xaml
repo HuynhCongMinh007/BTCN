@@ -89,11 +89,21 @@
         Padding="12"
              Margin="0,0,8,0">
             <StackPanel Spacing="8">
-        <TextBlock Text="Shapes" FontSize="12" Opacity="0.7"/>
+    <TextBlock Text="Shapes" FontSize="12" Opacity="0.7"/>
      <StackPanel Orientation="Horizontal" Spacing="4">
-            <ToggleButton x:Name="LineButton" 
+                <!-- Select/Edit Button -->
+           <ToggleButton x:Name="SelectButton" 
+    Width="36" Height="36" 
+         ToolTipService.ToolTip="Select"
+    Click="SelectButton_Click"
+   Tag="Select">
+            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" 
+  Glyph="&#xE71C;"/>
+</ToggleButton>
+   
+    <ToggleButton x:Name="LineButton" 
       Width="36" Height="36" 
-     ToolTipService.ToolTip="Line"
+   ToolTipService.ToolTip="Line"
           Click="ShapeButton_Click"
    Tag="Line">
     <Viewbox Width="18" Height="18">
