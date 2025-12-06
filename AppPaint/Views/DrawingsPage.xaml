@@ -8,61 +8,56 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="Transparent">
 
-    <Grid Padding="24">
-     <Grid.RowDefinitions>
-       <RowDefinition Height="Auto"/>
-           <RowDefinition Height="*"/>
- </Grid.RowDefinitions>
+    <!-- REMOVE Header/Toolbar - chỉ giữ content -->
+    <ScrollViewer>
+   <GridView ItemsSource="{x:Bind ViewModel.Templates, Mode=OneWay}"
+    SelectionMode="None"
+      Padding="0">
+   <GridView.ItemTemplate>
+<DataTemplate x:DataType="models:DrawingTemplate">
+              <Border BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                 BorderThickness="1"
+    CornerRadius="8"
+           Width="280"
+          Height="240"
+                 Padding="16"
+           Margin="8">
+ <Grid>
+           <Grid.RowDefinitions>
+        <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
 
-        <!-- Header -->
-     <TextBlock Grid.Row="0" 
-         Text="Saved Drawings"
- Style="{StaticResource TitleLargeTextBlockStyle}"
-      Margin="0,0,0,24"/>
-
-  <!-- Drawings Grid -->
-  <ScrollViewer Grid.Row="1">
-        <GridView ItemsSource="{x:Bind ViewModel.Templates, Mode=OneWay}"
-           SelectionMode="None">
-     <GridView.ItemTemplate>
-          <DataTemplate x:DataType="models:DrawingTemplate">
-        <Border BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-   BorderThickness="1"
-        CornerRadius="8"
-   Width="280" Height="240"
-    Padding="16"
-         Margin="8">
-  <Grid>
- <Grid.RowDefinitions>
-   <RowDefinition Height="*"/>
-       <RowDefinition Height="Auto"/>
-       </Grid.RowDefinitions>
-
-   <!-- Info -->
- <StackPanel Grid.Row="0" Spacing="8">
-        <TextBlock Text="{x:Bind Name}" 
-     FontWeight="SemiBold"
-   FontSize="18"/>
-       <TextBlock Text="{x:Bind Shapes.Count}" 
- Opacity="0.7"/>
-   </StackPanel>
-
-                 <!-- Actions -->
-           <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
-        <Button Content="Open" 
-        Click="LoadDrawing_Click"
-       Tag="{x:Bind}"/>
-                <Button Content="Delete"
-   Click="DeleteDrawing_Click"
-            Tag="{x:Bind}"/>
+        <!-- Info -->
+         <StackPanel Grid.Row="0" Spacing="8">
+  <TextBlock Text="{x:Bind Name}" 
+               FontWeight="SemiBold"
+              FontSize="18"/>
+      <TextBlock Opacity="0.7">
+       <Run Text="{x:Bind Shapes.Count}"/>
+<Run Text="shape(s)"/>
+    </TextBlock>
+          <TextBlock Text="{x:Bind CreatedAt}" 
+    FontSize="12"
+          Opacity="0.5"/>
      </StackPanel>
-      </Grid>
-     </Border>
-</DataTemplate>
+
+ <!-- Actions -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+      <Button Content="Open" 
+          Click="LoadDrawing_Click"
+ Tag="{x:Bind}"
+  Style="{StaticResource AppAccentButtonStyle}"/>
+     <Button Content="Delete"
+ Click="DeleteDrawing_Click"
+   Tag="{x:Bind}"/>
+   </StackPanel>
+   </Grid>
+        </Border>
+          </DataTemplate>
       </GridView.ItemTemplate>
- </GridView>
-      </ScrollViewer>
- </Grid>
+   </GridView>
+    </ScrollViewer>
 </Page>
