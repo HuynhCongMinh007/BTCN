@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="AppPaint.Views.ShellPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:AppPaint.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <!-- Entrance Animation -->
+        <Storyboard x:Name="EntranceAnimation">
+            <DoubleAnimation Storyboard.TargetName="ContentFrame"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0" To="1"
+                             Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- BreadcrumbBar Header -->
+        <Grid Grid.Row="0" 
+              Background="{ThemeResource LayerFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+              BorderThickness="0,0,0,1"
+              Padding="16,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <BreadcrumbBar x:Name="BreadcrumbNav" 
+                           Grid.Column="0"
+                           VerticalAlignment="Center">
+                <BreadcrumbBar.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <TextBlock Text="{x:Bind}" FontWeight="SemiBold"/>
+                    </DataTemplate>
+                </BreadcrumbBar.ItemTemplate>
+            </BreadcrumbBar>
+
+            <!-- Theme Toggle with Icon -->
+            <StackPanel Grid.Column="1" 
+                        Orientation="Horizontal" 
+                        Spacing="12">
+                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                          Glyph="&#xE793;"
+                          FontSize="16"
+                          VerticalAlignment="Center"
+                          Opacity="0.8"/>
+                <TextBlock Text="Theme:" 
+                           VerticalAlignment="Center"/>
+                <ToggleSwitch x:Name="ThemeToggle"
+                              OffContent="Light"
+                              OnContent="Dark"
+                              Toggled="ThemeToggle_Toggled"
+                              MinWidth="0">
+                    <ToggleSwitch.OnContentTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                          Glyph="&#xE708;"
+                                          FontSize="14"/>
+                                <TextBlock Text="Dark"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ToggleSwitch.OnContentTemplate>
+                    <ToggleSwitch.OffContentTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                          Glyph="&#xE706;"
+                                          FontSize="14"/>
+                                <TextBlock Text="Light"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ToggleSwitch.OffContentTemplate>
+                </ToggleSwitch>
+            </StackPanel>
+        </Grid>
+
+        <!-- NavigationView with Fluent Icons -->
+        <NavigationView x:Name="NavView"
+                        Grid.Row="1"
+                        IsBackButtonVisible="Auto"
+                        BackRequested="NavView_BackRequested"
+                        ItemInvoked="NavView_ItemInvoked"
+                        PaneDisplayMode="Left"
+                        IsSettingsVisible="False"
+                        IsPaneToggleButtonVisible="True"
+                        OpenPaneLength="240"
+                        CompactPaneLength="48">
+
+            <NavigationView.MenuItems>
+                <!-- Home -->
+                <NavigationViewItem Content="Home" 
+                                    Tag="Home"
+                                    ToolTipService.ToolTip="Go to Home Dashboard">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                  Glyph="&#xE80F;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItemSeparator/>
+
+                <!-- Draw Canvas -->
+                <NavigationViewItem Content="Draw Canvas" 
+                                    Tag="DrawingCanvas"
+                                    ToolTipService.ToolTip="Create new drawings">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                  Glyph="&#xE70F;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <!-- Templates -->
+                <NavigationViewItem Content="Templates" 
+                                    Tag="Templates"
+                                    ToolTipService.ToolTip="Manage templates">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                  Glyph="&#xE8B7;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItemSeparator/>
+
+                <!-- Profile -->
+                <NavigationViewItem Content="Profile" 
+                                    Tag="Profile"
+                                    ToolTipService.ToolTip="Manage profile and settings">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                  Glyph="&#xE77B;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <!-- Content Frame with Animation -->
+            <Frame x:Name="ContentFrame" 
+                   Navigated="ContentFrame_Navigated">
+                <Frame.ContentTransitions>
+                    <TransitionCollection>
+                        <NavigationThemeTransition>
+                            <NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                                <EntranceNavigationTransitionInfo/>
+                            </NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                        </NavigationThemeTransition>
+                    </TransitionCollection>
+                </Frame.ContentTransitions>
+            </Frame>
+
+        </NavigationView>
+    </Grid>
+</Page>

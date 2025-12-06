@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="AppPaint.Views.TemplateManagerPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:local="using:AppPaint.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+ Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+  <Grid Style="{StaticResource PageContainerStyle}">
+        <Grid.RowDefinitions>
+   <RowDefinition Height="Auto"/>
+ <RowDefinition Height="*"/>
+ </Grid.RowDefinitions>
+
+        <!-- Page Header -->
+        <StackPanel Grid.Row="0" Style="{StaticResource PageHeaderStyle}">
+   <StackPanel Orientation="Horizontal" Spacing="12">
+      <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" 
+    Glyph="&#xE8B7;" 
+    FontSize="32"
+      Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+   VerticalAlignment="Center"/>
+      <TextBlock Text="Template Manager" 
+          Style="{StaticResource TitleLargeTextBlockStyle}"
+  FontWeight="Bold"
+      VerticalAlignment="Center"/>
+</StackPanel>
+  <TextBlock Text="Browse, manage, and load your saved drawing templates"
+        Style="{StaticResource BodyTextBlockStyle}"
+   Opacity="0.7"/>
+    </StackPanel>
+
+ <!-- Content Area -->
+ <Grid Grid.Row="1">
+   <Grid.RowDefinitions>
+     <RowDefinition Height="Auto"/>
+    <RowDefinition Height="*"/>
+   </Grid.RowDefinitions>
+
+   <!-- Toolbar -->
+   <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,16">
+      <Button Style="{StaticResource AppAccentButtonStyle}">
+   <StackPanel Orientation="Horizontal" Spacing="8">
+      <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE710;"/>
+       <TextBlock Text="New Template"/>
+    </StackPanel>
+      </Button>
+     
+   <Button>
+    <StackPanel Orientation="Horizontal" Spacing="8">
+         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE72C;"/>
+      <TextBlock Text="Refresh"/>
+    </StackPanel>
+      </Button>
+
+    <Border Width="1" Background="{ThemeResource CardStrokeColorDefaultBrush}"/>
+     
+     <ComboBox x:Name="SortComboBox" 
+       Header="Sort by" 
+     PlaceholderText="Select"
+   MinWidth="150">
+     <ComboBoxItem Content="Date Created" IsSelected="True"/>
+        <ComboBoxItem Content="Name"/>
+      <ComboBoxItem Content="Size"/>
+ </ComboBox>
+   </StackPanel>
+
+      <!-- Templates Grid -->
+   <ScrollViewer Grid.Row="1">
+      <GridView x:Name="TemplatesGridView"
+        SelectionMode="Single"
+    ItemsSource="{x:Bind}"
+       Padding="0">
+      <GridView.ItemTemplate>
+    <DataTemplate>
+  <Border Style="{StaticResource AppCardStyle}" 
+  Width="300" Height="250"
+    Margin="8">
+   <Grid>
+   <Grid.RowDefinitions>
+    <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+     <RowDefinition Height="Auto"/>
+  </Grid.RowDefinitions>
+
+ <!-- Preview -->
+     <Border Grid.Row="0" 
+    Background="{ThemeResource LayerFillColorDefaultBrush}"
+   CornerRadius="4"
+    Margin="0,0,0,12">
+         <Grid>
+       <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" 
+      Glyph="&#xE8B7;" 
+           FontSize="48"
+      Opacity="0.2"
+    HorizontalAlignment="Center"
+     VerticalAlignment="Center"/>
+        <TextBlock Text="Preview" 
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+   Opacity="0.5"/>
+ </Grid>
+</Border>
+
+      <!-- Template Info -->
+      <StackPanel Grid.Row="1" Spacing="4" Margin="0,0,0,12">
+      <TextBlock Text="Template Name" 
+ FontWeight="SemiBold"
+     FontSize="16"/>
+     <TextBlock Text="Created: 2025-01-05" 
+        Style="{StaticResource CaptionTextBlockStyle}"
+       Opacity="0.7"/>
+   </StackPanel>
+
+       <!-- Actions -->
+       <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8">
+      <Button Style="{StaticResource AppAccentButtonStyle}" 
+      HorizontalAlignment="Stretch">
+     <StackPanel Orientation="Horizontal" Spacing="6">
+       <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" 
+ Glyph="&#xE8E5;" FontSize="14"/>
+  <TextBlock Text="Load"/>
+  </StackPanel>
+      </Button>
+     <Button>
+      <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" 
+   Glyph="&#xE70F;"/>
+       </Button>
+    <Button>
+      <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" 
+     Glyph="&#xE74D;"/>
+      </Button>
+      </StackPanel>
+   </Grid>
+       </Border>
+   </DataTemplate>
+       </GridView.ItemTemplate>
+
+    <!-- Empty State -->
+      <GridView.Footer>
+      <StackPanel x:Name="EmptyState" 
+      Style="{StaticResource EmptyStateStyle}"
+    MinHeight="400">
+   <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" 
+      Glyph="&#xE8B7;" 
+    FontSize="72"
+   Opacity="0.2"/>
+      <TextBlock Text="No templates yet" 
+   Style="{StaticResource TitleTextBlockStyle}"
+      Opacity="0.6"/>
+       <TextBlock Text="Create your first template by saving a drawing" 
+    Opacity="0.5"
+        TextAlignment="Center"/>
+     <Button Style="{StaticResource AppAccentButtonStyle}" 
+      Margin="0,16,0,0">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+     <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE710;"/>
+    <TextBlock Text="Create Template"/>
+     </StackPanel>
+   </Button>
+       </StackPanel>
+   </GridView.Footer>
+   </GridView>
+     </ScrollViewer>
+  </Grid>
+    </Grid>
+</Page>
