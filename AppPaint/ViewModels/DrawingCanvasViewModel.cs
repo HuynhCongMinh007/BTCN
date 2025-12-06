@@ -23,6 +23,9 @@ public partial class DrawingCanvasViewModel : BaseViewModel
     private string _selectedColor = "#000000";
 
     [ObservableProperty]
+    private string _fillColor = "#FFFF00"; // Default yellow fill
+
+    [ObservableProperty]
     private string _backgroundColor = "#FFFFFF";
 
     [ObservableProperty]

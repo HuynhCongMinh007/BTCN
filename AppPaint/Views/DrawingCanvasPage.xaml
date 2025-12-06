@@ -226,20 +226,46 @@
            
         <!-- Style & Fill -->
          <StackPanel Grid.Column="2" Spacing="4">
-           <TextBlock Text="Style" FontSize="11" Opacity="0.6"/>
-           <StackPanel Spacing="4">
-          <ComboBox x:Name="StrokeStyleComboBox"
+    <TextBlock Text="Options" FontSize="11" Opacity="0.6"/>
+       <StackPanel Spacing="4">
+    <ComboBox x:Name="StrokeStyleComboBox"
  SelectedIndex="0"
              SelectionChanged="StrokeStyleComboBox_SelectionChanged"
-             MinWidth="100">
-            <ComboBoxItem Content="Solid" Tag="Solid"/>
-        <ComboBoxItem Content="Dash" Tag="Dash"/>
+      MinWidth="100">
+  <ComboBoxItem Content="Solid" Tag="Solid"/>
+     <ComboBoxItem Content="Dash" Tag="Dash"/>
   <ComboBoxItem Content="Dot" Tag="Dot"/>
      <ComboBoxItem Content="Dash-Dot" Tag="DashDot"/>
     </ComboBox>
+        
+     <!-- Fill Option with Color Picker -->
+         <Grid>
+         <Grid.ColumnDefinitions>
+    <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="Auto"/>
+       </Grid.ColumnDefinitions>
+ 
         <CheckBox x:Name="FillCheckBox" 
-           Content="Fill" FontSize="11"
-         IsChecked="{x:Bind ViewModel.IsFilled, Mode=TwoWay}"/>
+  Grid.Column="0"
+  Content="Fill" 
+   FontSize="11"
+         VerticalAlignment="Center"
+    IsChecked="{x:Bind ViewModel.IsFilled, Mode=TwoWay}"/>
+            
+     <!-- Fill Color Picker (visible when Fill is checked) -->
+       <ColorPicker x:Name="FillColorPicker"
+               Grid.Column="1"
+            Margin="4,0,0,0"
+    ColorSpectrumShape="Ring"
+    IsColorSliderVisible="False"
+    IsColorChannelTextInputVisible="False"
+    IsHexInputVisible="False"
+ IsAlphaEnabled="False"
+         ColorChanged="FillColorPicker_ColorChanged"
+            Width="24" 
+     Height="24"
+              Visibility="{x:Bind FillCheckBox.IsChecked, Mode=OneWay}"/>
+      </Grid>
        </StackPanel>
        </StackPanel>
   </Grid>

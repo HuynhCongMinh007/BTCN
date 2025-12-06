@@ -178,8 +178,8 @@ DrawingCanvas.Children.Add(_previewShape);
         var strokeColor = ViewModel.SelectedColor;
 var thickness = ViewModel.StrokeThickness;
     var isFilled = ViewModel.IsFilled;
-   var fillColor = ViewModel.SelectedColor;
-    var strokeStyle = ViewModel.StrokeStyle;
+        var fillColor = ViewModel.SelectedColor; // Use same color for now
+   var strokeStyle = ViewModel.StrokeStyle;
 
    if (isPreview)
       {
@@ -202,47 +202,47 @@ var thickness = ViewModel.StrokeThickness;
 
     private async void SaveShapeToDatabase(Point start, Point end, ShapeType shapeType)
     {
-        var points = new List<Point> { start, end };
-        var pointsJson = DrawingService.PointsToJson(points);
+      var points = new List<Point> { start, end };
+     var pointsJson = DrawingService.PointsToJson(points);
 
         var shape = new Data.Models.Shape
-        {
+   {
     ShapeType = shapeType,
     PointsData = pointsJson,
     Color = ViewModel.SelectedColor,
     StrokeThickness = ViewModel.StrokeThickness,
-            IsFilled = ViewModel.IsFilled,
-       FillColor = ViewModel.IsFilled ? ViewModel.SelectedColor : null,
-            TemplateId = ViewModel.CurrentTemplateId,
+    IsFilled = ViewModel.IsFilled,
+    FillColor = ViewModel.IsFilled ? ViewModel.SelectedColor : null, // Use same color
+  TemplateId = ViewModel.CurrentTemplateId,
     CreatedAt = DateTime.Now
         };
 
-        await ViewModel.AddShapeCommand.ExecuteAsync(shape);
+    await ViewModel.AddShapeCommand.ExecuteAsync(shape);
   }
 
     private void FinishPolygonButton_Click(object sender, RoutedEventArgs e)
     {
     if (_polygonPoints.Count < 3)
 {
-            System.Diagnostics.Debug.WriteLine("Need at least 3 points to create polygon");
+   System.Diagnostics.Debug.WriteLine("Need at least 3 points to create polygon");
     return;
-        }
+     }
 
         // Remove preview markers and lines
         foreach (var line in _polygonPreviewLines)
         {
             DrawingCanvas.Children.Remove(line);
-        }
+     }
         _polygonPreviewLines.Clear();
 
-        // Remove markers (small circles)
+     // Remove markers (small circles)
       var markersToRemove = DrawingCanvas.Children
   .OfType<Ellipse>()
    .Where(e => e.Width == 8 && e.Height == 8)
           .ToList();
         foreach (var marker in markersToRemove)
         {
-            DrawingCanvas.Children.Remove(marker);
+        DrawingCanvas.Children.Remove(marker);
   }
 
       // Create final polygon
@@ -251,8 +251,8 @@ var thickness = ViewModel.StrokeThickness;
             ViewModel.SelectedColor,
             ViewModel.StrokeThickness,
   ViewModel.IsFilled,
-      ViewModel.StrokeStyle,
-  ViewModel.SelectedColor
+    ViewModel.StrokeStyle,
+       ViewModel.SelectedColor // Use same color
      );
 
         DrawingCanvas.Children.Add(polygon);
@@ -261,22 +261,22 @@ var thickness = ViewModel.StrokeThickness;
         var pointsJson = DrawingService.PointsToJson(_polygonPoints);
         var shape = new Data.Models.Shape
         {
-      ShapeType = ShapeType.Polygon,
+  ShapeType = ShapeType.Polygon,
    PointsData = pointsJson,
      Color = ViewModel.SelectedColor,
-          StrokeThickness = ViewModel.StrokeThickness,
-        IsFilled = ViewModel.IsFilled,
-            FillColor = ViewModel.IsFilled ? ViewModel.SelectedColor : null,
-            TemplateId = ViewModel.CurrentTemplateId,
+    StrokeThickness = ViewModel.StrokeThickness,
+      IsFilled = ViewModel.IsFilled,
+  FillColor = ViewModel.IsFilled ? ViewModel.SelectedColor : null, // Use same color
+       TemplateId = ViewModel.CurrentTemplateId,
      CreatedAt = DateTime.Now
     };
 
-        ViewModel.AddShapeCommand.ExecuteAsync(shape);
+   ViewModel.AddShapeCommand.ExecuteAsync(shape);
 
-        // Reset
+      // Reset
         _polygonPoints.Clear();
-        FinishPolygonButton.Visibility = Visibility.Collapsed;
-    }
+FinishPolygonButton.Visibility = Visibility.Collapsed;
+  }
 
     private void OnClearCanvasRequested(object? sender, EventArgs e)
     {
@@ -326,7 +326,13 @@ RectangleButton.IsChecked = false;
     private void StrokeColorPicker_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
     {
         var color = args.NewColor;
-        ViewModel.SelectedColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+   ViewModel.SelectedColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+    }
+
+    private void FillColorPicker_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
+  {
+   // Currently uses same color as stroke
+   // Future: can implement separate fill color
     }
 
     private void StrokeStyleComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
