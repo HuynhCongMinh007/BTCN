@@ -100,15 +100,30 @@ if (selectedItem != null)
 
     private void UpdateBreadcrumb(string tag, string title)
     {
-_breadcrumbs.Clear();
+        _breadcrumbs.Clear();
         _breadcrumbs.Add(("Home", "Home"));
    
- if (tag != "Home")
- {
-_breadcrumbs.Add((tag, title));
- }
+        if (tag != "Home")
+        {
+            _breadcrumbs.Add((tag, title));
+  }
 
-  BreadcrumbNav.ItemsSource = _breadcrumbs.Select(b => b.Title).ToList();
+ BreadcrumbNav.ItemsSource = _breadcrumbs.Select(b => b.Title).ToList();
+    }
+
+    /// <summary>
+    /// Add sub-page to breadcrumb (for Management tabs)
+    /// </summary>
+    public void UpdateBreadcrumbWithSubPage(string parentTag, string parentTitle, string subPageTitle)
+    {
+    _breadcrumbs.Clear();
+        _breadcrumbs.Add(("Home", "Home"));
+     _breadcrumbs.Add((parentTag, parentTitle));
+      _breadcrumbs.Add(("SubPage", subPageTitle));
+
+    BreadcrumbNav.ItemsSource = _breadcrumbs.Select(b => b.Title).ToList();
+    
+        System.Diagnostics.Debug.WriteLine($"🍞 Breadcrumb: Home > {parentTitle} > {subPageTitle}");
     }
 
     private async void ThemeToggle_Toggled(object sender, RoutedEventArgs e)
