@@ -18,35 +18,35 @@ public sealed partial class DrawingsPage : Page
     public DrawingsPage()
     {
         ViewModel = App.Services.GetRequiredService<TemplateManagerViewModel>();
-   this.DataContext = ViewModel;
-        
+        this.DataContext = ViewModel;
+
         // Subscribe to events
         ViewModel.LoadTemplateRequested += OnLoadTemplateRequested;
-        
-     this.InitializeComponent();
+
+        this.InitializeComponent();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        
+
         // Pass false to load DRAWINGS (IsTemplate = false), not templates!
         ViewModel.OnNavigatedTo(false);
     }
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
-{
+    {
         base.OnNavigatedFrom(e);
-      
+
         // Unsubscribe
-      ViewModel.LoadTemplateRequested -= OnLoadTemplateRequested;
-        
+        ViewModel.LoadTemplateRequested -= OnLoadTemplateRequested;
+
         ViewModel.OnNavigatedFrom();
     }
 
     private void OnLoadTemplateRequested(object? sender, int templateId)
     {
-     // Navigate using Shell's main frame
+        // Navigate using Shell's main frame
         NavigateToDrawingCanvas(templateId);
     }
 
@@ -54,132 +54,132 @@ public sealed partial class DrawingsPage : Page
     {
         if (sender is Button button && button.Tag is DrawingTemplate drawing)
         {
-       // Navigate using Shell's main frame
+            // Navigate using Shell's main frame
             NavigateToDrawingCanvas(drawing.Id);
         }
     }
 
     private async void DeleteDrawing_Click(object sender, RoutedEventArgs e)
     {
-   if (sender is Button button && button.Tag is DrawingTemplate drawing)
+        if (sender is Button button && button.Tag is DrawingTemplate drawing)
         {
             await ShowDeleteConfirmationAndDelete(drawing);
- }
+        }
     }
 
     private async Task ShowDeleteConfirmationAndDelete(DrawingTemplate drawing)
     {
         var dialog = new ContentDialog
-  {
-  XamlRoot = this.XamlRoot,
-        Title = "Delete Drawing?",
-          Content = $"Are you sure you want to delete '{drawing.Name}'?\n\n" +
+        {
+            XamlRoot = this.XamlRoot,
+            Title = "Delete Drawing?",
+            Content = $"Are you sure you want to delete '{drawing.Name}'?\n\n" +
     $"This will delete {drawing.Shapes.Count} shape(s).\n\n" +
    $"This action cannot be undone.",
-     PrimaryButtonText = "Delete",
-      CloseButtonText = "Cancel",
+            PrimaryButtonText = "Delete",
+            CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Close
-};
+        };
 
- var result = await dialog.ShowAsync();
+        var result = await dialog.ShowAsync();
 
         if (result == ContentDialogResult.Primary)
         {
-     // Execute delete command
-        await ViewModel.DeleteTemplateCommand.ExecuteAsync(drawing);
-     
+            // Execute delete command
+            await ViewModel.DeleteTemplateCommand.ExecuteAsync(drawing);
+
             // Show success message
-var successDialog = new ContentDialog
-  {
- XamlRoot = this.XamlRoot,
-      Title = "Deleted",
-         Content = $"'{drawing.Name}' has been deleted successfully.",
-       CloseButtonText = "OK"
-   };
+            var successDialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "Deleted",
+                Content = $"'{drawing.Name}' has been deleted successfully.",
+                CloseButtonText = "OK"
+            };
             await successDialog.ShowAsync();
-   }
+        }
     }
 
     private void NavigateToDrawingCanvas(int? drawingId)
     {
-    System.Diagnostics.Debug.WriteLine($"🎯 DrawingsPage.NavigateToDrawingCanvas - DrawingId: {drawingId}");
-        
+        System.Diagnostics.Debug.WriteLine($"🎯 DrawingsPage.NavigateToDrawingCanvas - DrawingId: {drawingId}");
+
         // Get MainWindow via static property
-   if (App.MainWindow is MainWindow mainWindow)
-    {
-  System.Diagnostics.Debug.WriteLine("✅ Got MainWindow");
-     
-     // Get RootFrame from MainWindow (defined in MainWindow.xaml)
-        var rootFrame = mainWindow.Content as Grid;
-   if (rootFrame != null)
+        if (App.MainWindow is MainWindow mainWindow)
+        {
+            System.Diagnostics.Debug.WriteLine("✅ Got MainWindow");
+
+            // Get RootFrame from MainWindow (defined in MainWindow.xaml)
+            var rootFrame = mainWindow.Content as Grid;
+            if (rootFrame != null)
             {
-       // Find RootFrame by name
-  var frameElement = rootFrame.FindName("RootFrame") as Frame;
-       if (frameElement != null && frameElement.Content is ShellPage shellPage)
-        {
-         System.Diagnostics.Debug.WriteLine("✅ Got ShellPage via RootFrame");
-      
-   // Get drawing to extract ProfileId
-     if (drawingId.HasValue)
-         {
-       // Find drawing in ViewModel
-        var drawing = ViewModel.Templates.FirstOrDefault(d => d.Id == drawingId.Value);
-             if (drawing != null)
-      {
-         System.Diagnostics.Debug.WriteLine($"✅ Found drawing: {drawing.Name}");
-      
-       // TODO: Drawing should have ProfileId! For now, use active profile
-    // This is a temporary solution - we need to add ProfileId to DrawingTemplate
-     var parameters = new AppPaint.Models.DrawingNavigationParameters(
-    profileId: 1, // TEMPORARY - should get from drawing.ProfileId
- drawingId: drawingId
-             );
-          
-         System.Diagnostics.Debug.WriteLine($"✅ Created parameters: ProfileId={parameters.ProfileId}, DrawingId={parameters.DrawingId}");
-           
-  shellPage.NavigateToDrawingCanvas(parameters);
-             System.Diagnostics.Debug.WriteLine("✅ Navigation called!");
-      return;
-             }
-             else
-        {
-           System.Diagnostics.Debug.WriteLine($"❌ Drawing {drawingId} not found in ViewModel");
-   }
-       }
-         
-    // Fallback: Navigate with drawing ID only (old behavior)
-     System.Diagnostics.Debug.WriteLine("⚠️ Using fallback navigation");
-      shellPage.NavigateToDrawingCanvas(drawingId);
-          }
-      else
-       {
-          System.Diagnostics.Debug.WriteLine("❌ Could not get ShellPage from RootFrame");
+                // Find RootFrame by name
+                var frameElement = rootFrame.FindName("RootFrame") as Frame;
+                if (frameElement != null && frameElement.Content is ShellPage shellPage)
+                {
+                    System.Diagnostics.Debug.WriteLine("✅ Got ShellPage via RootFrame");
+
+                    // Get drawing to extract ProfileId
+                    if (drawingId.HasValue)
+                    {
+                        // Find drawing in ViewModel
+                        var drawing = ViewModel.Templates.FirstOrDefault(d => d.Id == drawingId.Value);
+                        if (drawing != null)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"✅ Found drawing: {drawing.Name}");
+
+                            // TODO: Drawing should have ProfileId! For now, use active profile
+                            // This is a temporary solution - we need to add ProfileId to DrawingTemplate
+                            var parameters = new AppPaint.Models.DrawingNavigationParameters(
+                           profileId: 1, // TEMPORARY - should get from drawing.ProfileId
+                        drawingId: drawingId
+                                    );
+
+                            System.Diagnostics.Debug.WriteLine($"✅ Created parameters: ProfileId={parameters.ProfileId}, DrawingId={parameters.DrawingId}");
+
+                            shellPage.NavigateToDrawingCanvas(parameters);
+                            System.Diagnostics.Debug.WriteLine("✅ Navigation called!");
+                            return;
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine($"❌ Drawing {drawingId} not found in ViewModel");
+                        }
+                    }
+
+                    // Fallback: Navigate with drawing ID only (old behavior)
+                    System.Diagnostics.Debug.WriteLine("⚠️ Using fallback navigation");
+                    shellPage.NavigateToDrawingCanvas(drawingId);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("❌ Could not get ShellPage from RootFrame");
+                }
             }
-  }
-     else
-    {
-    System.Diagnostics.Debug.WriteLine("❌ MainWindow.Content is not Grid");
-   }
-  }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("❌ MainWindow.Content is not Grid");
+            }
+        }
         else
         {
-   System.Diagnostics.Debug.WriteLine("❌ Could not get MainWindow");
+            System.Diagnostics.Debug.WriteLine("❌ Could not get MainWindow");
         }
     }
 
     private async void RefreshButton_Click(object sender, RoutedEventArgs e)
     {
-      await ViewModel.LoadTemplatesCommand.ExecuteAsync(null);
+        await ViewModel.LoadTemplatesCommand.ExecuteAsync(null);
     }
 
     private void SortComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-   if (sender is ComboBox comboBox && comboBox.SelectedItem is ComboBoxItem item)
-  {
-       string tag = item.Tag?.ToString() ?? "Date";
-            
-    // TODO: Implement sorting logic
+        if (sender is ComboBox comboBox && comboBox.SelectedItem is ComboBoxItem item)
+        {
+            string tag = item.Tag?.ToString() ?? "Date";
+
+            // TODO: Implement sorting logic
             System.Diagnostics.Debug.WriteLine($"Sort by: {tag}");
         }
-}
+    }
 }
