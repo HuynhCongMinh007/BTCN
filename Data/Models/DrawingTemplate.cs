@@ -15,12 +15,15 @@ public class DrawingTemplate
     public double Width { get; set; } = 800;
  
     public double Height { get; set; } = 600;
-    
- // Background color in hex format
+  
+    // Background color in hex format
     public string BackgroundColor { get; set; } = "#FFFFFF";
     
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    // Is this a reusable template (vs a saved drawing)?
+    public bool IsTemplate { get; set; } = false;
     
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+  
     public DateTime? ModifiedAt { get; set; }
     
     // Navigation property
