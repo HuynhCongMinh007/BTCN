@@ -15,28 +15,75 @@ namespace AppPaint.Services;
 public class DrawingService
 {
     /// <summary>
-    /// Create a Line shape
+    /// Create a Line shape with optimizations
     /// </summary>
-    public static Line CreateLine(Point start, Point end, string color, double thickness, string strokeStyle = "Solid")
+    public static Line CreateLine(Point start, Point end, string color, double thickness, string strokeStyle = "Solid", bool snapToAngle = false)
     {
+        // Snap to 45-degree angles if enabled (hold Shift key)
+        if (snapToAngle)
+        {
+            end = SnapToAngle(start, end);
+        }
+
+        // Validate points - skip zero-length lines for performance
+        if (Math.Abs(end.X - start.X) < 0.01 && Math.Abs(end.Y - start.Y) < 0.01)
+        {
+            // Return minimal line for very short distances
+            var minLine = new Line
+            {
+                X1 = start.X,
+                Y1 = start.Y,
+                X2 = start.X + 0.1,
+                Y2 = start.Y + 0.1,
+                Stroke = new SolidColorBrush(ParseColor(color)),
+                StrokeThickness = thickness,
+                Opacity = 0.5
+            };
+            return minLine;
+        }
+
         var line = new Line
-     {
+        {
             X1 = start.X,
-     Y1 = start.Y,
- X2 = end.X,
-   Y2 = end.Y,
-    Stroke = new SolidColorBrush(ColorHelper.FromArgb(
-255,
-  Convert.ToByte(color.Substring(1, 2), 16),
- Convert.ToByte(color.Substring(3, 2), 16),
-  Convert.ToByte(color.Substring(5, 2), 16)
-            )),
+            Y1 = start.Y,
+            X2 = end.X,
+            Y2 = end.Y,
+            Stroke = new SolidColorBrush(ParseColor(color)), // Use ParseColor for consistency
             StrokeThickness = thickness,
             StrokeStartLineCap = PenLineCap.Round,
             StrokeEndLineCap = PenLineCap.Round,
- StrokeDashArray = GetStrokeDashArray(strokeStyle)
-    };
-  return line;
+            StrokeLineJoin = PenLineJoin.Round, // Smooth line joins
+            StrokeDashArray = GetStrokeDashArray(strokeStyle),
+            // Anti-aliasing for smoother lines
+            UseLayoutRounding = false
+        };
+
+        return line;
+    }
+
+    /// <summary>
+    /// Snap line to nearest 45-degree angle (0°, 45°, 90°, 135°, 180°, etc.)
+    /// Useful when holding Shift key
+    /// </summary>
+    public static Point SnapToAngle(Point start, Point end)
+    {
+        double dx = end.X - start.X;
+        double dy = end.Y - start.Y;
+        double distance = Math.Sqrt(dx * dx + dy * dy);
+
+        if (distance < 0.01) return end;
+
+        // Calculate angle
+        double angle = Math.Atan2(dy, dx);
+
+        // Snap to nearest 45-degree increment
+        double snapAngle = Math.Round(angle / (Math.PI / 4)) * (Math.PI / 4);
+
+        // Calculate new endpoint
+        double newX = start.X + distance * Math.Cos(snapAngle);
+        double newY = start.Y + distance * Math.Sin(snapAngle);
+
+        return new Point(newX, newY);
     }
 
     /// <summary>
@@ -46,20 +93,20 @@ public class DrawingService
     {
         var rect = new Rectangle
         {
-     Width = Math.Abs(end.X - start.X),
-       Height = Math.Abs(end.Y - start.Y),
-    Stroke = new SolidColorBrush(ParseColor(strokeColor)),
-  StrokeThickness = thickness,
-     StrokeDashArray = GetStrokeDashArray(strokeStyle)
+            Width = Math.Abs(end.X - start.X),
+            Height = Math.Abs(end.Y - start.Y),
+            Stroke = new SolidColorBrush(ParseColor(strokeColor)),
+            StrokeThickness = thickness,
+            StrokeDashArray = GetStrokeDashArray(strokeStyle)
         };
 
- Canvas.SetLeft(rect, Math.Min(start.X, end.X));
-      Canvas.SetTop(rect, Math.Min(start.Y, end.Y));
+        Canvas.SetLeft(rect, Math.Min(start.X, end.X));
+        Canvas.SetTop(rect, Math.Min(start.Y, end.Y));
 
         if (isFilled && !string.IsNullOrEmpty(fillColor))
         {
-       rect.Fill = new SolidColorBrush(ParseColor(fillColor));
-      }
+            rect.Fill = new SolidColorBrush(ParseColor(fillColor));
+        }
 
         return rect;
     }
@@ -72,29 +119,29 @@ public class DrawingService
         double width = Math.Abs(end.X - start.X);
         double height = Math.Abs(end.Y - start.Y);
 
-    if (isCircle)
- {
-         // Make it a perfect circle
-         double size = Math.Max(width, height);
-      width = height = size;
+        if (isCircle)
+        {
+            // Make it a perfect circle
+            double size = Math.Max(width, height);
+            width = height = size;
         }
 
         var ellipse = new Ellipse
-      {
-        Width = width,
+        {
+            Width = width,
             Height = height,
-       Stroke = new SolidColorBrush(ParseColor(strokeColor)),
-          StrokeThickness = thickness,
+            Stroke = new SolidColorBrush(ParseColor(strokeColor)),
+            StrokeThickness = thickness,
             StrokeDashArray = GetStrokeDashArray(strokeStyle)
-     };
+        };
 
         Canvas.SetLeft(ellipse, Math.Min(start.X, end.X));
-     Canvas.SetTop(ellipse, Math.Min(start.Y, end.Y));
+        Canvas.SetTop(ellipse, Math.Min(start.Y, end.Y));
 
-     if (isFilled && !string.IsNullOrEmpty(fillColor))
+        if (isFilled && !string.IsNullOrEmpty(fillColor))
         {
-     ellipse.Fill = new SolidColorBrush(ParseColor(fillColor));
-      }
+            ellipse.Fill = new SolidColorBrush(ParseColor(fillColor));
+        }
 
         return ellipse;
     }
@@ -104,49 +151,49 @@ public class DrawingService
     /// </summary>
     public static Polygon CreateTriangle(Point start, Point end, string strokeColor, double thickness, bool isFilled, string strokeStyle = "Solid", string? fillColor = null)
     {
-    var triangle = new Polygon
-     {
-        Stroke = new SolidColorBrush(ParseColor(strokeColor)),
-         StrokeThickness = thickness,
-          StrokeDashArray = GetStrokeDashArray(strokeStyle),
+        var triangle = new Polygon
+        {
+            Stroke = new SolidColorBrush(ParseColor(strokeColor)),
+            StrokeThickness = thickness,
+            StrokeDashArray = GetStrokeDashArray(strokeStyle),
             Points = new PointCollection
             {
-      new Point((start.X + end.X) / 2, start.Y), // Top center
-new Point(start.X, end.Y),     // Bottom left
-        new Point(end.X, end.Y)       // Bottom right
- }
+                new Point((start.X + end.X) / 2, start.Y), // Top center
+                new Point(start.X, end.Y),     // Bottom left
+                new Point(end.X, end.Y)       // Bottom right
+            }
         };
 
         if (isFilled && !string.IsNullOrEmpty(fillColor))
- {
-    triangle.Fill = new SolidColorBrush(ParseColor(fillColor));
-     }
+        {
+            triangle.Fill = new SolidColorBrush(ParseColor(fillColor));
+        }
 
-      return triangle;
+        return triangle;
     }
 
     /// <summary>
     /// Create a Polygon shape with multiple points
     /// </summary>
-  public static Polygon CreatePolygon(List<Point> points, string strokeColor, double thickness, bool isFilled, string strokeStyle = "Solid", string? fillColor = null)
+    public static Polygon CreatePolygon(List<Point> points, string strokeColor, double thickness, bool isFilled, string strokeStyle = "Solid", string? fillColor = null)
     {
-   var polygon = new Polygon
-   {
-  Stroke = new SolidColorBrush(ParseColor(strokeColor)),
-      StrokeThickness = thickness,
-         StrokeDashArray = GetStrokeDashArray(strokeStyle)
-     };
+        var polygon = new Polygon
+        {
+            Stroke = new SolidColorBrush(ParseColor(strokeColor)),
+            StrokeThickness = thickness,
+            StrokeDashArray = GetStrokeDashArray(strokeStyle)
+        };
 
         // Add points manually
- foreach (var point in points)
+        foreach (var point in points)
         {
-polygon.Points.Add(point);
-  }
+            polygon.Points.Add(point);
+        }
 
-   if (isFilled && !string.IsNullOrEmpty(fillColor))
-    {
-     polygon.Fill = new SolidColorBrush(ParseColor(fillColor));
-      }
+        if (isFilled && !string.IsNullOrEmpty(fillColor))
+        {
+            polygon.Fill = new SolidColorBrush(ParseColor(fillColor));
+        }
 
         return polygon;
     }
@@ -159,8 +206,8 @@ polygon.Points.Add(point);
         return strokeStyle switch
         {
             "Dash" => new DoubleCollection { 4, 2 },      // Dashed line
-   "Dot" => new DoubleCollection { 1, 2 },       // Dotted line
-  "DashDot" => new DoubleCollection { 4, 2, 1, 2 }, // Dash-dot line
+            "Dot" => new DoubleCollection { 1, 2 },       // Dotted line
+            "DashDot" => new DoubleCollection { 4, 2, 1, 2 }, // Dash-dot line
             "DashDotDot" => new DoubleCollection { 4, 2, 1, 2, 1, 2 }, // Dash-dot-dot
             _ => null  // Solid (default)
         };
