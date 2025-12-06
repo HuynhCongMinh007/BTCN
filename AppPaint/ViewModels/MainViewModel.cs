@@ -5,6 +5,8 @@ using AppPaint.Views;
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Data.Models;
+using System.Collections.ObjectModel;
 
 namespace AppPaint.ViewModels;
 
@@ -20,6 +22,12 @@ public partial class MainViewModel : BaseViewModel
 
     [ObservableProperty]
     private int _totalShapes;
+
+    [ObservableProperty]
+ private ObservableCollection<Profile> _profiles = new();
+
+    [ObservableProperty]
+  private Profile? _selectedProfile;
 
     // Remove navigation service dependency - will navigate via Page events instead
     public MainViewModel(IProfileService profileService)
@@ -40,15 +48,20 @@ public partial class MainViewModel : BaseViewModel
   {
     IsBusy = true;
    
-        // Use scoped service
-        using var scope = App.Services.CreateScope();
+        // Load active profile
+ using var scope = App.Services.CreateScope();
       var profileService = scope.ServiceProvider.GetRequiredService<IProfileService>();
       
         var profile = await profileService.GetActiveProfileAsync();
   if (profile != null)
    {
-      WelcomeMessage = $"Welcome, {profile.Name}!";
+    WelcomeMessage = $"Welcome to AppPaint!";
+     SelectedProfile = profile;
    }
+        else
+    {
+     WelcomeMessage = "Welcome to AppPaint!";
+      }
     }
      catch (Exception ex)
    {
@@ -57,7 +70,7 @@ ErrorMessage = $"Error loading dashboard: {ex.Message}";
   finally
   {
       IsBusy = false;
-        }
+}
  }
 
     // Navigation will be handled by MainPage code-behind
