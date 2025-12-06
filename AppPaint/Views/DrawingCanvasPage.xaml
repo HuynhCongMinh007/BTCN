@@ -201,15 +201,38 @@
             <!-- Color -->
                <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,12,0">
       <TextBlock Text="Color" FontSize="11" Opacity="0.6"/>
-  <ColorPicker x:Name="StrokeColorPicker" 
-      ColorSpectrumShape="Ring"
-    IsColorSliderVisible="False"
-           IsColorChannelTextInputVisible="False"
-          IsHexInputVisible="False"
-       IsAlphaEnabled="False"
+   
+   <!-- Stroke Color Button with Flyout -->
+      <Button x:Name="StrokeColorButton"
+      Width="36" Height="36"
+       ToolTipService.ToolTip="Stroke Color (Nét vẽ)">
+     <Button.Content>
+        <Border Width="24" Height="24"
+        CornerRadius="2"
+ BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+  BorderThickness="1">
+      <Border.Background>
+          <SolidColorBrush x:Name="StrokeColorPreview" Color="Black"/>
+           </Border.Background>
+              </Border>
+            </Button.Content>
+              <Button.Flyout>
+       <Flyout Placement="Bottom">
+       <StackPanel Spacing="12" Padding="8">
+<TextBlock Text="Stroke Color (Màu nét vẽ)" FontWeight="SemiBold"/>
+          <ColorPicker x:Name="StrokeColorPicker" 
+     ColorSpectrumShape="Ring"
+   IsColorSliderVisible="True"
+             IsColorChannelTextInputVisible="False"
+ IsHexInputVisible="False"
+        IsAlphaEnabled="False"
               ColorChanged="StrokeColorPicker_ColorChanged"
-         Width="36" Height="36"/>
-             </StackPanel>
+            Color="Black"/>
+        </StackPanel>
+      </Flyout>
+      </Button.Flyout>
+                </Button>
+  </StackPanel>
            
  <!-- Thickness -->
      <StackPanel Grid.Column="1" Spacing="4" Margin="0,0,12,0">
@@ -254,18 +277,19 @@
             
      <!-- Fill Color Picker (visible when Fill is checked) -->
        <ColorPicker x:Name="FillColorPicker"
-               Grid.Column="1"
-            Margin="4,0,0,0"
+           Grid.Column="1"
+         Margin="4,0,0,0"
     ColorSpectrumShape="Ring"
     IsColorSliderVisible="False"
     IsColorChannelTextInputVisible="False"
     IsHexInputVisible="False"
  IsAlphaEnabled="False"
          ColorChanged="FillColorPicker_ColorChanged"
-            Width="24" 
+        Color="#FFFF00"
+      Width="24" 
      Height="24"
-              Visibility="{x:Bind FillCheckBox.IsChecked, Mode=OneWay}"/>
-      </Grid>
+  Visibility="{x:Bind FillCheckBox.IsChecked, Mode=OneWay}"/>
+    </Grid>
        </StackPanel>
        </StackPanel>
   </Grid>
