@@ -36,6 +36,9 @@ public sealed partial class DrawingCanvasPage : Page
     private Border? _selectionBorder = null;
     private string? _selectedShapeOriginalStrokeColor = null;
     private double _selectedShapeOriginalThickness = 0;
+    private bool _isDraggingShape = false;
+    private Point _dragStartPoint;
+    private Point _shapeStartPosition;
 
     public DrawingCanvasPage()
     {
@@ -265,7 +268,7 @@ public sealed partial class DrawingCanvasPage : Page
 
         // Ensure point is within canvas bounds
         if (point.X < 0 || point.X > DrawingCanvas.Width ||
-point.Y < 0 || point.Y > DrawingCanvas.Height)
+            point.Y < 0 || point.Y > DrawingCanvas.Height)
         {
             return;
         }
@@ -273,7 +276,20 @@ point.Y < 0 || point.Y > DrawingCanvas.Height)
         // Selection mode - check if clicking on existing shape
         if (_isSelectMode)
         {
-            SelectShapeAtPoint(point);
+            if (_selectedShape != null && IsPointInShape(_selectedShape, point))
+            {
+                // Start dragging selected shape
+                _isDraggingShape = true;
+                _dragStartPoint = point;
+                _shapeStartPosition = GetShapePosition(_selectedShape);
+                DrawingCanvas.CapturePointer(e.Pointer);
+                e.Handled = true;
+                System.Diagnostics.Debug.WriteLine("Started dragging shape");
+            }
+            else
+            {
+                SelectShapeAtPoint(point);
+            }
             return;
         }
 
@@ -684,10 +700,29 @@ point.Y < 0 || point.Y > DrawingCanvas.Height)
 
     private void DrawingCanvas_PointerMoved(object sender, PointerRoutedEventArgs e)
     {
+        var currentPoint = e.GetCurrentPoint(DrawingCanvas).Position;
+
+        // Handle shape dragging
+        if (_isDraggingShape && _selectedShape != null)
+        {
+            var deltaX = currentPoint.X - _dragStartPoint.X;
+            var deltaY = currentPoint.Y - _dragStartPoint.Y;
+
+            MoveShape(_selectedShape, _shapeStartPosition.X + deltaX, _shapeStartPosition.Y + deltaY);
+
+            // Update selection border
+            if (_selectionBorder != null)
+            {
+                Canvas.SetLeft(_selectionBorder, Canvas.GetLeft(_selectedShape));
+                Canvas.SetTop(_selectionBorder, Canvas.GetTop(_selectedShape));
+            }
+
+            e.Handled = true;
+            return;
+        }
+
         if (!_isDrawing) return;
         if (ViewModel.SelectedShapeType == ShapeType.Polygon) return;
-
-        var currentPoint = e.GetCurrentPoint(DrawingCanvas).Position;
 
         // Clamp to canvas bounds
         currentPoint.X = Math.Max(0, Math.Min(DrawingCanvas.Width, currentPoint.X));
@@ -709,6 +744,16 @@ point.Y < 0 || point.Y > DrawingCanvas.Height)
 
     private void DrawingCanvas_PointerReleased(object sender, PointerRoutedEventArgs e)
     {
+        // Handle end of shape dragging
+        if (_isDraggingShape)
+        {
+            _isDraggingShape = false;
+            DrawingCanvas.ReleasePointerCapture(e.Pointer);
+            System.Diagnostics.Debug.WriteLine("Finished dragging shape");
+            e.Handled = true;
+            return;
+        }
+
         if (!_isDrawing) return;
         if (ViewModel.SelectedShapeType == ShapeType.Polygon) return;
 
@@ -1469,4 +1514,72 @@ point.Y < 0 || point.Y > DrawingCanvas.Height)
             ViewModel.IsBusy = false;
         }
     }
+
+    private Point GetShapePosition(UIShape shape)
+    {
+   if (shape is Line line)
+      {
+  return new Point(Math.Min(line.X1, line.X2), Math.Min(line.Y1, line.Y2));
+  }
+        else
+  {
+     return new Point(Canvas.GetLeft(shape), Canvas.GetTop(shape));
+        }
+}
+
+    private void MoveShape(UIShape shape, double newX, double newY)
+    {
+   // Clamp to canvas bounds
+        newX = Math.Max(0, Math.Min(DrawingCanvas.Width - GetShapeWidth(shape), newX));
+   newY = Math.Max(0, Math.Min(DrawingCanvas.Height - GetShapeHeight(shape), newY));
+
+   if (shape is Line line)
+   {
+  var width = Math.Abs(line.X2 - line.X1);
+      var height = Math.Abs(line.Y2 - line.Y1);
+       var wasInverted = line.X2 < line.X1;
+
+       line.X1 = newX;
+       line.Y1 = newY;
+    line.X2 = wasInverted ? newX - width : newX + width;
+      line.Y2 = newY + height;
+        }
+     else if (shape is Rectangle || shape is Ellipse)
+ {
+   Canvas.SetLeft(shape, newX);
+       Canvas.SetTop(shape, newY);
+        }
+     else if (shape is Polygon polygon)
+        {
+  var bounds = GetPolygonBounds(polygon.Points);
+   var offsetX = newX - bounds.Left;
+   var offsetY = newY - bounds.Top;
+
+   var newPoints = new Microsoft.UI.Xaml.Media.PointCollection();
+ foreach (var pt in polygon.Points)
+       {
+      newPoints.Add(new Point(pt.X + offsetX, pt.Y + offsetY));
+   }
+      polygon.Points = newPoints;
+        }
+    }
+
+    private double GetShapeWidth(UIShape shape)
+ {
+        if (shape is Line line) return Math.Abs(line.X2 - line.X1);
+        if (shape is Rectangle rect) return rect.Width;
+        if (shape is Ellipse ellipse) return ellipse.Width;
+   if (shape is Polygon polygon) return GetPolygonBounds(polygon.Points).Width;
+  return 0;
+    }
+
+    private double GetShapeHeight(UIShape shape)
+    {
+        if (shape is Line line) return Math.Abs(line.Y2 - line.Y1);
+ if (shape is Rectangle rect) return rect.Height;
+     if (shape is Ellipse ellipse) return ellipse.Height;
+        if (shape is Polygon polygon) return GetPolygonBounds(polygon.Points).Height;
+        return 0;
+    }
+
 }
