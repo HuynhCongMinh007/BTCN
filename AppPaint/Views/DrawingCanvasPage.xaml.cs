@@ -353,11 +353,35 @@ double.TryParse(parts[1], out double height))
     private void BackgroundColorPicker_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
     {
    var color = args.NewColor;
-        ViewModel.BackgroundColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+      ViewModel.BackgroundColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
      
-        // Update canvas background brush
+    // Update canvas background brush
   CanvasBackgroundBrush.Color = color;
+  
+  // Update button preview color
+   BackgroundColorPreview.Color = color;
     
     System.Diagnostics.Debug.WriteLine($"Background color changed: {ViewModel.BackgroundColor}");
+    }
+
+ private void ToolsToggle_Click(object sender, RoutedEventArgs e)
+    {
+  ToolsSection.Visibility = ToolsSection.Visibility == Visibility.Visible 
+  ? Visibility.Collapsed 
+   : Visibility.Visible;
+    }
+
+    private void BrushesToggle_Click(object sender, RoutedEventArgs e)
+  {
+ BrushesSection.Visibility = BrushesSection.Visibility == Visibility.Visible 
+     ? Visibility.Collapsed 
+ : Visibility.Visible;
+    }
+
+    private void CanvasToggle_Click(object sender, RoutedEventArgs e)
+    {
+        CanvasSection.Visibility = CanvasSection.Visibility == Visibility.Visible 
+    ? Visibility.Collapsed 
+  : Visibility.Visible;
     }
 }

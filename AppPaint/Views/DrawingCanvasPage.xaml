@@ -20,242 +20,305 @@
     Background="{ThemeResource LayerFillColorDefaultBrush}"
    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
       BorderThickness="0,0,0,1">
-   <Grid Padding="12">
-    <Grid.ColumnDefinitions>
-     <ColumnDefinition Width="Auto"/>
-  <ColumnDefinition Width="*"/>
-       <ColumnDefinition Width="Auto"/>
-    </Grid.ColumnDefinitions>
+            
+ <!-- Toolbar Content with Groups -->
+   <StackPanel Orientation="Vertical" Spacing="0">
+           
+          <!-- Main Toolbar Row -->
+      <Grid Padding="12,8">
+     <Grid.ColumnDefinitions>
+           <ColumnDefinition Width="Auto"/>
+       <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+         </Grid.ColumnDefinitions
 
-      <!-- Left Toolbar - Shape Tools -->
-    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
- <TextBlock Text="Tools:" VerticalAlignment="Center" Margin="0,0,12,0" FontWeight="SemiBold"/>
-   
-      <!-- Line Button -->
-    <ToggleButton x:Name="LineButton" 
- Width="40" Height="40" 
-   ToolTipService.ToolTip="Line (Straight)"
-       Click="ShapeButton_Click"
- Tag="Line">
-            <Viewbox Width="20" Height="20">
-    <Canvas Width="24" Height="24">
-        <Line X1="4" Y1="20" X2="20" Y2="4" 
-     Stroke="{ThemeResource TextFillColorPrimaryBrush}" 
-          StrokeThickness="2"/>
-                </Canvas>
-            </Viewbox>
-   </ToggleButton>
-     
-     <!-- Rectangle Button -->
-     <ToggleButton x:Name="RectangleButton" 
- Width="40" Height="40" 
-   ToolTipService.ToolTip="Rectangle"
-    Click="ShapeButton_Click"
-    Tag="Rectangle">
-            <Viewbox Width="20" Height="20">
-     <Canvas Width="24" Height="24">
-           <Rectangle Width="16" Height="12" 
-         Canvas.Left="4" Canvas.Top="6"
-             Stroke="{ThemeResource TextFillColorPrimaryBrush}" 
-  StrokeThickness="2"/>
-                </Canvas>
-  </Viewbox>
-        </ToggleButton>
-   
-   <!-- Oval Button -->
-     <ToggleButton x:Name="OvalButton" 
-        Width="40" Height="40" 
-          ToolTipService.ToolTip="Oval (Ellipse)"
-  Click="ShapeButton_Click"
-   Tag="Oval">
-            <Viewbox Width="20" Height="20">
-                <Canvas Width="24" Height="24">
-   <Ellipse Width="16" Height="10" 
-        Canvas.Left="4" Canvas.Top="7"
-          Stroke="{ThemeResource TextFillColorPrimaryBrush}" 
-      StrokeThickness="2"/>
-    </Canvas>
-            </Viewbox>
-        </ToggleButton>
-   
-        <!-- Circle Button -->
-<ToggleButton x:Name="CircleButton" 
- Width="40" Height="40" 
-    ToolTipService.ToolTip="Circle"
-  Click="ShapeButton_Click"
-       Tag="Circle">
-            <Viewbox Width="20" Height="20">
-        <Canvas Width="24" Height="24">
-           <Ellipse Width="14" Height="14" 
-       Canvas.Left="5" Canvas.Top="5"
- Stroke="{ThemeResource TextFillColorPrimaryBrush}" 
-       StrokeThickness="2"/>
-         </Canvas>
-            </Viewbox>
-        </ToggleButton>
-      
-   <!-- Triangle Button -->
-      <ToggleButton x:Name="TriangleButton" 
-    Width="40" Height="40" 
- ToolTipService.ToolTip="Triangle"
-  Click="ShapeButton_Click"
-    Tag="Triangle">
-            <Viewbox Width="20" Height="20">
-           <Canvas Width="24" Height="24">
- <Polygon Points="12,4 4,20 20,20"
-       Stroke="{ThemeResource TextFillColorPrimaryBrush}" 
-         StrokeThickness="2"/>
-      </Canvas>
-       </Viewbox>
-        </ToggleButton>
+     <!-- Left: File Actions -->
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4">
+         <Button x:Name="SaveButton" 
+      Style="{StaticResource AppAccentButtonStyle}"
+         Command="{x:Bind ViewModel.SaveAsTemplateCommand}"
+      ToolTipService.ToolTip="Save">
+       <StackPanel Orientation="Horizontal" Spacing="8">
+             <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE74E;"/>
+<TextBlock Text="Save"/>
+        </StackPanel>
+        </Button>
+    
+                   <Button x:Name="ClearButton" 
+     ToolTipService.ToolTip="Clear Canvas"
+         Command="{x:Bind ViewModel.ClearCanvasCommand}">
+<StackPanel Orientation="Horizontal" Spacing="8">
+     <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
+      <TextBlock Text="Clear"/>
+     </StackPanel>
+            </Button>
+              </StackPanel>
+
+               <!-- Center: Tools Toggle Buttons -->
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+     <Button x:Name="ToolsToggle" Click="ToolsToggle_Click" Width="80">
+    <StackPanel Orientation="Horizontal" Spacing="4">
+    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" 
+               Glyph="&#xE90F;" FontSize="14"/>
+              <TextBlock Text="Tools" FontSize="12"/>
+   </StackPanel>
+                </Button>
+        
+     <Button x:Name="BrushesToggle" Click="BrushesToggle_Click" Width="80">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" 
+  Glyph="&#xE771;" FontSize="14"/>
+        <TextBlock Text="Brushes" FontSize="12"/>
+        </StackPanel>
+               </Button
  
-      <!-- Polygon Button -->
-      <ToggleButton x:Name="PolygonButton" 
-     Width="40" Height="40" 
-   ToolTipService.ToolTip="Polygon (Multi-point)"
-   Click="ShapeButton_Click"
-   Tag="Polygon">
-            <Viewbox Width="20" Height="20">
+        <Button x:Name="CanvasToggle" Click="CanvasToggle_Click" Width="80">
+<StackPanel Orientation="Horizontal" Spacing="4">
+                  <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" 
+                 Glyph="&#xE7C3;" FontSize="14"/>
+   <TextBlock Text="Canvas" FontSize="12"/>
+   </StackPanel>
+        </Button>
+          </StackPanel>
+
+      <!-- Right: Polygon Finish Button -->
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+    <Button x:Name="FinishPolygonButton"
+Style="{StaticResource AppAccentButtonStyle}"
+Click="FinishPolygonButton_Click"
+    Visibility="Collapsed"
+ ToolTipService.ToolTip="Finish Polygon">
+  <StackPanel Orientation="Horizontal" Spacing="8">
+              <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE73E;"/>
+    <TextBlock Text="Finish Polygon"/>
+     </StackPanel>
+      </Button>
+          </StackPanel>
+            </Grid>
+
+     <!-- Collapsible Sections -->
+           
+         <!-- Tools Section -->
+    <Border x:Name="ToolsSection" 
+     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+    BorderThickness="0,1,0,0"
+     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+             Visibility="Visible">
+           <Grid Padding="12,8">
+ <Grid.ColumnDefinitions>
+    <ColumnDefinition Width="Auto"/>
+   <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+          
+                 <TextBlock Grid.Column="0" Text="Shapes:" 
+   VerticalAlignment="Center" 
+           FontWeight="SemiBold" 
+             Margin="0,0,12,0"/>
+            
+     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+             <!-- Shape Buttons -->
+              <ToggleButton x:Name="LineButton" Width="40" Height="40" 
+     ToolTipService.ToolTip="Line" Click="ShapeButton_Click" Tag="Line">
+      <Viewbox Width="20" Height="20">
     <Canvas Width="24" Height="24">
-         <Polygon Points="12,3 20,8 18,18 6,18 4,8"
-    Stroke="{ThemeResource TextFillColorPrimaryBrush}" 
-          StrokeThickness="2"/>
+          <Line X1="4" Y1="20" X2="20" Y2="4" 
+            Stroke="{ThemeResource TextFillColorPrimaryBrush}" StrokeThickness="2"/>
          </Canvas>
    </Viewbox>
-        </ToggleButton>
-  </StackPanel>
+         </ToggleButton>
+             
+     <ToggleButton x:Name="RectangleButton" Width="40" Height="40" 
+      ToolTipService.ToolTip="Rectangle" Click="ShapeButton_Click" Tag="Rectangle">
+    <Viewbox Width="20" Height="20">
+       <Canvas Width="24" Height="24">
+       <Rectangle Width="16" Height="12" Canvas.Left="4" Canvas.Top="6"
+             Stroke="{ThemeResource TextFillColorPrimaryBrush}" StrokeThickness="2"/>
+             </Canvas>
+          </Viewbox>
+      </ToggleButton>
+    
+               <ToggleButton x:Name="OvalButton" Width="40" Height="40" 
+   ToolTipService.ToolTip="Oval" Click="ShapeButton_Click" Tag="Oval">
+               <Viewbox Width="20" Height="20">
+      <Canvas Width="24" Height="24">
+   <Ellipse Width="16" Height="10" Canvas.Left="4" Canvas.Top="7"
+          Stroke="{ThemeResource TextFillColorPrimaryBrush}" StrokeThickness="2"/>
+             </Canvas>
+          </Viewbox>
+    </ToggleButton>
+   
+   <ToggleButton x:Name="CircleButton" Width="40" Height="40" 
+         ToolTipService.ToolTip="Circle" Click="ShapeButton_Click" Tag="Circle">
+           <Viewbox Width="20" Height="20">
+     <Canvas Width="24" Height="24">
+              <Ellipse Width="14" Height="14" Canvas.Left="5" Canvas.Top="5"
+      Stroke="{ThemeResource TextFillColorPrimaryBrush}" StrokeThickness="2"/>
+      </Canvas>
+      </Viewbox>
+     </ToggleButton>
+      
+      <ToggleButton x:Name="TriangleButton" Width="40" Height="40" 
+                    ToolTipService.ToolTip="Triangle" Click="ShapeButton_Click" Tag="Triangle">
+             <Viewbox Width="20" Height="20">
+  <Canvas Width="24" Height="24">
+          <Polygon Points="12,4 4,20 20,20"
+      Stroke="{ThemeResource TextFillColorPrimaryBrush}" StrokeThickness="2"/>
+       </Canvas>
+            </Viewbox>
+         </ToggleButton>
+            
+      <ToggleButton x:Name="PolygonButton" Width="40" Height="40" 
+       ToolTipService.ToolTip="Polygon" Click="ShapeButton_Click" Tag="Polygon">
+               <Viewbox Width="20" Height="20">
+   <Canvas Width="24" Height="24">
+        <Polygon Points="12,3 20,8 18,18 6,18 4,8"
+      Stroke="{ThemeResource TextFillColorPrimaryBrush}" StrokeThickness="2"/>
+    </Canvas>
+    </Viewbox>
+              </ToggleButton>
+ </StackPanel>
+</Grid>
+      </Border>
 
- <!-- Middle Toolbar - Color & Stroke -->
-          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
-  <StackPanel Orientation="Horizontal" Spacing="8">
-        <TextBlock Text="Color:" VerticalAlignment="Center"/>
-  <ColorPicker x:Name="StrokeColorPicker" 
-   ColorSpectrumShape="Ring"
-      IsColorSliderVisible="False"
-  IsColorChannelTextInputVisible="False"
-IsHexInputVisible="False"
-         IsAlphaEnabled="False"
-         ColorChanged="StrokeColorPicker_ColorChanged"
-  Width="40" Height="40"/>
-  </StackPanel>
-         
-         <Border Width="1" Background="{ThemeResource CardStrokeColorDefaultBrush}"/>
- 
-        <StackPanel Orientation="Horizontal" Spacing="8">
-       <TextBlock Text="Thickness:" VerticalAlignment="Center"/>
-   <Slider x:Name="StrokeThicknessSlider" 
-Minimum="1" Maximum="20" 
-        Value="{x:Bind ViewModel.StrokeThickness, Mode=TwoWay}"
-Width="120" VerticalAlignment="Center"/>
-         <TextBlock Text="{x:Bind StrokeThicknessSlider.Value, Mode=OneWay}" 
-   VerticalAlignment="Center" Width="30"/>
-    </StackPanel>
-
-  <Border Width="1" Background="{ThemeResource CardStrokeColorDefaultBrush}"/>
-
-         <!-- Stroke Style ComboBox -->
-     <StackPanel Orientation="Horizontal" Spacing="8">
-     <TextBlock Text="Style:" VerticalAlignment="Center"/>
-      <ComboBox x:Name="StrokeStyleComboBox"
-       SelectedIndex="0"
-            SelectionChanged="StrokeStyleComboBox_SelectionChanged"
-          MinWidth="120"
-   VerticalAlignment="Center">
-  <ComboBoxItem Content="Solid" Tag="Solid"/>
-    <ComboBoxItem Content="Dash" Tag="Dash"/>
-           <ComboBoxItem Content="Dot" Tag="Dot"/>
-     <ComboBoxItem Content="DashDot" Tag="DashDot"/>
-    <ComboBoxItem Content="DashDotDot" Tag="DashDotDot"/>
-   </ComboBox>
-     </StackPanel>
-
-  <Border Width="1" Background="{ThemeResource CardStrokeColorDefaultBrush}"/>
-       
-     <CheckBox x:Name="FillCheckBox" 
-   Content="Fill Shape"
-      IsChecked="{x:Bind ViewModel.IsFilled, Mode=TwoWay}"/>
-       </StackPanel>
-
- <!-- Right Toolbar - Actions -->
-    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-        <!-- Canvas Size Picker -->
-        <ComboBox x:Name="CanvasSizeComboBox"
-    Header="Canvas Size"
-        SelectionChanged="CanvasSizeComboBox_SelectionChanged"
-SelectedIndex="2"
-             MinWidth="120"
-            ToolTipService.ToolTip="Select canvas size">
-       <ComboBoxItem Content="640x480" Tag="640x480"/>
-      <ComboBoxItem Content="800x600" Tag="800x600"/>
-            <ComboBoxItem Content="1024x768" Tag="1024x768"/>
- <ComboBoxItem Content="1280x720" Tag="1280x720"/>
-   <ComboBoxItem Content="1920x1080" Tag="1920x1080"/>
-        </ComboBox>
-
-   <!-- Background Color Picker -->
-        <StackPanel Orientation="Horizontal" Spacing="8">
-        <TextBlock Text="Background:" VerticalAlignment="Center"/>
-            <ColorPicker x:Name="BackgroundColorPicker"
-       ColorSpectrumShape="Ring"
-         IsColorSliderVisible="False"
-           IsColorChannelTextInputVisible="False"
-    IsHexInputVisible="False"
-     IsAlphaEnabled="False"
- ColorChanged="BackgroundColorPicker_ColorChanged"
-                  Width="40" Height="40"
-                  ToolTipService.ToolTip="Canvas background color"/>
-   </StackPanel>
-
-        <Border Width="1" Background="{ThemeResource CardStrokeColorDefaultBrush}"/>
-
-<!-- Polygon Finish Button (visible only when drawing polygon) -->
-   <Button x:Name="FinishPolygonButton"
-      Style="{StaticResource AppAccentButtonStyle}"
-      Click="FinishPolygonButton_Click"
-      Visibility="Collapsed"
-       ToolTipService.ToolTip="Finish Polygon (Complete shape)">
- <StackPanel Orientation="Horizontal" Spacing="8">
-   <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE73E;"/>
-   <TextBlock Text="Finish"/>
-      </StackPanel>
-        </Button>
-
-        <!-- Canvas Size Info -->
- <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
-      CornerRadius="4"
-  Padding="8,4"
-    VerticalAlignment="Center">
-  <TextBlock>
-   <Run Text="Canvas: "/>
-      <Run Text="{x:Bind ViewModel.CanvasWidth, Mode=OneWay}"/>
-<Run Text="x"/>
-    <Run Text="{x:Bind ViewModel.CanvasHeight, Mode=OneWay}"/>
-    </TextBlock>
- </Border>
-
-        <Border Width="1" Background="{ThemeResource CardStrokeColorDefaultBrush}"/>
-
- <Button x:Name="ClearButton" 
-     Style="{StaticResource IconButtonStyle}" 
-  Command="{x:Bind ViewModel.ClearCanvasCommand}"
-ToolTipService.ToolTip="Clear Canvas">
-    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
-  </Button>
+     <!-- Brushes Section -->
+       <Border x:Name="BrushesSection" 
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+    BorderThickness="0,1,0,0"
+    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                 Visibility="Collapsed">
+            <Grid Padding="12,8">
+        <Grid.ColumnDefinitions>
+       <ColumnDefinition Width="Auto"/>
+    <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+         <ColumnDefinition Width="Auto"/>
+    </Grid.ColumnDefinitions>
      
-      <Button x:Name="SaveButton" 
-    Style="{StaticResource AppAccentButtonStyle}"
-    Command="{x:Bind ViewModel.SaveAsTemplateCommand}"
-      ToolTipService.ToolTip="Save as Template">
-   <StackPanel Orientation="Horizontal" Spacing="8">
-  <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE74E;"/>
-  <TextBlock Text="Save"/>
-  </StackPanel>
-  </Button>
+        <!-- Color -->
+    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" Margin="0,0,16,0">
+          <TextBlock Text="Color:" VerticalAlignment="Center" FontWeight="SemiBold"/>
+         <ColorPicker x:Name="StrokeColorPicker" 
+  ColorSpectrumShape="Ring"
+   IsColorSliderVisible="False"
+     IsColorChannelTextInputVisible="False"
+  IsHexInputVisible="False"
+        IsAlphaEnabled="False"
+ ColorChanged="StrokeColorPicker_ColorChanged"
+ Width="40" Height="40"/>
+        </StackPanel>
+          
+            <!-- Thickness -->
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" Margin="0,0,16,0">
+          <TextBlock Text="Size:" VerticalAlignment="Center" FontWeight="SemiBold"/>
+          <Slider x:Name="StrokeThicknessSlider" 
+       Minimum="1" Maximum="20" 
+         Value="{x:Bind ViewModel.StrokeThickness, Mode=TwoWay}"
+       Width="120" VerticalAlignment="Center"/>
+       <TextBlock Text="{x:Bind StrokeThicknessSlider.Value, Mode=OneWay}" 
+   VerticalAlignment="Center" Width="30"/>
+        </StackPanel>
+    
+         <!-- Style -->
+             <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" Margin="0,0,16,0">
+         <TextBlock Text="Style:" VerticalAlignment="Center" FontWeight="SemiBold"/>
+         <ComboBox x:Name="StrokeStyleComboBox"
+     SelectedIndex="0"
+                 SelectionChanged="StrokeStyleComboBox_SelectionChanged"
+MinWidth="120">
+         <ComboBoxItem Content="Solid" Tag="Solid"/>
+      <ComboBoxItem Content="Dash" Tag="Dash"/>
+         <ComboBoxItem Content="Dot" Tag="Dot"/>
+        <ComboBoxItem Content="DashDot" Tag="DashDot"/>
+     <ComboBoxItem Content="DashDotDot" Tag="DashDotDot"/>
+    </ComboBox>
      </StackPanel>
-  </Grid>
-        </Border>
+       
+      <!-- Fill -->
+      <CheckBox Grid.Column="3" x:Name="FillCheckBox" 
+        Content="Fill Shape"
+    IsChecked="{x:Bind ViewModel.IsFilled, Mode=TwoWay}"/>
+            </Grid>
+       </Border>
 
-        <!-- Canvas Area -->
+      <!-- Canvas Section -->
+                <Border x:Name="CanvasSection" 
+           BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+  BorderThickness="0,1,0,0"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+        Visibility="Collapsed">
+                 <Grid Padding="12,8">
+         <Grid.ColumnDefinitions>
+    <ColumnDefinition Width="Auto"/>
+ <ColumnDefinition Width="Auto"/>
+   <ColumnDefinition Width="*"/>
+  </Grid.ColumnDefinitions>
+         
+            <!-- Canvas Size -->
+         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" Margin="0,0,24,0">
+       <TextBlock Text="Canvas Size:" VerticalAlignment="Center" FontWeight="SemiBold"/>
+        <ComboBox x:Name="CanvasSizeComboBox"
+           SelectionChanged="CanvasSizeComboBox_SelectionChanged"
+            SelectedIndex="2"
+          MinWidth="140">
+   <ComboBoxItem Content="640 x 480" Tag="640x480"/>
+     <ComboBoxItem Content="800 x 600" Tag="800x600"/>
+     <ComboBoxItem Content="1024 x 768" Tag="1024x768"/>
+         <ComboBoxItem Content="1280 x 720" Tag="1280x720"/>
+    <ComboBoxItem Content="1920 x 1080" Tag="1920x1080"/>
+                 </ComboBox>
+    </StackPanel>
+          
+        <!-- Background Color -->
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Background:" VerticalAlignment="Center" FontWeight="SemiBold"/>
+         <Button x:Name="BackgroundColorButton" Width="40" Height="40"
+       ToolTipService.ToolTip="Canvas Background Color">
+<Button.Content>
+           <Border Width="24" Height="24" CornerRadius="2"
+  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1">
+     <Border.Background>
+        <SolidColorBrush x:Name="BackgroundColorPreview" Color="White"/>
+      </Border.Background>
+        </Border>
+  </Button.Content>
+ <Button.Flyout>
+<Flyout Placement="Bottom">
+     <StackPanel Spacing="12" Padding="8">
+      <TextBlock Text="Canvas Background" FontWeight="SemiBold"/>
+               <ColorPicker x:Name="BackgroundColorPicker"
+      ColorSpectrumShape="Ring"
+         IsColorSliderVisible="True"
+        IsColorChannelTextInputVisible="False"
+           IsHexInputVisible="False"
+           IsAlphaEnabled="False"
+  ColorChanged="BackgroundColorPicker_ColorChanged"/>
+                  </StackPanel>
+   </Flyout>
+     </Button.Flyout>
+           </Button>
+        </StackPanel>
+       
+      <!-- Canvas Info -->
+       <Border Grid.Column="2" 
+       Background="{ThemeResource LayerFillColorDefaultBrush}"
+          CornerRadius="4" Padding="12,6"
+      HorizontalAlignment="Right"
+        VerticalAlignment="Center">
+      <TextBlock>
+            <Run Text="Canvas: "/>
+   <Run Text="{x:Bind ViewModel.CanvasWidth, Mode=OneWay}" FontWeight="SemiBold"/>
+         <Run Text=" x "/>
+         <Run Text="{x:Bind ViewModel.CanvasHeight, Mode=OneWay}" FontWeight="SemiBold"/>
+            </TextBlock>
+            </Border>
+  </Grid>
+             </Border>
+   
+            </StackPanel>
+  </Border>
+
+  <!-- Canvas Area -->
   <ScrollViewer Grid.Row="1" 
      HorizontalScrollBarVisibility="Auto"
        VerticalScrollBarVisibility="Auto"
