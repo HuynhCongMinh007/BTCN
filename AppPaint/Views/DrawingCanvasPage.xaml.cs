@@ -112,19 +112,37 @@ public sealed partial class DrawingCanvasPage : Page
     /// </summary>
     private void Shapes_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        // When shapes are loaded from DB, render them
+        // ONLY render shapes loaded from DB when opening existing drawing
+        // DO NOT render newly created shapes (they're already on canvas)
         if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && e.NewItems != null)
         {
-            foreach (Data.Models.Shape shape in e.NewItems)
+            // Check if this is initial load or user-created shape
+            // If CurrentTemplateId was just set (opening existing drawing), render shapes
+        // Otherwise, skip (user just drew the shape, already on canvas)
+     if (ViewModel.CurrentTemplateId.HasValue)
             {
-                RenderShapeOnCanvas(shape);
-            }
+     foreach (Data.Models.Shape shape in e.NewItems)
+     {
+     // Only render if this shape is not already on canvas (from DB load)
+   if (!IsShapeAlreadyOnCanvas(shape))
+        {
+      RenderShapeOnCanvas(shape);
+      }
+   }
+         }
         }
         else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
-        {
-            // Clear and re-render all shapes
+ {
+     // Clear and re-render all shapes
             RenderShapesFromViewModel();
-        }
+   }
+    }
+
+    private bool IsShapeAlreadyOnCanvas(Data.Models.Shape shape)
+    {
+        // Check if canvas already has shapes (user drawing mode)
+      // vs empty canvas (loading from DB)
+      return false; // For now, always render
     }
 
     /// <summary>
@@ -836,30 +854,24 @@ DrawingCanvas.Children.Add(_previewShape);
         if (!_isDrawing) return;
         if (ViewModel.SelectedShapeType == ShapeType.Polygon) return;
 
-   var endPoint = e.GetCurrentPoint(DrawingCanvas).Position;
+        var endPoint = e.GetCurrentPoint(DrawingCanvas).Position;
 
-   // Clamp to canvas bounds
-        endPoint.X = Math.Max(0, Math.Min(DrawingCanvas.Width, endPoint.X));
-   endPoint.Y = Math.Max(0, Math.Min(DrawingCanvas.Height, endPoint.Y));
+ // Clamp to canvas bounds
+ endPoint.X = Math.Max(0, Math.Min(DrawingCanvas.Width, endPoint.X));
+    endPoint.Y = Math.Max(0, Math.Min(DrawingCanvas.Height, endPoint.Y));
 
   _isDrawing = false;
 
         // Remove preview
-  if (_previewShape != null)
-      {
-    DrawingCanvas.Children.Remove(_previewShape);
-         _previewShape = null;
-   }
+ if (_previewShape != null)
+        {
+   DrawingCanvas.Children.Remove(_previewShape);
+   _previewShape = null;
+        }
 
-        // Create final shape
-   var finalShape = CreateShape(_startPoint, endPoint, ViewModel.SelectedShapeType, false);
- if (finalShape != null)
-    {
-       DrawingCanvas.Children.Add(finalShape);
-
-        // Save to ViewModel/Database
-   SaveShapeToDatabase(_startPoint, endPoint, ViewModel.SelectedShapeType);
-  }
+        // DON'T add shape to canvas here - let Shapes_CollectionChanged do it
+   // Just save to database
+        SaveShapeToDatabase(_startPoint, endPoint, ViewModel.SelectedShapeType);
     }
 
     private UIShape? CreateShape(Point start, Point end, ShapeType shapeType, bool isPreview)
