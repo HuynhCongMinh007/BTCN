@@ -10,7 +10,7 @@ public class NavigationService : INavigationService
 
     public Frame? Frame
     {
-    get => _frame;
+        get => _frame;
         set => _frame = value;
     }
 
@@ -18,30 +18,30 @@ public class NavigationService : INavigationService
 
     public void NavigateTo(Type pageType, object? parameter = null)
     {
-   if (_frame == null)
+        if (_frame == null)
         {
-     throw new InvalidOperationException("Navigation frame is not set.");
-    }
+            throw new InvalidOperationException("Navigation frame is not set.");
+        }
 
         _frame.Navigate(pageType, parameter, new SlideNavigationTransitionInfo
         {
- Effect = SlideNavigationTransitionEffect.FromRight
-  });
-   }
+            Effect = SlideNavigationTransitionEffect.FromRight
+        });
+    }
 
     public void GoBack()
-  {
-      if (CanGoBack)
+    {
+        if (CanGoBack)
         {
-     _frame?.GoBack();
+            _frame?.GoBack();
         }
     }
 
     public void ClearBackStack()
     {
         if (_frame != null)
- {
+        {
             _frame.BackStack.Clear();
-     }
+        }
     }
 }

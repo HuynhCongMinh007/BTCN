@@ -23,13 +23,16 @@ public partial class DrawingCanvasViewModel : BaseViewModel
     private string _selectedColor = "#000000";
 
     [ObservableProperty]
- private string _backgroundColor = "#FFFFFF";
+    private string _backgroundColor = "#FFFFFF";
 
  [ObservableProperty]
     private double _strokeThickness = 2.0;
 
 [ObservableProperty]
     private bool _isFilled;
+
+    [ObservableProperty]
+    private string _strokeStyle = "Solid"; // New: Solid, Dash, Dot, DashDot
 
   [ObservableProperty]
  private double _canvasWidth = 800;
@@ -48,10 +51,14 @@ public partial class DrawingCanvasViewModel : BaseViewModel
 
     // Navigation events
     public event EventHandler? NavigateBackRequested;
+    public event EventHandler? ClearCanvasRequested;
 
- public DrawingCanvasViewModel()
+    public DrawingCanvasViewModel()
     {
    Title = "Drawing Canvas";
+        
+        // Set default color
+   SelectedColor = "#000000";
     }
 
     public override async void OnNavigatedTo(object? parameter = null)
@@ -186,6 +193,9 @@ Name = TemplateName,
    Shapes.Clear();
 CurrentTemplateId = null;
    TemplateName = "New Drawing";
+        
+        // Raise event to clear UI canvas
+  ClearCanvasRequested?.Invoke(this, EventArgs.Empty);
     }
 
  [RelayCommand]
