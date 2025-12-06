@@ -179,20 +179,22 @@ DrawingCanvas.Children.Add(_previewShape);
 var thickness = ViewModel.StrokeThickness;
     var isFilled = ViewModel.IsFilled;
    var fillColor = ViewModel.SelectedColor;
-        var strokeStyle = ViewModel.StrokeStyle;
+    var strokeStyle = ViewModel.StrokeStyle;
 
    if (isPreview)
-        {
+      {
         thickness = Math.Max(1, thickness - 1);
      }
 
       return shapeType switch
      {
             // Pass Shift key state for snap-to-angle on Line
-            ShapeType.Line => DrawingService.CreateLine(start, end, strokeColor, thickness, strokeStyle, _isShiftPressed),
-       ShapeType.Rectangle => DrawingService.CreateRectangle(start, end, strokeColor, thickness, isFilled, strokeStyle, fillColor),
+     ShapeType.Line => DrawingService.CreateLine(start, end, strokeColor, thickness, strokeStyle, _isShiftPressed),
+         // Pass Shift key state for snap-to-square on Rectangle
+       ShapeType.Rectangle => DrawingService.CreateRectangle(start, end, strokeColor, thickness, isFilled, strokeStyle, fillColor, _isShiftPressed),
+     // Pass Shift key state for perfect circle
   ShapeType.Circle => DrawingService.CreateEllipse(start, end, strokeColor, thickness, true, isFilled, strokeStyle, fillColor),
-      ShapeType.Oval => DrawingService.CreateEllipse(start, end, strokeColor, thickness, false, isFilled, strokeStyle, fillColor),
+  ShapeType.Oval => DrawingService.CreateEllipse(start, end, strokeColor, thickness, false, isFilled, strokeStyle, fillColor),
      ShapeType.Triangle => DrawingService.CreateTriangle(start, end, strokeColor, thickness, isFilled, strokeStyle, fillColor),
   _ => null
 };
