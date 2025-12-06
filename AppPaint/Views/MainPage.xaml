@@ -11,172 +11,172 @@ xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     Loaded="Page_Loaded">
 
-    <ScrollViewer>
-        <Grid Padding="48,32" MaxWidth="1000">
-       <Grid.RowDefinitions>
-   <RowDefinition Height="Auto"/>
-  <RowDefinition Height="Auto"/>
-        <RowDefinition Height="Auto"/>
- </Grid.RowDefinitions>
+	<ScrollViewer>
+		<Grid Padding="48,32" MaxWidth="1000">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="Auto"/>
+			</Grid.RowDefinitions>
 
-          <!-- App Introduction -->
-            <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,48">
-      <StackPanel Orientation="Horizontal" Spacing="16">
-         <TextBlock Text="🎨" FontSize="64"/>
-     <StackPanel VerticalAlignment="Center" Spacing="8">
-     <TextBlock Text="Welcome to AppPaint"
-    Style="{StaticResource TitleLargeTextBlockStyle}"
-          FontSize="32"
-  FontWeight="Bold"/>
-       <TextBlock Text="Professional Drawing Application"
-      Style="{StaticResource SubtitleTextBlockStyle}"
-            Opacity="0.7"/>
-        </StackPanel>
- </StackPanel>
+			<!-- App Introduction -->
+			<StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,48">
+				<StackPanel Orientation="Horizontal" Spacing="16">
+					<TextBlock Text="🎨" FontSize="64"/>
+					<StackPanel VerticalAlignment="Center" Spacing="8">
+						<TextBlock Text="Welcome to AppPaint"
+					   Style="{StaticResource TitleLargeTextBlockStyle}"
+							 FontSize="32"
+					 FontWeight="Bold"/>
+						<TextBlock Text="Professional Drawing Application"
+					   Style="{StaticResource SubtitleTextBlockStyle}"
+							 Opacity="0.7"/>
+					</StackPanel>
+				</StackPanel>
 
-        <TextBlock TextWrapping="Wrap" 
-             Style="{StaticResource BodyTextBlockStyle}"
-         Opacity="0.8">
-  Create amazing drawings with professional tools. Draw shapes, customize colors and styles, save your work, and manage multiple profiles.
-         </TextBlock>
-            </StackPanel>
+				<TextBlock TextWrapping="Wrap"
+					 Style="{StaticResource BodyTextBlockStyle}"
+				 Opacity="0.8">
+					Create amazing drawings with professional tools. Draw shapes, customize colors and styles, save your work, and manage multiple profiles.
+				</TextBlock>
+			</StackPanel>
 
-  <!-- Profile Selection Section -->
-            <StackPanel Grid.Row="1" Spacing="16" Margin="0,0,0,32">
-              <StackPanel Orientation="Horizontal" Spacing="12">
-     <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
- Glyph="&#xE77B;"
-           FontSize="28"
-    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
-               <TextBlock Text="Select or Create a Profile"
-      Style="{StaticResource TitleTextBlockStyle}"
-           FontSize="24"
-          FontWeight="SemiBold"
-         VerticalAlignment="Center"/>
-            </StackPanel>
+			<!-- Profile Selection Section -->
+			<StackPanel Grid.Row="1" Spacing="16" Margin="0,0,0,32">
+				<StackPanel Orientation="Horizontal" Spacing="12">
+					<FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+				Glyph="&#xE77B;"
+						  FontSize="28"
+				   Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+					<TextBlock Text="Select or Create a Profile"
+		   Style="{StaticResource TitleTextBlockStyle}"
+				FontSize="24"
+			   FontWeight="SemiBold"
+			  VerticalAlignment="Center"/>
+				</StackPanel>
 
-             <TextBlock Text="⚠️ You must select a profile before you can start drawing"
-             Foreground="{ThemeResource SystemFillColorAttentionBrush}"
-      FontWeight="SemiBold"
-        Margin="0,0,0,8"/>
+				<TextBlock Text="⚠️ You must select a profile before you can start drawing"
+				Foreground="{ThemeResource SystemFillColorAttentionBrush}"
+		 FontWeight="SemiBold"
+		   Margin="0,0,0,8"/>
 
-     <!-- Profiles List -->
-      <ItemsRepeater ItemsSource="{x:Bind ViewModel.Profiles, Mode=OneWay}">
-     <ItemsRepeater.Layout>
-               <StackLayout Spacing="12"/>
-         </ItemsRepeater.Layout>
-             <ItemsRepeater.ItemTemplate>
-             <DataTemplate x:DataType="models:Profile">
-       <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-             BorderThickness="2"
-      CornerRadius="8"
-        Padding="20">
-          <Grid>
-     <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto"/>
-                  <ColumnDefinition Width="*"/>
-      <ColumnDefinition Width="Auto"/>
-             </Grid.ColumnDefinitions>
+				<!-- Profiles List -->
+				<ItemsRepeater ItemsSource="{x:Bind ViewModel.Profiles, Mode=OneWay}">
+					<ItemsRepeater.Layout>
+						<StackLayout Spacing="12"/>
+					</ItemsRepeater.Layout>
+					<ItemsRepeater.ItemTemplate>
+						<DataTemplate x:DataType="models:Profile">
+							<Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+							 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+								  BorderThickness="2"
+						   CornerRadius="8"
+							 Padding="20">
+								<Grid>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="*"/>
+										<ColumnDefinition Width="Auto"/>
+									</Grid.ColumnDefinitions>
 
-     <!-- Radio Button -->
-  <RadioButton Grid.Column="0"
-        GroupName="ProfileSelection"
-      IsChecked="{x:Bind IsActive, Mode=OneWay}"
-              Click="ProfileRadio_Click"
- Tag="{x:Bind}"
-VerticalAlignment="Center"/>
+									<!-- Radio Button -->
+									<RadioButton Grid.Column="0"
+										  GroupName="ProfileSelection"
+										IsChecked="{x:Bind IsActive, Mode=OneWay}"
+												Click="ProfileRadio_Click"
+								   Tag="{x:Bind}"
+								  VerticalAlignment="Center"/>
 
-           <!-- Profile Info -->
-          <StackPanel Grid.Column="1" 
-          Margin="16,0,0,0"
-      Spacing="8">
-  <StackPanel Orientation="Horizontal" Spacing="12">
-            <TextBlock Text="{x:Bind Name}"
-           FontSize="18"
-     FontWeight="SemiBold"/>
-      <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
-        CornerRadius="4"
- Padding="8,2"
-      Visibility="{x:Bind IsActive, Mode=OneWay}">
-    <TextBlock Text="ACTIVE"
-         FontSize="10"
-              FontWeight="Bold"
-      Foreground="White"/>
-          </Border>
-               </StackPanel>
+									<!-- Profile Info -->
+									<StackPanel Grid.Column="1"
+									Margin="16,0,0,0"
+								Spacing="8">
+										<StackPanel Orientation="Horizontal" Spacing="12">
+											<TextBlock Text="{x:Bind Name}"
+										   FontSize="18"
+									 FontWeight="SemiBold"/>
+											<Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+											  CornerRadius="4"
+									   Padding="8,2"
+											Visibility="{x:Bind IsActive, Mode=OneWay}">
+												<TextBlock Text="ACTIVE"
+													 FontSize="10"
+														  FontWeight="Bold"
+												  Foreground="White"/>
+											</Border>
+										</StackPanel>
 
- <TextBlock Opacity="0.7">
-           <Run Text="Theme:"/>
-         <Run Text="{x:Bind Theme}" FontWeight="SemiBold"/>
-  <Run Text=" • Canvas:"/>
-     <Run Text="{x:Bind DefaultCanvasWidth}"/>
-        <Run Text="×"/>
-     <Run Text="{x:Bind DefaultCanvasHeight}"/>
-</TextBlock>
-             </StackPanel>
+										<TextBlock Opacity="0.7">
+											<Run Text="Theme:"/>
+											<Run Text="{x:Bind Theme}" FontWeight="SemiBold"/>
+											<Run Text=" • Canvas:"/>
+											<Run Text="{x:Bind DefaultCanvasWidth}"/>
+											<Run Text="×"/>
+											<Run Text="{x:Bind DefaultCanvasHeight}"/>
+										</TextBlock>
+									</StackPanel>
 
-     <!-- Edit Button -->
-     <Button Grid.Column="2"
-         Content="Edit"
-Click="EditProfile_Click"
-Tag="{x:Bind}"
-    VerticalAlignment="Center"/>
-     </Grid>
-    </Border>
-      </DataTemplate>
-      </ItemsRepeater.ItemTemplate>
-   </ItemsRepeater>
+									<!-- Edit Button -->
+									<Button Grid.Column="2"
+										Content="Edit"
+							   Click="EditProfile_Click"
+							   Tag="{x:Bind}"
+								   VerticalAlignment="Center"/>
+								</Grid>
+							</Border>
+						</DataTemplate>
+					</ItemsRepeater.ItemTemplate>
+				</ItemsRepeater>
 
-       <!-- Create New Profile Button -->
-     <Button Click="CreateProfile_Click"
-              HorizontalAlignment="Left"
-           Margin="0,8,0,0">
-       <StackPanel Orientation="Horizontal" Spacing="8">
-       <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
-       Glyph="&#xE710;"
-   FontSize="16"/>
-  <TextBlock Text="Create New Profile"/>
-     </StackPanel>
-       </Button>
-       </StackPanel>
+				<!-- Create New Profile Button -->
+				<Button Click="CreateProfile_Click"
+						 HorizontalAlignment="Left"
+					  Margin="0,8,0,0">
+					<StackPanel Orientation="Horizontal" Spacing="8">
+						<FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+						Glyph="&#xE710;"
+					FontSize="16"/>
+						<TextBlock Text="Create New Profile"/>
+					</StackPanel>
+				</Button>
+			</StackPanel>
 
-  <!-- Start Drawing Section -->
-            <StackPanel Grid.Row="2" Spacing="16">
-             <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
-    CornerRadius="12"
-Padding="32,24">
- <Grid>
-    <Grid.ColumnDefinitions>
-         <ColumnDefinition Width="*"/>
-    <ColumnDefinition Width="Auto"/>
-          </Grid.ColumnDefinitions>
+			<!-- Start Drawing Section -->
+			<StackPanel Grid.Row="2" Spacing="16">
+				<Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+	   CornerRadius="12"
+   Padding="32,24">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="Auto"/>
+						</Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Column="0" Spacing="8">
-            <TextBlock Text="Ready to Draw?"
-   FontSize="24"
- FontWeight="Bold"
-     Foreground="White"/>
-  <TextBlock x:Name="SelectedProfileText"
-          Text="⚠️ Please select a profile to start drawing"
-    Foreground="White"
-       Opacity="0.9"/>
-  </StackPanel>
+						<StackPanel Grid.Column="0" Spacing="8">
+							<TextBlock Text="Ready to Draw?"
+				   FontSize="24"
+				 FontWeight="Bold"
+					 Foreground="White"/>
+							<TextBlock x:Name="SelectedProfileText"
+									Text="⚠️ Please select a profile to start drawing"
+							  Foreground="White"
+								 Opacity="0.9"/>
+						</StackPanel>
 
-     <Button x:Name="StartDrawingButton"
-  Grid.Column="1"
-          Content="Start Drawing"
-                 Click="StartDrawing_Click"
- IsEnabled="False"
-    Padding="24,12"
-       FontSize="16"
-         FontWeight="SemiBold"
-              VerticalAlignment="Center"
-        Background="White"
-       Foreground="{ThemeResource SystemAccentColor}"/>
-           </Grid>
-            </Border>
-       </StackPanel>
-    </Grid>
-    </ScrollViewer>
+						<Button x:Name="StartDrawingButton"
+					 Grid.Column="1"
+							 Content="Start Drawing"
+									Click="StartDrawing_Click"
+					IsEnabled="False"
+					   Padding="24,12"
+						  FontSize="16"
+							FontWeight="SemiBold"
+								 VerticalAlignment="Center"
+						   Background="White"
+						  Foreground="{ThemeResource SystemAccentColor}"/>
+					</Grid>
+				</Border>
+			</StackPanel>
+		</Grid>
+	</ScrollViewer>
 </Page>
