@@ -9,94 +9,62 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid Style="{StaticResource PageContainerStyle}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+    <Grid>
+        <!-- NavigationView with sub-menu for Management -->
+        <NavigationView x:Name="ManagementNav"
+                        PaneDisplayMode="Left"
+                        IsBackButtonVisible="Collapsed"
+                        IsSettingsVisible="False"
+                        SelectionChanged="ManagementNav_SelectionChanged"
+                        OpenPaneLength="240"
+                        CompactPaneLength="48">
+
             <!-- Header -->
-            <RowDefinition Height="Auto"/>
-            <!-- TabView -->
-            <RowDefinition Height="Auto"/>
-            <!-- Toolbar -->
-            <RowDefinition Height="*"/>
-            <!-- Content (removed, in TabView) -->
-        </Grid.RowDefinitions>
-
-        <!-- Page Header -->
-        <StackPanel Grid.Row="0" Style="{StaticResource PageHeaderStyle}">
-            <StackPanel Orientation="Horizontal" Spacing="12">
-                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
-                          Glyph="&#xE8F1;"
-                          FontSize="32"
-                          Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                          VerticalAlignment="Center"/>
-                <TextBlock Text="Management"
-                           Style="{StaticResource TitleLargeTextBlockStyle}"
-                           FontWeight="Bold"
-                           VerticalAlignment="Center"/>
-            </StackPanel>
-            <TextBlock Text="Manage profiles, drawings, and templates"
-                       Style="{StaticResource BodyTextBlockStyle}"
-                       Opacity="0.7"/>
-        </StackPanel>
-
-        <!-- Tab View (Modern, Clean) -->
-        <TabView Grid.Row="1"
-                 x:Name="ManagementTabView"
-                 TabWidthMode="Equal"
-                 SelectionChanged="ManagementTabView_SelectionChanged"
-                 CanDragTabs="False"
-                 CanReorderTabs="False"
-                 IsAddTabButtonVisible="False"
-                 Margin="0,16,0,0">
-
-            <!-- Profiles Tab -->
-            <TabView.TabItems>
-                <TabViewItem Header="Profiles">
-                    <TabViewItem.IconSource>
-                        <SymbolIconSource Symbol="Contact"/>
-                    </TabViewItem.IconSource>
-                    <Frame x:Name="ProfilesFrame"/>
-                </TabViewItem>
-
-                <!-- Drawings Tab -->
-                <TabViewItem Header="Drawings">
-                    <TabViewItem.IconSource>
-                        <SymbolIconSource Symbol="Library"/>
-                    </TabViewItem.IconSource>
-                    <Frame x:Name="DrawingsFrame"/>
-                </TabViewItem>
-
-                <!-- Templates Tab -->
-                <TabViewItem Header="Templates">
-                    <TabViewItem.IconSource>
-                        <SymbolIconSource Symbol="Favorite"/>
-                    </TabViewItem.IconSource>
-                    <Frame x:Name="TemplatesFrame"/>
-                </TabViewItem>
-            </TabView.TabItems>
-        </TabView>
-
-        <!-- Toolbar chung (chỉ hiển thị cho Drawings/Templates tab) -->
-        <Border x:Name="ToolbarBorder"
-                Grid.Row="2"
-                Background="{ThemeResource LayerFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                BorderThickness="0,1,0,0"
-                Padding="16,12"
-                Margin="0,0,0,0"
-                Visibility="Collapsed">
-            <StackPanel Orientation="Horizontal" Spacing="12">
-                <Button x:Name="RefreshButton"
-                        Style="{StaticResource AppAccentButtonStyle}"
-                        Click="RefreshButton_Click">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE72C;"/>
-                        <TextBlock Text="Refresh"/>
+            <NavigationView.Header>
+                <Grid Height="Auto" Padding="16,12">
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                      Glyph="&#xE8F1;"
+                                      FontSize="28"
+                                      Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                      VerticalAlignment="Center"/>
+                            <TextBlock Text="Management"
+                                       Style="{StaticResource TitleTextBlockStyle}"
+                                       FontWeight="Bold"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="Manage profiles, drawings, and templates"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Opacity="0.7"/>
                     </StackPanel>
-                </Button>
+                </Grid>
+            </NavigationView.Header>
 
-                <!-- Add more common actions here if needed -->
-            </StackPanel>
-        </Border>
+            <!-- Menu Items -->
+            <NavigationView.MenuItems>
+                <!-- Profiles -->
+                <NavigationViewItem Icon="Contact"
+                                    Content="Profiles"
+                                    Tag="Profiles"
+                                    ToolTipService.ToolTip="Manage your profiles and settings"/>
+
+                <!-- Drawings -->
+                <NavigationViewItem Icon="Library"
+                                    Content="Drawings"
+                                    Tag="Drawings"
+                                    ToolTipService.ToolTip="Manage saved drawings"/>
+
+                <!-- Templates -->
+                <NavigationViewItem Icon="Favorite"
+                                    Content="Templates"
+                                    Tag="Templates"
+                                    ToolTipService.ToolTip="Manage shape templates"/>
+            </NavigationView.MenuItems>
+
+            <!-- Content Frame -->
+            <Frame x:Name="ContentFrame"
+                   Navigated="ContentFrame_Navigated"/>
+        </NavigationView>
     </Grid>
 </Page>
