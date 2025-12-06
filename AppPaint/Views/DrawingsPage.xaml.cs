@@ -6,6 +6,7 @@ using AppPaint.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Data.Models;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AppPaint.Views;
@@ -105,10 +106,28 @@ var successDialog = new ContentDialog
         // Get ShellPage from RootFrame
    if (mainWindow.Content is Frame rootFrame && rootFrame.Content is ShellPage shellPage)
    {
-    // Use ShellPage's public method
+                // Get drawing to extract ProfileId
+    if (drawingId.HasValue)
+   {
+    // Find drawing in ViewModel
+     var drawing = ViewModel.Templates.FirstOrDefault(d => d.Id == drawingId.Value);
+        if (drawing != null)
+        {
+      // TODO: Drawing should have ProfileId! For now, use active profile
+         // This is a temporary solution - we need to add ProfileId to DrawingTemplate
+      var parameters = new AppPaint.Models.DrawingNavigationParameters(
+ profileId: 1, // TEMPORARY - should get from drawing.ProfileId
+       drawingId: drawingId
+   );
+            shellPage.NavigateToDrawingCanvas(parameters);
+    return;
+  }
+    }
+         
+       // Fallback: Navigate with drawing ID only (old behavior)
     shellPage.NavigateToDrawingCanvas(drawingId);
-}
-     }
+    }
+   }
     }
 
     private async void RefreshButton_Click(object sender, RoutedEventArgs e)
