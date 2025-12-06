@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Media;
@@ -100,34 +100,69 @@ var successDialog = new ContentDialog
 
     private void NavigateToDrawingCanvas(int? drawingId)
     {
- // Get MainWindow via static property
-        if (App.MainWindow is MainWindow mainWindow)
+    System.Diagnostics.Debug.WriteLine($"🎯 DrawingsPage.NavigateToDrawingCanvas - DrawingId: {drawingId}");
+        
+        // Get MainWindow via static property
+   if (App.MainWindow is MainWindow mainWindow)
+    {
+  System.Diagnostics.Debug.WriteLine("✅ Got MainWindow");
+     
+     // Get RootFrame from MainWindow (defined in MainWindow.xaml)
+        var rootFrame = mainWindow.Content as Grid;
+   if (rootFrame != null)
+            {
+       // Find RootFrame by name
+  var frameElement = rootFrame.FindName("RootFrame") as Frame;
+       if (frameElement != null && frameElement.Content is ShellPage shellPage)
         {
-        // Get ShellPage from RootFrame
-   if (mainWindow.Content is Frame rootFrame && rootFrame.Content is ShellPage shellPage)
-   {
-                // Get drawing to extract ProfileId
-    if (drawingId.HasValue)
-   {
-    // Find drawing in ViewModel
-     var drawing = ViewModel.Templates.FirstOrDefault(d => d.Id == drawingId.Value);
-        if (drawing != null)
+         System.Diagnostics.Debug.WriteLine("✅ Got ShellPage via RootFrame");
+      
+   // Get drawing to extract ProfileId
+     if (drawingId.HasValue)
+         {
+       // Find drawing in ViewModel
+        var drawing = ViewModel.Templates.FirstOrDefault(d => d.Id == drawingId.Value);
+             if (drawing != null)
+      {
+         System.Diagnostics.Debug.WriteLine($"✅ Found drawing: {drawing.Name}");
+      
+       // TODO: Drawing should have ProfileId! For now, use active profile
+    // This is a temporary solution - we need to add ProfileId to DrawingTemplate
+     var parameters = new AppPaint.Models.DrawingNavigationParameters(
+    profileId: 1, // TEMPORARY - should get from drawing.ProfileId
+ drawingId: drawingId
+             );
+          
+         System.Diagnostics.Debug.WriteLine($"✅ Created parameters: ProfileId={parameters.ProfileId}, DrawingId={parameters.DrawingId}");
+           
+  shellPage.NavigateToDrawingCanvas(parameters);
+             System.Diagnostics.Debug.WriteLine("✅ Navigation called!");
+      return;
+             }
+             else
         {
-      // TODO: Drawing should have ProfileId! For now, use active profile
-         // This is a temporary solution - we need to add ProfileId to DrawingTemplate
-      var parameters = new AppPaint.Models.DrawingNavigationParameters(
- profileId: 1, // TEMPORARY - should get from drawing.ProfileId
-       drawingId: drawingId
-   );
-            shellPage.NavigateToDrawingCanvas(parameters);
-    return;
-  }
-    }
-         
-       // Fallback: Navigate with drawing ID only (old behavior)
-    shellPage.NavigateToDrawingCanvas(drawingId);
-    }
+           System.Diagnostics.Debug.WriteLine($"❌ Drawing {drawingId} not found in ViewModel");
    }
+       }
+         
+    // Fallback: Navigate with drawing ID only (old behavior)
+     System.Diagnostics.Debug.WriteLine("⚠️ Using fallback navigation");
+      shellPage.NavigateToDrawingCanvas(drawingId);
+          }
+      else
+       {
+          System.Diagnostics.Debug.WriteLine("❌ Could not get ShellPage from RootFrame");
+            }
+  }
+     else
+    {
+    System.Diagnostics.Debug.WriteLine("❌ MainWindow.Content is not Grid");
+   }
+  }
+        else
+        {
+   System.Diagnostics.Debug.WriteLine("❌ Could not get MainWindow");
+        }
     }
 
     private async void RefreshButton_Click(object sender, RoutedEventArgs e)
