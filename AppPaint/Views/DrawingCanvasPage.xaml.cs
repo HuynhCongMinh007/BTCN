@@ -69,9 +69,15 @@ public sealed partial class DrawingCanvasPage : Page
  System.Diagnostics.Debug.WriteLine($"📍 DrawingCanvasPage.OnNavigatedTo - Parameter: {e.Parameter?.GetType().Name ?? "null"}");
   
         base.OnNavigatedTo(e);
-        ViewModel.OnNavigatedTo(e.Parameter);
+  ViewModel.OnNavigatedTo(e.Parameter);
         
       System.Diagnostics.Debug.WriteLine("✅ ViewModel.OnNavigatedTo called");
+ 
+ // Subscribe to ViewModel.Shapes collection changes to render shapes
+ViewModel.Shapes.CollectionChanged += Shapes_CollectionChanged;
+        
+  // Render existing shapes if any
+  RenderShapesFromViewModel();
     }
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -79,11 +85,171 @@ public sealed partial class DrawingCanvasPage : Page
         base.OnNavigatedFrom(e);
 
         // Unsubscribe
+   ViewModel.Shapes.CollectionChanged -= Shapes_CollectionChanged;
         ViewModel.NavigateBackRequested -= OnNavigateBackRequested;
         ViewModel.ClearCanvasRequested -= OnClearCanvasRequested;
-        ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+    ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
 
         ViewModel.OnNavigatedFrom();
+    }
+
+    /// <summary>
+    /// Handle when shapes collection changes in ViewModel
+  /// </summary>
+    private void Shapes_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+  {
+     // When shapes are loaded from DB, render them
+  if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && e.NewItems != null)
+        {
+  foreach (Data.Models.Shape shape in e.NewItems)
+       {
+    RenderShapeOnCanvas(shape);
+  }
+   }
+        else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+   {
+      // Clear and re-render all shapes
+    RenderShapesFromViewModel();
+        }
+    }
+
+    /// <summary>
+    /// Render all shapes from ViewModel to Canvas
+    /// </summary>
+    private void RenderShapesFromViewModel()
+    {
+  System.Diagnostics.Debug.WriteLine($"🎨 Rendering {ViewModel.Shapes.Count} shapes from ViewModel");
+        
+        // Clear canvas UI (but keep ViewModel.Shapes intact)
+   DrawingCanvas.Children.Clear();
+  
+   // Render each shape
+  foreach (var shape in ViewModel.Shapes)
+   {
+     RenderShapeOnCanvas(shape);
+}
+   
+        System.Diagnostics.Debug.WriteLine($"✅ Rendered {ViewModel.Shapes.Count} shapes to canvas");
+    }
+
+    /// <summary>
+ /// Render a single shape from data model to UI canvas
+    /// </summary>
+    private void RenderShapeOnCanvas(Data.Models.Shape shape)
+    {
+   try
+        {
+ // Parse points data
+   var points = DrawingService.JsonToPoints(shape.PointsData);
+   if (points.Count < 2)
+     {
+    System.Diagnostics.Debug.WriteLine($"⚠️ Invalid points data for shape {shape.Id}");
+   return;
+  }
+
+    UIShape? uiShape = null;
+
+     switch (shape.ShapeType)
+     {
+        case ShapeType.Line:
+    if (points.Count >= 2)
+      {
+    uiShape = DrawingService.CreateLine(
+      points[0], points[1],
+  shape.Color,
+      shape.StrokeThickness,
+   shape.StrokeStyle
+  );
+      }
+       break;
+
+    case ShapeType.Rectangle:
+     if (points.Count >= 2)
+    {
+        uiShape = DrawingService.CreateRectangle(
+    points[0], points[1],
+      shape.Color,
+      shape.StrokeThickness,
+   shape.IsFilled,
+  shape.StrokeStyle,
+          shape.FillColor
+        );
+  }
+   break;
+
+     case ShapeType.Circle:
+   if (points.Count >= 2)
+   {
+           uiShape = DrawingService.CreateEllipse(
+         points[0], points[1],
+       shape.Color,
+        shape.StrokeThickness,
+     isCircle: true,
+      shape.IsFilled,
+      shape.StrokeStyle,
+      shape.FillColor
+     );
+      }
+       break;
+
+  case ShapeType.Oval:
+   if (points.Count >= 2)
+ {
+     uiShape = DrawingService.CreateEllipse(
+points[0], points[1],
+       shape.Color,
+       shape.StrokeThickness,
+isCircle: false,
+      shape.IsFilled,
+    shape.StrokeStyle,
+    shape.FillColor
+       );
+    }
+    break;
+
+    case ShapeType.Triangle:
+       if (points.Count >= 2)
+    {
+        uiShape = DrawingService.CreateTriangle(
+          points[0], points[1],
+       shape.Color,
+        shape.StrokeThickness,
+  shape.IsFilled,
+         shape.StrokeStyle,
+  shape.FillColor
+        );
+    }
+          break;
+
+  case ShapeType.Polygon:
+   if (points.Count >= 3)
+      {
+      uiShape = DrawingService.CreatePolygon(
+      points,
+       shape.Color,
+           shape.StrokeThickness,
+   shape.IsFilled,
+         shape.StrokeStyle,
+         shape.FillColor
+ );
+}
+      break;
+  }
+
+   if (uiShape != null)
+  {
+     DrawingCanvas.Children.Add(uiShape);
+      System.Diagnostics.Debug.WriteLine($"✅ Rendered {shape.ShapeType} shape (ID: {shape.Id})");
+      }
+   else
+  {
+     System.Diagnostics.Debug.WriteLine($"❌ Failed to render {shape.ShapeType} shape (ID: {shape.Id})");
+  }
+        }
+     catch (Exception ex)
+        {
+System.Diagnostics.Debug.WriteLine($"❌ Error rendering shape {shape.Id}: {ex.Message}");
+   }
     }
 
     private void DrawingCanvas_PointerPressed(object sender, PointerRoutedEventArgs e)
