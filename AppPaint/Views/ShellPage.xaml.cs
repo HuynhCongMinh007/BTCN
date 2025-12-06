@@ -130,4 +130,22 @@ _breadcrumbs.Add((tag, title));
       System.Diagnostics.Debug.WriteLine($"Error setting theme: {ex.Message}");
  }
   }
+
+    /// <summary>
+    /// Navigate to DrawingCanvasPage from anywhere in the app
+  /// </summary>
+  public void NavigateToDrawingCanvas(int? drawingId)
+    {
+   ContentFrame.Navigate(typeof(DrawingCanvasPage), drawingId);
+   UpdateBreadcrumb("DrawingCanvas", "Draw Canvas");
+    
+    // Update NavigationView selection
+    var drawingItem = NavView.MenuItems
+       .OfType<NavigationViewItem>()
+     .FirstOrDefault(item => item.Tag?.ToString() == "DrawingCanvas");
+   if (drawingItem != null)
+   {
+       NavView.SelectedItem = drawingItem;
+   }
+    }
 }
