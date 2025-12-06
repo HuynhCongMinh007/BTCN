@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Page
     x:Class="AppPaint.Views.DashboardPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -10,285 +10,245 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <ScrollViewer>
-    <Grid Padding="24" MaxWidth="1400">
-            <Grid.RowDefinitions>
-           <RowDefinition Height="Auto"/>
-     <RowDefinition Height="Auto"/>
-   <RowDefinition Height="Auto"/>
-              <RowDefinition Height="*"/>
+        <Grid Padding="24">
+  <Grid.RowDefinitions>
+       <RowDefinition Height="Auto"/>
+         <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
       </Grid.RowDefinitions>
 
-         <!-- Breadcrumb Navigation -->
-    <BreadcrumbBar Grid.Row="0" Margin="0,0,0,24">
-        <BreadcrumbBar.Items>
-         <BreadcrumbBarItem Content="Home"/>
-        <BreadcrumbBarItem Content="Management"/>
-      <BreadcrumbBarItem Content="Dashboard"/>
-     </BreadcrumbBar.Items>
-         </BreadcrumbBar>
+         <!-- Header -->
+            <StackPanel Grid.Row="0" Spacing="8" Margin="0,0,0,24">
+      <TextBlock Text="📊 Dashboard"
+           Style="{StaticResource TitleLargeTextBlockStyle}"
+      FontWeight="Bold"/>
+          <TextBlock Text="Overview of your drawings and usage statistics"
+     Opacity="0.7"/>
+       </StackPanel>
 
-     <!-- Page Header -->
-     <StackPanel Grid.Row="1" Spacing="8" Margin="0,0,0,32">
-                <StackPanel Orientation="Horizontal" Spacing="12">
-  <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
-        Glyph="&#xE9D9;"
-         FontSize="32"
-  Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
-            <TextBlock Text="Dashboard"
-   Style="{StaticResource TitleLargeTextBlockStyle}"
-  FontWeight="Bold"
-   VerticalAlignment="Center"/>
-            </StackPanel>
-       <TextBlock Text="Overview of your drawings, shapes, and activity"
-             Style="{StaticResource BodyTextBlockStyle}"
-       Opacity="0.7"/>
-            </StackPanel>
-
-          <!-- Stats Cards Row -->
-            <Grid Grid.Row="2" Margin="0,0,0,32">
-      <Grid.ColumnDefinitions>
-     <ColumnDefinition Width="*"/>
+            <!-- Statistics Cards -->
+            <Grid Grid.Row="1" Margin="0,0,0,24">
+         <Grid.ColumnDefinitions>
+   <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="*"/>
           <ColumnDefinition Width="*"/>
-<ColumnDefinition Width="*"/>
-       <ColumnDefinition Width="*"/>
-     </Grid.ColumnDefinitions>
+           <ColumnDefinition Width="*"/>
+             </Grid.ColumnDefinitions>
 
-       <!-- Total Drawings Card -->
-        <Border Grid.Column="0"
-     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-       BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-        BorderThickness="1"
-   CornerRadius="8"
-         Padding="20"
- Margin="0,0,8,0">
-   <StackPanel Spacing="8">
-       <StackPanel Orientation="Horizontal" Spacing="8">
-   <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
-      Glyph="&#xE8F1;"
-            FontSize="20"
-              Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
-        <TextBlock Text="Total Drawings"
-        Style="{StaticResource BodyTextBlockStyle}"
-Opacity="0.7"/>
-            </StackPanel>
-       <TextBlock x:Name="TotalDrawingsText"
-    Text="0"
-               FontSize="36"
-     FontWeight="Bold"/>
-     </StackPanel>
-     </Border>
+                <!-- Total Drawings Card -->
+ <Border Grid.Column="0" 
+            Background="{ThemeResource AccentFillColorDefaultBrush}"
+        CornerRadius="8"
+      Padding="20"
+   Margin="0,0,8,0">
+       <StackPanel Spacing="8">
+          <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+     Glyph="&#xE8F1;"
+     FontSize="32"
+    Foreground="White"/>
+      <TextBlock Text="{x:Bind ViewModel.TotalDrawings, Mode=OneWay}"
+      FontSize="32"
+FontWeight="Bold"
+   Foreground="White"/>
+           <TextBlock Text="Total Drawings"
+       FontSize="14"
+  Foreground="White"
+       Opacity="0.9"/>
+             </StackPanel>
+                </Border>
 
-                <!-- Total Shapes Card -->
-       <Border Grid.Column="1"
-         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+   <!-- Total Shapes Card -->
+    <Border Grid.Column="1"
+        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
        BorderThickness="1"
-          CornerRadius="8"
-          Padding="20"
-          Margin="4,0">
-              <StackPanel Spacing="8">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-       <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
-            Glyph="&#xE91B;"
-         FontSize="20"
-     Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
-         <TextBlock Text="Total Shapes"
-                 Style="{StaticResource BodyTextBlockStyle}"
-           Opacity="0.7"/>
+ CornerRadius="8"
+             Padding="20"
+         Margin="4,0">
+       <StackPanel Spacing="8">
+   <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                 Glyph="&#xE91B;"
+       FontSize="32"
+            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+ <TextBlock Text="{x:Bind ViewModel.TotalShapes, Mode=OneWay}"
+   FontSize="32"
+       FontWeight="Bold"/>
+   <TextBlock Text="Total Shapes"
+             FontSize="14"
+          Opacity="0.7"/>
      </StackPanel>
-     <TextBlock x:Name="TotalShapesText"
-         Text="0"
-           FontSize="36"
-           FontWeight="Bold"/>
- </StackPanel>
-        </Border>
+          </Border>
 
      <!-- Total Profiles Card -->
        <Border Grid.Column="2"
         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-       BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-             BorderThickness="1"
-           CornerRadius="8"
-    Padding="20"
-      Margin="4,0">
-      <StackPanel Spacing="8">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-     <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
-        Glyph="&#xE77B;"
-      FontSize="20"
-     Foreground="{ThemeResource SystemFillColorCautionBrush}"/>
-                  <TextBlock Text="Profiles"
-              Style="{StaticResource BodyTextBlockStyle}"
-               Opacity="0.7"/>
-      </StackPanel>
-             <TextBlock x:Name="TotalProfilesText"
-        Text="0"
-  FontSize="36"
-     FontWeight="Bold"/>
-   </StackPanel>
-          </Border>
-
-     <!-- Active Profile Card -->
-              <Border Grid.Column="3"
-         Background="{ThemeResource AccentFillColorDefaultBrush}"
+        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+   BorderThickness="1"
          CornerRadius="8"
-              Padding="20"
-                 Margin="8,0,0,0">
-    <StackPanel Spacing="8">
-      <StackPanel Orientation="Horizontal" Spacing="8">
-    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
-         Glyph="&#xE8FB;"
-          FontSize="20"
-                  Foreground="White"/>
-      <TextBlock Text="Active Profile"
-        Style="{StaticResource BodyTextBlockStyle}"
-  Foreground="White"
-          Opacity="0.9"/>
-        </StackPanel>
-            <TextBlock x:Name="ActiveProfileText"
-      Text="None"
-             FontSize="24"
-        FontWeight="SemiBold"
-         Foreground="White"
-     TextTrimming="CharacterEllipsis"/>
-    </StackPanel>
-              </Border>
-     </Grid>
-
-            <!-- Charts Row -->
-            <Grid Grid.Row="3">
-       <Grid.ColumnDefinitions>
-       <ColumnDefinition Width="*"/>
-      <ColumnDefinition Width="16"/>
-      <ColumnDefinition Width="*"/>
-   </Grid.ColumnDefinitions>
-
-                <!-- Shape Types Chart -->
-     <Border Grid.Column="0"
-       Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-             BorderThickness="1"
-     CornerRadius="8"
-           Padding="24">
-      <StackPanel Spacing="16">
-             <TextBlock Text="Shape Types Distribution"
-    Style="{StaticResource SubtitleTextBlockStyle}"
-          FontWeight="SemiBold"/>
-  
-             <ItemsRepeater x:Name="ShapeTypesChart">
-   <ItemsRepeater.Layout>
-       <StackLayout Spacing="12"/>
-  </ItemsRepeater.Layout>
-   <ItemsRepeater.ItemTemplate>
-  <DataTemplate>
-  <Grid>
-           <Grid.ColumnDefinitions>
- <ColumnDefinition Width="100"/>
-         <ColumnDefinition Width="*"/>
-        <ColumnDefinition Width="Auto"/>
-  </Grid.ColumnDefinitions>
-
- <TextBlock Grid.Column="0"
-       Text="{Binding ShapeType}"
-      VerticalAlignment="Center"/>
-        
-            <ProgressBar Grid.Column="1"
-              Value="{Binding Percentage}"
-          Maximum="100"
- Margin="8,0"
-   VerticalAlignment="Center"/>
-         
-    <TextBlock Grid.Column="2"
-        VerticalAlignment="Center">
-              <Run Text="{Binding Count}"/>
-        <Run Text="(" Opacity="0.7"/>
-       <Run Text="{Binding Percentage}" Opacity="0.7"/>
-              <Run Text="%)" Opacity="0.7"/>
-  </TextBlock>
-  </Grid>
-       </DataTemplate>
-  </ItemsRepeater.ItemTemplate>
- </ItemsRepeater>
-
-         <TextBlock x:Name="NoShapesMessage"
-  Text="No shapes created yet. Start drawing to see statistics!"
-           TextWrapping="Wrap"
-             Opacity="0.7"
-     HorizontalAlignment="Center"
-      Visibility="Collapsed"/>
-                 </StackPanel>
-                </Border>
-
-   <!-- Most Used Drawings Chart -->
-           <Border Grid.Column="2"
-    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-   BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-        BorderThickness="1"
-             CornerRadius="8"
-            Padding="24">
-         <StackPanel Spacing="16">
-        <TextBlock Text="Most Used Drawings"
-     Style="{StaticResource SubtitleTextBlockStyle}"
-   FontWeight="SemiBold"/>
-          
-   <ItemsRepeater x:Name="TopDrawingsChart">
-            <ItemsRepeater.Layout>
-         <StackLayout Spacing="12"/>
-               </ItemsRepeater.Layout>
-   <ItemsRepeater.ItemTemplate>
-             <DataTemplate>
-     <Grid>
-             <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto"/>
-         <ColumnDefinition Width="*"/>
-    <ColumnDefinition Width="Auto"/>
-</Grid.ColumnDefinitions>
-
-      <Border Grid.Column="0"
-    Background="{ThemeResource AccentFillColorDefaultBrush}"
-   CornerRadius="12"
-     Width="24"
-       Height="24"
-        Margin="0,0,12,0">
-           <TextBlock Text="{Binding Rank}"
-   FontSize="12"
-   FontWeight="Bold"
-    Foreground="White"
-     HorizontalAlignment="Center"
-      VerticalAlignment="Center"/>
-      </Border>
-
-                 <StackPanel Grid.Column="1">
- <TextBlock Text="{Binding Name}"
-          FontWeight="SemiBold"
-   TextTrimming="CharacterEllipsis"/>
-           <TextBlock Opacity="0.7"
-            Style="{StaticResource CaptionTextBlockStyle}">
-   <Run Text="{Binding ShapeCount}"/>
-       <Run Text="shapes"/>
-      </TextBlock>
+             Padding="20"
+    Margin="4,0">
+       <StackPanel Spacing="8">
+                 <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+         Glyph="&#xE77B;"
+    FontSize="32"
+          Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+            <TextBlock Text="{x:Bind ViewModel.TotalProfiles, Mode=OneWay}"
+    FontSize="32"
+    FontWeight="Bold"/>
+   <TextBlock Text="Profiles"
+  FontSize="14"
+    Opacity="0.7"/>
          </StackPanel>
-
-        <TextBlock Grid.Column="2"
-     Text="{Binding ShapeCount}"
-FontSize="20"
-         FontWeight="Bold"
-     Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-       VerticalAlignment="Center"/>
- </Grid>
-  </DataTemplate>
-       </ItemsRepeater.ItemTemplate>
-       </ItemsRepeater>
-
-      <TextBlock x:Name="NoDrawingsMessage"
-      Text="No drawings yet. Create your first drawing to see statistics!"
-        TextWrapping="Wrap"
-      Opacity="0.7"
-              HorizontalAlignment="Center"
-                 Visibility="Collapsed"/>
-        </StackPanel>
       </Border>
+
+  <!-- Average Shapes Per Drawing Card -->
+  <Border Grid.Column="3"
+             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+    CornerRadius="8"
+ Padding="20"
+      Margin="8,0,0,0">
+     <StackPanel Spacing="8">
+         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+       Glyph="&#xE9D9;"
+       FontSize="32"
+     Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+   <TextBlock Text="{x:Bind ViewModel.AverageShapesPerDrawing, Mode=OneWay}"
+      FontSize="32"
+    FontWeight="Bold"/>
+    <TextBlock Text="Avg Shapes/Drawing"
+      FontSize="14"
+       Opacity="0.7"/>
+            </StackPanel>
+       </Border>
+          </Grid>
+
+    <!-- Charts and Details -->
+            <Grid Grid.Row="2">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+
+    <!-- Shape Type Distribution -->
+      <Border Grid.Row="0"
+        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+ BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+          BorderThickness="1"
+      CornerRadius="8"
+        Padding="24"
+        Margin="0,0,0,16">
+     <StackPanel Spacing="16">
+               <TextBlock Text="📈 Shape Type Distribution"
+      FontSize="20"
+     FontWeight="SemiBold"/>
+
+      <ItemsRepeater ItemsSource="{x:Bind ViewModel.ShapeTypeStats, Mode=OneWay}">
+        <ItemsRepeater.Layout>
+              <StackLayout Spacing="12"/>
+     </ItemsRepeater.Layout>
+           <ItemsRepeater.ItemTemplate>
+         <DataTemplate>
+       <Grid>
+           <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="120"/>
+     <ColumnDefinition Width="*"/>
+         <ColumnDefinition Width="80"/>
+     </Grid.ColumnDefinitions>
+
+     <!-- Shape Type Name -->
+         <TextBlock Grid.Column="0"
+              Text="{Binding ShapeTypeName}"
+  VerticalAlignment="Center"
+          FontWeight="SemiBold"/>
+
+     <!-- Progress Bar -->
+               <ProgressBar Grid.Column="1"
+     Value="{Binding Percentage}"
+             Maximum="100"
+            Margin="12,0"
+     VerticalAlignment="Center"
+      Height="20"
+           CornerRadius="4"/>
+
+   <!-- Count and Percentage -->
+              <StackPanel Grid.Column="2"
+            Orientation="Horizontal"
+    Spacing="8"
+      HorizontalAlignment="Right">
+         <TextBlock Text="{Binding Count}"
+   FontWeight="Bold"/>
+      <TextBlock Opacity="0.7">
+ <Run Text="("/>
+             <Run Text="{Binding Percentage}"/>
+            <Run Text="%)"/>
+       </TextBlock>
+    </StackPanel>
+           </Grid>
+        </DataTemplate>
+           </ItemsRepeater.ItemTemplate>
+              </ItemsRepeater>
+             </StackPanel>
+  </Border>
+
+       <!-- Recent Activity -->
+    <Border Grid.Row="1"
+           Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+     CornerRadius="8"
+      Padding="24">
+        <StackPanel Spacing="16">
+       <TextBlock Text="🕒 Recent Drawings"
+  FontSize="20"
+   FontWeight="SemiBold"/>
+
+              <ListView ItemsSource="{x:Bind ViewModel.RecentDrawings, Mode=OneWay}"
+           SelectionMode="None"
+       MaxHeight="300">
+  <ListView.ItemTemplate>
+   <DataTemplate>
+         <Grid Padding="12">
+ <Grid.ColumnDefinitions>
+<ColumnDefinition Width="Auto"/>
+     <ColumnDefinition Width="*"/>
+     <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+         <!-- Icon -->
+       <FontIcon Grid.Column="0"
+            FontFamily="{StaticResource SymbolThemeFontFamily}"
+     Glyph="&#xE8F1;"
+            FontSize="24"
+   Margin="0,0,16,0"
+             Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+
+     <!-- Info -->
+       <StackPanel Grid.Column="1" Spacing="4">
+      <TextBlock Text="{Binding Name}"
+      FontWeight="SemiBold"/>
+     <TextBlock Opacity="0.7">
+        <Run Text="{Binding Shapes.Count}"/>
+     <Run Text="shapes • "/>
+   <Run Text="{Binding Width}"/>
+         <Run Text="×"/>
+       <Run Text="{Binding Height}"/>
+          </TextBlock>
+        </StackPanel>
+
+                <!-- Date -->
+             <TextBlock Grid.Column="2"
+     Text="{Binding CreatedAt}"
+           Opacity="0.7"
+      VerticalAlignment="Center"/>
+        </Grid>
+          </DataTemplate>
+      </ListView.ItemTemplate>
+  </ListView>
+             </StackPanel>
+              </Border>
       </Grid>
-   </Grid>
+      </Grid>
     </ScrollViewer>
 </Page>
