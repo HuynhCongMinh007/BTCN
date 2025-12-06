@@ -480,15 +480,14 @@ public sealed partial class DrawingCanvasPage : Page
       if (!(shape is Line)) // Lines don't need resize handles
         {
    _resizeHandle = new Ellipse
-            {
+     {
      Width = 12,
     Height = 12,
-           Fill = new SolidColorBrush(Microsoft.UI.Colors.Blue),
+      Fill = new SolidColorBrush(Microsoft.UI.Colors.Blue),
         Stroke = new SolidColorBrush(Microsoft.UI.Colors.White),
- StrokeThickness = 2,
-      Cursor = Microsoft.UI.Input.InputSystemCursor.Create(Microsoft.UI.Input.InputSystemCursorShape.SizeNorthwestSoutheast)
+ StrokeThickness = 2
           };
-            Canvas.SetLeft(_resizeHandle, left + width - 6);
+    Canvas.SetLeft(_resizeHandle, left + width - 6);
       Canvas.SetTop(_resizeHandle, top + height - 6);
        Canvas.SetZIndex(_resizeHandle, 1000);
     DrawingCanvas.Children.Add(_resizeHandle);
@@ -520,8 +519,15 @@ public sealed partial class DrawingCanvasPage : Page
             DrawingCanvas.Children.Remove(_selectionBorder);
             _selectionBorder = null;
         }
+        if (_resizeHandle != null)
+        {
+            _resizeHandle.PointerPressed -= ResizeHandle_PointerPressed;
+            DrawingCanvas.Children.Remove(_resizeHandle);
+            _resizeHandle = null;
+        }
         _selectedShape = null;
-        HidePropertyEditor();
+        _activeResizeCorner = ResizeCorner.None;
+      HidePropertyEditor();
     }
 
     private void LoadShapeProperties(UIShape shape)
@@ -726,138 +732,134 @@ public sealed partial class DrawingCanvasPage : Page
     {
         var currentPoint = e.GetCurrentPoint(DrawingCanvas).Position;
 
-        // Handle shape dragging
-        if (_isDraggingShape && _selectedShape != null)
-        {
-            var deltaX = currentPoint.X - _dragStartPoint.X;
-            var deltaY = currentPoint.Y - _dragStartPoint.Y;
-
-            MoveShape(_selectedShape, _shapeStartPosition.X + deltaX, _shapeStartPosition.Y + deltaY);
-
-            // Update selection border
-            if (_selectionBorder != null)
-            {
-                Canvas.SetLeft(_selectionBorder, Canvas.GetLeft(_selectedShape));
-                Canvas.SetTop(_selectionBorder, Canvas.GetTop(_selectedShape));
-            }
-
-            e.Handled = true;
-            return;
-        }
-
         // Handle shape resizing
-        if (_isResizingShape && _selectedShape != null && _activeResizeCorner != ResizeCorner.None)
+        if (_isResizingShape && _selectedShape != null)
         {
-            var deltaX = currentPoint.X - _dragStartPoint.X;
-            var deltaY = currentPoint.Y - _dragStartPoint.Y;
+      var deltaX = currentPoint.X - _dragStartPoint.X;
+     var deltaY = currentPoint.Y - _dragStartPoint.Y;
 
-            // Calculate new position and size based on active resize corner
-            double newX = _shapeStartPosition.X;
-            double newY = _shapeStartPosition.Y;
-            double newWidth = GetShapeWidth(_selectedShape);
-            double newHeight = GetShapeHeight(_selectedShape);
+     ResizeShape(_selectedShape, deltaX, deltaY);
 
-            switch (_activeResizeCorner)
-            {
-                case ResizeCorner.TopLeft:
-                    newX += deltaX;
-                    newY += deltaY;
-                    newWidth -= deltaX;
-                    newHeight -= deltaY;
-                    break;
-                case ResizeCorner.TopRight:
-                    newY += deltaY;
-                    newWidth += deltaX;
-                    newHeight -= deltaY;
-                    break;
-                case ResizeCorner.BottomLeft:
-                    newX += deltaX;
-                    newWidth -= deltaX;
-                    newHeight += deltaY;
-                    break;
-                case ResizeCorner.BottomRight:
-                    newWidth += deltaX;
-                    newHeight += deltaY;
-                    break;
-            }
+   // Update selection border and resize handle
+    if (_selectionBorder != null && _resizeHandle != null)
+  {
+      var left = Canvas.GetLeft(_selectedShape);
+       var top = Canvas.GetTop(_selectedShape);
+    var width = GetShapeWidth(_selectedShape);
+      var height = GetShapeHeight(_selectedShape);
 
-            // Update shape geometry
-            UpdateShapeSizeAndPosition(_selectedShape, newX, newY, newWidth, newHeight);
+  _selectionBorder.Width = width;
+     _selectionBorder.Height = height;
+        Canvas.SetLeft(_selectionBorder, left);
+      Canvas.SetTop(_selectionBorder, top);
 
-            e.Handled = true;
+    Canvas.SetLeft(_resizeHandle, left + width - 6);
+      Canvas.SetTop(_resizeHandle, top + height - 6);
+}
+
+  e.Handled = true;
             return;
-        }
+   }
+
+   // Handle shape dragging
+     if (_isDraggingShape && _selectedShape != null)
+   {
+  var deltaX = currentPoint.X - _dragStartPoint.X;
+ var deltaY = currentPoint.Y - _dragStartPoint.Y;
+
+      MoveShape(_selectedShape, _shapeStartPosition.X + deltaX, _shapeStartPosition.Y + deltaY);
+         
+  // Update selection border and resize handle
+      if (_selectionBorder != null)
+       {
+     Canvas.SetLeft(_selectionBorder, Canvas.GetLeft(_selectedShape));
+      Canvas.SetTop(_selectionBorder, Canvas.GetTop(_selectedShape));
+   }
+      if (_resizeHandle != null)
+       {
+var left = Canvas.GetLeft(_selectedShape);
+  var top = Canvas.GetTop(_selectedShape);
+  var width = GetShapeWidth(_selectedShape);
+    var height = GetShapeHeight(_selectedShape);
+           Canvas.SetLeft(_resizeHandle, left + width - 6);
+ Canvas.SetTop(_resizeHandle, top + height - 6);
+     }
+         
+e.Handled = true;
+            return;
+    }
 
         if (!_isDrawing) return;
-        if (ViewModel.SelectedShapeType == ShapeType.Polygon) return;
+   if (ViewModel.SelectedShapeType == ShapeType.Polygon) return;
 
         // Clamp to canvas bounds
-        currentPoint.X = Math.Max(0, Math.Min(DrawingCanvas.Width, currentPoint.X));
-        currentPoint.Y = Math.Max(0, Math.Min(DrawingCanvas.Height, currentPoint.Y));
+ currentPoint.X = Math.Max(0, Math.Min(DrawingCanvas.Width, currentPoint.X));
+   currentPoint.Y = Math.Max(0, Math.Min(DrawingCanvas.Height, currentPoint.Y));
 
-        // Remove previous preview
+  // Remove previous preview
         if (_previewShape != null)
-        {
-            DrawingCanvas.Children.Remove(_previewShape);
-        }
+     {
+       DrawingCanvas.Children.Remove(_previewShape);
+     }
 
-        // Create preview shape
-        _previewShape = CreateShape(_startPoint, currentPoint, ViewModel.SelectedShapeType, true);
-        if (_previewShape != null)
+ // Create preview shape
+     _previewShape = CreateShape(_startPoint, currentPoint, ViewModel.SelectedShapeType, true);
+   if (_previewShape != null)
         {
-            DrawingCanvas.Children.Add(_previewShape);
+DrawingCanvas.Children.Add(_previewShape);
         }
-    }
+}
 
     private void DrawingCanvas_PointerReleased(object sender, PointerRoutedEventArgs e)
     {
-        // Handle end of shape dragging
-        if (_isDraggingShape)
+        // Handle end of shape resizing
+   if (_isResizingShape)
         {
-            _isDraggingShape = false;
-            DrawingCanvas.ReleasePointerCapture(e.Pointer);
-            System.Diagnostics.Debug.WriteLine("Finished dragging shape");
-            e.Handled = true;
-            return;
+ _isResizingShape = false;
+            _activeResizeCorner = ResizeCorner.None;
+ DrawingCanvas.ReleasePointerCapture(e.Pointer);
+      System.Diagnostics.Debug.WriteLine("Finished resizing shape");
+    e.Handled = true;
+    return;
         }
 
-        // Handle end of shape resizing
-        if (_isResizingShape)
-        {
-            _isResizingShape = false;
-            DrawingCanvas.ReleasePointerCapture(e.Pointer);
-            System.Diagnostics.Debug.WriteLine("Finished resizing shape");
-            e.Handled = true;
-            return;
-        }
+   // Handle end of shape dragging
+   if (_isDraggingShape)
+  {
+   _isDraggingShape = false;
+  DrawingCanvas.ReleasePointerCapture(e.Pointer);
+  System.Diagnostics.Debug.WriteLine("Finished dragging shape");
+    e.Handled = true;
+  return;
+ }
 
         if (!_isDrawing) return;
         if (ViewModel.SelectedShapeType == ShapeType.Polygon) return;
 
-        var endPoint = e.GetCurrentPoint(DrawingCanvas).Position;
+   var endPoint = e.GetCurrentPoint(DrawingCanvas).Position;
 
-        // Clamp to canvas bounds
+   // Clamp to canvas bounds
         endPoint.X = Math.Max(0, Math.Min(DrawingCanvas.Width, endPoint.X));
-        endPoint.Y = Math.Max(0, Math.Min(DrawingCanvas.Height, endPoint.Y));
+   endPoint.Y = Math.Max(0, Math.Min(DrawingCanvas.Height, endPoint.Y));
 
-        _isDrawing = false;
+  _isDrawing = false;
 
         // Remove preview
-        if (_previewShape != null)
-        {
-            DrawingCanvas.Children.Remove(_previewShape);
-            _previewShape = null;
-        }
+  if (_previewShape != null)
+      {
+    DrawingCanvas.Children.Remove(_previewShape);
+         _previewShape = null;
+   }
 
         // Create final shape
-        var finalShape = CreateShape(_startPoint, endPoint, ViewModel.SelectedShapeType, false);
-        if (finalShape != null)
-        {
-            DrawingCanvas.Children.Add(finalShape);
+   var finalShape = CreateShape(_startPoint, endPoint, ViewModel.SelectedShapeType, false);
+ if (finalShape != null)
+    {
+       DrawingCanvas.Children.Add(finalShape);
 
-            // Save to ViewModel/Database
-            SaveShapeToDatabase(_startPoint, endPoint, ViewModel.SelectedShapeType);
-        }
+        // Save to ViewModel/Database
+   SaveShapeToDatabase(_startPoint, endPoint, ViewModel.SelectedShapeType);
+  }
     }
 
     private UIShape? CreateShape(Point start, Point end, ShapeType shapeType, bool isPreview)
@@ -1717,5 +1719,58 @@ public sealed partial class DrawingCanvasPage : Page
     {
         // Ignore mouse wheel events in this version
         e.Handled = true;
+    }
+
+    private void ResizeHandle_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+  if (_selectedShape != null)
+   {
+   _isResizingShape = true;
+   _activeResizeCorner = ResizeCorner.BottomRight;
+     _dragStartPoint = e.GetCurrentPoint(DrawingCanvas).Position;
+    _shapeStartPosition = GetShapePosition(_selectedShape);
+  DrawingCanvas.CapturePointer(e.Pointer);
+   e.Handled = true;
+     System.Diagnostics.Debug.WriteLine("Started resizing shape");
+    }
+    }
+
+  private void ResizeShape(UIShape shape, double deltaX, double deltaY)
+    {
+  if (shape is Rectangle rect)
+   {
+  var newWidth = Math.Max(20, rect.Width + deltaX);
+      var newHeight = Math.Max(20, rect.Height + deltaY);
+    rect.Width = newWidth;
+rect.Height = newHeight;
+   _dragStartPoint.X += deltaX;
+   _dragStartPoint.Y += deltaY;
+  }
+  else if (shape is Ellipse ellipse)
+ {
+    var newWidth = Math.Max(20, ellipse.Width + deltaX);
+  var newHeight = Math.Max(20, ellipse.Height + deltaY);
+ ellipse.Width = newWidth;
+  ellipse.Height = newHeight;
+    _dragStartPoint.X += deltaX;
+  _dragStartPoint.Y += deltaY;
+   }
+   else if (shape is Polygon polygon)
+  {
+    var bounds = GetPolygonBounds(polygon.Points);
+    var scaleX = Math.Max(0.1, (bounds.Width + deltaX) / bounds.Width);
+ var scaleY = Math.Max(0.1, (bounds.Height + deltaY) / bounds.Height);
+
+    var newPoints = new Microsoft.UI.Xaml.Media.PointCollection();
+   foreach (var pt in polygon.Points)
+        {
+     var relX = (pt.X - bounds.Left) * scaleX;
+       var relY = (pt.Y - bounds.Top) * scaleY;
+ newPoints.Add(new Point(bounds.Left + relX, bounds.Top + relY));
+   }
+   polygon.Points = newPoints;
+  _dragStartPoint.X += deltaX;
+  _dragStartPoint.Y += deltaY;
+ }
     }
 }
