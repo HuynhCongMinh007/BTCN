@@ -26,6 +26,7 @@ public sealed partial class DrawingCanvasPage : Page
     private List<Line> _polygonPreviewLines = new();
     private bool _isDrawing = false;
     private bool _isToolbarExpanded = true;
+    private bool _isShiftPressed = false; // Track Shift key for snap-to-angle
 
     public DrawingCanvasPage()
     {
@@ -42,6 +43,10 @@ public sealed partial class DrawingCanvasPage : Page
         DrawingCanvas.PointerPressed += DrawingCanvas_PointerPressed;
         DrawingCanvas.PointerMoved += DrawingCanvas_PointerMoved;
     DrawingCanvas.PointerReleased += DrawingCanvas_PointerReleased;
+
+        // Keyboard events for Shift key
+  this.KeyDown += DrawingCanvasPage_KeyDown;
+   this.KeyUp += DrawingCanvasPage_KeyUp;
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -173,23 +178,24 @@ DrawingCanvas.Children.Add(_previewShape);
         var strokeColor = ViewModel.SelectedColor;
 var thickness = ViewModel.StrokeThickness;
     var isFilled = ViewModel.IsFilled;
-        var fillColor = ViewModel.SelectedColor;
+   var fillColor = ViewModel.SelectedColor;
         var strokeStyle = ViewModel.StrokeStyle;
 
    if (isPreview)
         {
         thickness = Math.Max(1, thickness - 1);
-        }
+     }
 
       return shapeType switch
      {
-       ShapeType.Line => DrawingService.CreateLine(start, end, strokeColor, thickness, strokeStyle),
-            ShapeType.Rectangle => DrawingService.CreateRectangle(start, end, strokeColor, thickness, isFilled, strokeStyle, fillColor),
-            ShapeType.Circle => DrawingService.CreateEllipse(start, end, strokeColor, thickness, true, isFilled, strokeStyle, fillColor),
+            // Pass Shift key state for snap-to-angle on Line
+            ShapeType.Line => DrawingService.CreateLine(start, end, strokeColor, thickness, strokeStyle, _isShiftPressed),
+       ShapeType.Rectangle => DrawingService.CreateRectangle(start, end, strokeColor, thickness, isFilled, strokeStyle, fillColor),
+  ShapeType.Circle => DrawingService.CreateEllipse(start, end, strokeColor, thickness, true, isFilled, strokeStyle, fillColor),
       ShapeType.Oval => DrawingService.CreateEllipse(start, end, strokeColor, thickness, false, isFilled, strokeStyle, fillColor),
-            ShapeType.Triangle => DrawingService.CreateTriangle(start, end, strokeColor, thickness, isFilled, strokeStyle, fillColor),
-            _ => null
-        };
+     ShapeType.Triangle => DrawingService.CreateTriangle(start, end, strokeColor, thickness, isFilled, strokeStyle, fillColor),
+  _ => null
+};
     }
 
     private async void SaveShapeToDatabase(Point start, Point end, ShapeType shapeType)
@@ -382,5 +388,21 @@ double.TryParse(parts[1], out double height))
    BackgroundColorPreview.Color = color;
     
     System.Diagnostics.Debug.WriteLine($"Background color changed: {ViewModel.BackgroundColor}");
+    }
+
+    private void DrawingCanvasPage_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+ if (e.Key == Windows.System.VirtualKey.Shift)
+  {
+   _isShiftPressed = true;
+        }
+    }
+
+    private void DrawingCanvasPage_KeyUp(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Shift)
+ {
+   _isShiftPressed = false;
+        }
     }
 }
