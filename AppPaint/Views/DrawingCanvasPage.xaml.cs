@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml;
@@ -66,8 +66,12 @@ public sealed partial class DrawingCanvasPage : Page
     
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
+ System.Diagnostics.Debug.WriteLine($"📍 DrawingCanvasPage.OnNavigatedTo - Parameter: {e.Parameter?.GetType().Name ?? "null"}");
+  
         base.OnNavigatedTo(e);
         ViewModel.OnNavigatedTo(e.Parameter);
+        
+      System.Diagnostics.Debug.WriteLine("✅ ViewModel.OnNavigatedTo called");
     }
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
