@@ -40,7 +40,7 @@ public sealed partial class ManagementPage : Page
           "Profiles" => typeof(ProfilePage),
     "Drawings" => typeof(DrawingsPage), // ✅ Use DrawingsPage for saved drawings
      "Templates" => typeof(TemplateManagerPage), // Will create TemplatesPage later for shape presets
-      "Dashboard" => typeof(DashboardPage), // ✅ Add Dashboard
+      "Dashboard" => typeof(DashboardPage), // Will create DashboardPage later
                 _ => null
        };
 
