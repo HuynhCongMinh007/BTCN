@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System;
@@ -15,7 +15,8 @@ public sealed partial class ShellPage : Page
     {
      { "Home", typeof(MainPage) },
  { "DrawingCanvas", typeof(DrawingCanvasPage) },
-      { "Templates", typeof(TemplateManagerPage) },
+      { "Management", typeof(ManagementPage) }, // ✅ Add Management page
+        { "Templates", typeof(TemplateManagerPage) },
         { "Profile", typeof(ProfilePage) }
     };
 

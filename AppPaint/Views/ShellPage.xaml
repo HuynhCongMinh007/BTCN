@@ -125,19 +125,19 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
-                <!-- Templates -->
-                <NavigationViewItem Content="Templates" 
-                                    Tag="Templates"
-                                    ToolTipService.ToolTip="Manage templates">
+                <!-- Management (Profiles, Drawings, Templates) -->
+                <NavigationViewItem Content="Management" 
+                                    Tag="Management"
+                                    ToolTipService.ToolTip="Manage profiles, drawings, and templates">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                  Glyph="&#xE8B7;"/>
+                                  Glyph="&#xE8F1;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
                 <NavigationViewItemSeparator/>
 
-                <!-- Profile -->
+                <!-- Profile (kept for backward compatibility, can remove later) -->
                 <NavigationViewItem Content="Profile" 
                                     Tag="Profile"
                                     ToolTipService.ToolTip="Manage profile and settings">
