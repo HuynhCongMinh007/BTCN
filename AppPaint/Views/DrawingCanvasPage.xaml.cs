@@ -434,47 +434,67 @@ public sealed partial class DrawingCanvasPage : Page
         double left = Canvas.GetLeft(shape);
         double top = Canvas.GetTop(shape);
         double width = 0;
-        double height = 0;
+  double height = 0;
 
         if (shape is Line line)
         {
-            left = Math.Min(line.X1, line.X2) - 5;
-            top = Math.Min(line.Y1, line.Y2) - 5;
+    left = Math.Min(line.X1, line.X2) - 5;
+        top = Math.Min(line.Y1, line.Y2) - 5;
             width = Math.Abs(line.X2 - line.X1) + 10;
-            height = Math.Abs(line.Y2 - line.Y1) + 10;
-        }
-        else if (shape is Rectangle rect)
-        {
+    height = Math.Abs(line.Y2 - line.Y1) + 10;
+}
+    else if (shape is Rectangle rect)
+    {
             width = rect.Width;
             height = rect.Height;
         }
         else if (shape is Ellipse ellipse)
-        {
-            width = ellipse.Width;
-            height = ellipse.Height;
-        }
-        else if (shape is Polygon polygon)
+  {
+          width = ellipse.Width;
+          height = ellipse.Height;
+    }
+      else if (shape is Polygon polygon)
         {
             var bounds = GetPolygonBounds(polygon.Points);
-            left = bounds.Left - 5;
-            top = bounds.Top - 5;
+          left = bounds.Left - 5;
+ top = bounds.Top - 5;
             width = bounds.Width + 10;
             height = bounds.Height + 10;
         }
 
         _selectionBorder = new Border
         {
-            Width = width,
-            Height = height,
-            BorderBrush = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Blue),
+     Width = width,
+       Height = height,
+        BorderBrush = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Blue),
             BorderThickness = new Thickness(2),
-            CornerRadius = new CornerRadius(2),
-            IsHitTestVisible = false
-        };
+   CornerRadius = new CornerRadius(2),
+     IsHitTestVisible = false
+      };
 
         Canvas.SetLeft(_selectionBorder, left);
         Canvas.SetTop(_selectionBorder, top);
         DrawingCanvas.Children.Add(_selectionBorder);
+
+        // Add resize handle (bottom-right corner)
+      if (!(shape is Line)) // Lines don't need resize handles
+        {
+   _resizeHandle = new Ellipse
+            {
+     Width = 12,
+    Height = 12,
+           Fill = new SolidColorBrush(Microsoft.UI.Colors.Blue),
+        Stroke = new SolidColorBrush(Microsoft.UI.Colors.White),
+ StrokeThickness = 2,
+      Cursor = Microsoft.UI.Input.InputSystemCursor.Create(Microsoft.UI.Input.InputSystemCursorShape.SizeNorthwestSoutheast)
+          };
+            Canvas.SetLeft(_resizeHandle, left + width - 6);
+      Canvas.SetTop(_resizeHandle, top + height - 6);
+       Canvas.SetZIndex(_resizeHandle, 1000);
+    DrawingCanvas.Children.Add(_resizeHandle);
+
+         _resizeHandle.PointerPressed += ResizeHandle_PointerPressed;
+        }
     }
 
     private Rect GetPolygonBounds(Microsoft.UI.Xaml.Media.PointCollection points)
