@@ -6,6 +6,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Microsoft.UI;
+using Microsoft.UI.Xaml;
 using Windows.UI;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -100,42 +101,53 @@ public partial class DrawingCanvasViewModel : BaseViewModel
     /// </summary>
     private async System.Threading.Tasks.Task LoadProfileSettingsAsync(int profileId)
     {
-      try
-        {
-    IsBusy = true;
+     try
+   {
+        IsBusy = true;
     
-   using var scope = App.Services.CreateScope();
-  var profileService = scope.ServiceProvider.GetRequiredService<IProfileService>();
-            
+  using var scope = App.Services.CreateScope();
+      var profileService = scope.ServiceProvider.GetRequiredService<IProfileService>();
+    var themeService = scope.ServiceProvider.GetRequiredService<IThemeService>();
+     
         var profile = await profileService.GetProfileByIdAsync(profileId);
-      if (profile != null)
- {
-           // Apply Profile settings to ViewModel
-     CanvasWidth = profile.DefaultCanvasWidth;
-          CanvasHeight = profile.DefaultCanvasHeight;
-    SelectedColor = profile.DefaultStrokeColor;
-       FillColor = profile.DefaultFillColor;
-       BackgroundColor = profile.DefaultBackgroundColor;
-      StrokeThickness = profile.DefaultStrokeThickness;
-           
-        System.Diagnostics.Debug.WriteLine($"✅ Applied Profile '{profile.Name}' settings:");
-     System.Diagnostics.Debug.WriteLine($"   Canvas: {CanvasWidth}x{CanvasHeight}");
-       System.Diagnostics.Debug.WriteLine($"   Stroke Color: {SelectedColor}");
-      System.Diagnostics.Debug.WriteLine($"   Background: {BackgroundColor}");
-     }
-            else
-    {
-       System.Diagnostics.Debug.WriteLine($"❌ Profile {profileId} not found");
-      }
-        }
-  catch (Exception ex)
- {
-     ErrorMessage = $"Error loading profile: {ex.Message}";
-     System.Diagnostics.Debug.WriteLine($"Error loading profile: {ex}");
-  }
-        finally
+  if (profile != null)
         {
-  IsBusy = false;
+          // Apply Profile settings to ViewModel
+                CanvasWidth = profile.DefaultCanvasWidth;
+                CanvasHeight = profile.DefaultCanvasHeight;
+         SelectedColor = profile.DefaultStrokeColor;
+       FillColor = profile.DefaultFillColor;
+         BackgroundColor = profile.DefaultBackgroundColor;
+                StrokeThickness = profile.DefaultStrokeThickness;
+     
+    // ✅ Apply theme from Profile
+ ElementTheme theme = profile.Theme switch
+                {
+         "Light" => ElementTheme.Light,
+  "Dark" => ElementTheme.Dark,
+_ => ElementTheme.Default
+      };
+     themeService.ApplyTheme(theme);
+        
+      System.Diagnostics.Debug.WriteLine($"✅ Applied Profile '{profile.Name}' settings:");
+       System.Diagnostics.Debug.WriteLine($"   Canvas: {CanvasWidth}x{CanvasHeight}");
+            System.Diagnostics.Debug.WriteLine($"   Stroke Color: {SelectedColor}");
+                System.Diagnostics.Debug.WriteLine($"   Background: {BackgroundColor}");
+  System.Diagnostics.Debug.WriteLine($"   Theme: {profile.Theme}");
+      }
+   else
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Profile {profileId} not found");
+      }
+     }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error loading profile: {ex.Message}";
+        System.Diagnostics.Debug.WriteLine($"Error loading profile: {ex}");
+        }
+        finally
+  {
+         IsBusy = false;
         }
     }
 
