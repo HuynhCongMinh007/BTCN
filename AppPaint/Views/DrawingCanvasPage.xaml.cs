@@ -1306,15 +1306,162 @@ _selectedShape.Fill = new SolidColorBrush(fillColor);
     {
         try
   {
- var color = DrawingService.ParseColor(ViewModel.BackgroundColor);
-     CanvasBackgroundBrush.Color = color;
-  BackgroundColorPreview.Color = color;
+            var color = DrawingService.ParseColor(ViewModel.BackgroundColor);
+        CanvasBackgroundBrush.Color = color;
+      BackgroundColorPreview.Color = color;
           
-      System.Diagnostics.Debug.WriteLine($"✅ Applied background color: {ViewModel.BackgroundColor}");
-  }
+            System.Diagnostics.Debug.WriteLine($"✅ Applied background color: {ViewModel.BackgroundColor}");
+        }
         catch (Exception ex)
-   {
-        System.Diagnostics.Debug.WriteLine($"❌ Error applying background color: {ex.Message}");
+        {
+  System.Diagnostics.Debug.WriteLine($"❌ Error applying background color: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Save selected shape as a reusable template
+    /// </summary>
+    private async void SaveAsTemplateButton_Click(object sender, RoutedEventArgs e)
+    {
+      if (_selectedShape == null)
+        {
+ var noSelectionDialog = new ContentDialog
+  {
+        XamlRoot = this.XamlRoot,
+    Title = "No Shape Selected",
+   Content = "Please select a shape first (click the Select button, then click on a shape).",
+              CloseButtonText = "OK"
+       };
+        await noSelectionDialog.ShowAsync();
+return;
+    }
+
+     // Show dialog to enter template name
+   var dialog = new ContentDialog
+        {
+            XamlRoot = this.XamlRoot,
+     Title = "Save as Template",
+            Content = "Enter a name for this reusable shape template:",
+      PrimaryButtonText = "Save",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary
+ };
+
+    // Create input panel
+        var stackPanel = new StackPanel { Spacing = 12 };
+        
+        stackPanel.Children.Add(new TextBlock 
+        { 
+            Text = "Template Name:", 
+            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold 
+        });
+
+     var nameTextBox = new TextBox
+  {
+   PlaceholderText = "Star Shape",
+       MaxLength = 200,
+    Text = $"{_selectedShape.GetType().Name} Template"
+ };
+      stackPanel.Children.Add(nameTextBox);
+
+     stackPanel.Children.Add(new TextBlock
+        {
+       Text = "This template can be quickly inserted into any drawing.",
+            FontSize = 12,
+          Opacity = 0.7,
+       TextWrapping = TextWrapping.Wrap
+        });
+
+        dialog.Content = stackPanel;
+
+      var result = await dialog.ShowAsync();
+
+        if (result == ContentDialogResult.Primary)
+        {
+            var name = nameTextBox.Text.Trim();
+          
+            if (string.IsNullOrEmpty(name))
+       {
+      var errorDialog = new ContentDialog
+    {
+       XamlRoot = this.XamlRoot,
+   Title = "Error",
+          Content = "Please enter a template name.",
+     CloseButtonText = "OK"
+        };
+     await errorDialog.ShowAsync();
+                return;
+    }
+
+   // Save shape as template
+            await SaveShapeAsTemplate(name, _selectedShape);
+   }
+    }
+
+    /// <summary>
+    /// Create a template from the selected shape
+    /// </summary>
+    private async Task SaveShapeAsTemplate(string templateName, UIShape shape)
+    {
+        try
+        {
+            ViewModel.IsBusy = true;
+
+  using var scope = App.Services.CreateScope();
+            var templateService = scope.ServiceProvider.GetRequiredService<ITemplateService>();
+            var shapeService = scope.ServiceProvider.GetRequiredService<IShapeService>();
+
+  // Create template with IsTemplate = true (this is the KEY!)
+    var template = new DrawingTemplate
+            {
+    Name = templateName,
+          Width = 200,  // Small default size for templates
+Height = 200,
+        BackgroundColor = "#FFFFFF",
+           IsTemplate = true,  // ← IMPORTANT: Mark as reusable template
+    CreatedAt = DateTime.Now
+            };
+
+            var savedTemplate = await templateService.CreateTemplateAsync(template);
+        System.Diagnostics.Debug.WriteLine($"✅ Created template: {templateName} (ID: {savedTemplate.Id})");
+
+            // Convert UI shape to data model and save
+            var shapeData = ConvertUIShapeToDataModel(shape, savedTemplate.Id);
+        if (shapeData != null)
+            {
+ await shapeService.CreateShapeAsync(shapeData);
+    System.Diagnostics.Debug.WriteLine($"✅ Saved shape to template");
+            }
+
+ // Show success message
+        var successDialog = new ContentDialog
+      {
+       XamlRoot = this.XamlRoot,
+    Title = "Template Saved",
+        Content = $"'{templateName}' saved successfully!\n\nYou can now find it in Management > Templates.",
+      CloseButtonText = "OK"
+            };
+      await successDialog.ShowAsync();
+
+       // Clear selection
+            ClearSelection();
+        }
+        catch (Exception ex)
+     {
+     System.Diagnostics.Debug.WriteLine($"❌ Error saving template: {ex}");
+      
+  var errorDialog = new ContentDialog
+  {
+       XamlRoot = this.XamlRoot,
+           Title = "Error",
+  Content = $"Failed to save template:\n{ex.Message}",
+              CloseButtonText = "OK"
+  };
+            await errorDialog.ShowAsync();
+        }
+   finally
+  {
+            ViewModel.IsBusy = false;
         }
     }
 }
