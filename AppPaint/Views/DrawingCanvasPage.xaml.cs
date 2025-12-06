@@ -58,6 +58,10 @@ public sealed partial class DrawingCanvasPage : Page
         
         // Thickness slider event
         StrokeThicknessSlider.ValueChanged += StrokeThicknessSlider_ValueChanged;
+        
+        // Fill checkbox event
+     FillCheckBox.Checked += FillCheckBox_CheckChanged;
+        FillCheckBox.Unchecked += FillCheckBox_CheckChanged;
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -304,23 +308,46 @@ point.Y < 0 || point.Y > DrawingCanvas.Height)
 
     private void LoadShapeProperties(UIShape shape)
     {
-        // Get current stroke color
-        if (shape.Stroke is SolidColorBrush strokeBrush)
-        {
-   var color = strokeBrush.Color;
-     _selectedShapeOriginalStrokeColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
-      System.Diagnostics.Debug.WriteLine($"Shape Stroke Color: {_selectedShapeOriginalStrokeColor}");
-  }
+      // Get current stroke color
+     if (shape.Stroke is SolidColorBrush strokeBrush)
+      {
+            var color = strokeBrush.Color;
+ _selectedShapeOriginalStrokeColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+     System.Diagnostics.Debug.WriteLine($"Shape Stroke Color: {_selectedShapeOriginalStrokeColor}");
+        }
 
-  // Get current thickness
- _selectedShapeOriginalThickness = shape.StrokeThickness;
-    System.Diagnostics.Debug.WriteLine($"Shape Thickness: {_selectedShapeOriginalThickness}");
-        
-  // Enable editing via stroke color picker and thickness slider
-  // User can change via main toolbar controls
-        ViewModel.SelectedColor = _selectedShapeOriginalStrokeColor ?? "#000000";
-      ViewModel.StrokeThickness = _selectedShapeOriginalThickness;
+        // Get current thickness
+        _selectedShapeOriginalThickness = shape.StrokeThickness;
+        System.Diagnostics.Debug.WriteLine($"Shape Thickness: {_selectedShapeOriginalThickness}");
+    
+      // Get current fill status and color
+        bool isFilled = shape.Fill != null;
+        if (shape.Fill is SolidColorBrush fillBrush)
+      {
+            var fillColor = fillBrush.Color;
+          ViewModel.FillColor = $"#{fillColor.R:X2}{fillColor.G:X2}{fillColor.B:X2}";
+       
+   // Update fill color preview button
+  if (FillColorPreview != null)
+    {
+   FillColorPreview.Color = fillColor;
+  }
+ 
+     System.Diagnostics.Debug.WriteLine($"Shape Fill Color: {ViewModel.FillColor}");
     }
+     else
+   {
+     // Keep current ViewModel fill color if shape has no fill
+     System.Diagnostics.Debug.WriteLine($"Shape not filled, keeping ViewModel.FillColor: {ViewModel.FillColor}");
+        }
+  
+ // Load properties to ViewModel
+    ViewModel.SelectedColor = _selectedShapeOriginalStrokeColor ?? "#000000";
+  ViewModel.StrokeThickness = _selectedShapeOriginalThickness;
+        ViewModel.IsFilled = isFilled;
+        
+    System.Diagnostics.Debug.WriteLine($"Shape IsFilled: {isFilled}");
+}
 
     private void ShowPropertyEditor()
     {
@@ -459,8 +486,47 @@ _selectedShape.Stroke = new SolidColorBrush(color);
     private void FillColorPicker_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
     {
         var color = args.NewColor;
-        ViewModel.FillColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+   ViewModel.FillColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+        
+        // Update preview button
+        if (FillColorPreview != null)
+  {
+   FillColorPreview.Color = color;
+ }
+        
+        // If shape is selected and filled, update its fill color
+     if (_selectedShape != null && _isSelectMode && ViewModel.IsFilled)
+  {
+   _selectedShape.Fill = new SolidColorBrush(color);
+     System.Diagnostics.Debug.WriteLine($"Updated selected shape fill color: {ViewModel.FillColor}");
+        }
+   
         System.Diagnostics.Debug.WriteLine($"Fill color changed: {ViewModel.FillColor}");
+    }
+
+    private void FillCheckBox_CheckChanged(object sender, RoutedEventArgs e)
+    {
+      if (_selectedShape != null && _isSelectMode)
+   {
+     if (ViewModel.IsFilled)
+  {
+      // Apply fill color from ViewModel
+       var fillColor = DrawingService.ParseColor(ViewModel.FillColor);
+          _selectedShape.Fill = new SolidColorBrush(fillColor);
+          System.Diagnostics.Debug.WriteLine($"Shape filled with color: {ViewModel.FillColor}");
+          }
+       else
+    {
+           // Remove fill
+    _selectedShape.Fill = null;
+    System.Diagnostics.Debug.WriteLine("Shape fill removed");
+     }
+        }
+        else
+    {
+       // Just updating ViewModel for new shapes
+  System.Diagnostics.Debug.WriteLine($"Fill checkbox changed: {ViewModel.IsFilled}");
+        }
     }
 
     private void DrawingCanvas_PointerMoved(object sender, PointerRoutedEventArgs e)

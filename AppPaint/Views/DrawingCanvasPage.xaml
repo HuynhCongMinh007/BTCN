@@ -260,7 +260,7 @@
         <!-- Style & Fill -->
          <StackPanel Grid.Column="2" Spacing="4">
     <TextBlock Text="Options" FontSize="11" Opacity="0.6"/>
-       <StackPanel Spacing="4">
+     <StackPanel Spacing="4">
     <ComboBox x:Name="StrokeStyleComboBox"
  SelectedIndex="0"
              SelectionChanged="StrokeStyleComboBox_SelectionChanged"
@@ -270,35 +270,55 @@
   <ComboBoxItem Content="Dot" Tag="Dot"/>
      <ComboBoxItem Content="Dash-Dot" Tag="DashDot"/>
     </ComboBox>
-        
-     <!-- Fill Option with Color Picker -->
-         <Grid>
+     
+     <!-- Fill Option with Color Picker Button -->
+    <Grid>
          <Grid.ColumnDefinitions>
     <ColumnDefinition Width="Auto"/>
-          <ColumnDefinition Width="Auto"/>
-       </Grid.ColumnDefinitions>
+    <ColumnDefinition Width="Auto"/>
+</Grid.ColumnDefinitions>
  
-        <CheckBox x:Name="FillCheckBox" 
+      <CheckBox x:Name="FillCheckBox" 
   Grid.Column="0"
   Content="Fill" 
    FontSize="11"
-         VerticalAlignment="Center"
+      VerticalAlignment="Center"
     IsChecked="{x:Bind ViewModel.IsFilled, Mode=TwoWay}"/>
-            
-     <!-- Fill Color Picker (visible when Fill is checked) -->
-       <ColorPicker x:Name="FillColorPicker"
-           Grid.Column="1"
-         Margin="4,0,0,0"
-    ColorSpectrumShape="Ring"
-    IsColorSliderVisible="False"
-    IsColorChannelTextInputVisible="False"
-    IsHexInputVisible="False"
- IsAlphaEnabled="False"
-         ColorChanged="FillColorPicker_ColorChanged"
-        Color="#FFFF00"
-      Width="24" 
+   
+     <!-- Fill Color Button (visible when Fill is checked) -->
+         <Button x:Name="FillColorButton"
+   Grid.Column="1"
+Margin="4,0,0,0"
+  Width="24" 
      Height="24"
-  Visibility="{x:Bind FillCheckBox.IsChecked, Mode=OneWay}"/>
+       Visibility="{x:Bind FillCheckBox.IsChecked, Mode=OneWay}"
+           ToolTipService.ToolTip="Fill Color">
+    <Button.Content>
+    <Border Width="18" Height="18"
+        CornerRadius="2"
+   BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+      BorderThickness="1">
+         <Border.Background>
+         <SolidColorBrush x:Name="FillColorPreview" Color="#FFFF00"/>
+        </Border.Background>
+   </Border>
+      </Button.Content>
+    <Button.Flyout>
+       <Flyout Placement="Bottom">
+   <StackPanel Spacing="12" Padding="8">
+   <TextBlock Text="Fill Color (Màu tô)" FontWeight="SemiBold"/>
+  <ColorPicker x:Name="FillColorPicker" 
+      ColorSpectrumShape="Ring"
+          IsColorSliderVisible="True"
+  IsColorChannelTextInputVisible="False"
+       IsHexInputVisible="False"
+   IsAlphaEnabled="False"
+      ColorChanged="FillColorPicker_ColorChanged"
+ Color="#FFFF00"/>
+   </StackPanel>
+   </Flyout>
+          </Button.Flyout>
+                </Button>
     </Grid>
        </StackPanel>
        </StackPanel>
