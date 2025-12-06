@@ -1145,12 +1145,17 @@ ViewModel.CurrentTemplateId = template.Id;
     {
         var template = new DrawingTemplate
         {
-        Name = ViewModel.TemplateName,
-  Width = ViewModel.CanvasWidth,
-            Height = ViewModel.CanvasHeight,
-            BackgroundColor = ViewModel.BackgroundColor
+  Name = ViewModel.TemplateName,
+ Width = ViewModel.CanvasWidth,
+         Height = ViewModel.CanvasHeight,
+            BackgroundColor = ViewModel.BackgroundColor,
+            IsTemplate = false  // ← IMPORTANT: This is a DRAWING, not a shape template!
         };
-        return await templateService.CreateTemplateAsync(template);
+        
+var savedTemplate = await templateService.CreateTemplateAsync(template);
+        System.Diagnostics.Debug.WriteLine($"✅ Created DRAWING (IsTemplate=false): {savedTemplate.Name} (ID: {savedTemplate.Id})");
+        
+  return savedTemplate;
     }
 
     private Data.Models.Shape? ConvertUIShapeToDataModel(UIShape uiShape, int templateId)
