@@ -114,19 +114,53 @@ public sealed partial class MainPage : Page
  CloseButtonText = "OK"
  };
             _ = dialog.ShowAsync();
-  return;
+            return;
         }
 
-        // Set active profile
-        SetActiveProfileAsync(_selectedProfile.Id);
+        System.Diagnostics.Debug.WriteLine($"🎯 StartDrawing_Click - Profile: {_selectedProfile.Name} (ID: {_selectedProfile.Id})");
+
+   // Set active profile
+  SetActiveProfileAsync(_selectedProfile.Id);
         
-        // Navigate to DrawingCanvas
-        if (App.MainWindow is MainWindow mainWindow)
-        {
-            if (mainWindow.Content is Frame rootFrame && rootFrame.Content is ShellPage shellPage)
+        // Navigate to DrawingCanvas with Profile settings
+      if (App.MainWindow is MainWindow mainWindow)
    {
-        shellPage.NavigateToDrawingCanvas(null); // null = new blank drawing
-            }
+      System.Diagnostics.Debug.WriteLine("✅ Got MainWindow");
+       
+  // Get RootFrame from MainWindow (defined in MainWindow.xaml)
+      var rootFrame = mainWindow.Content as Grid;
+      if (rootFrame != null)
+ {
+     // Find RootFrame by name
+  var frameElement = rootFrame.FindName("RootFrame") as Frame;
+  if (frameElement != null && frameElement.Content is ShellPage shellPage)
+  {
+     System.Diagnostics.Debug.WriteLine("✅ Got ShellPage via RootFrame");
+  
+    // Pass ProfileId to apply settings
+      var parameters = new AppPaint.Models.DrawingNavigationParameters(
+           _selectedProfile.Id,
+    drawingId: null // null = new blank drawing
+     );
+    
+     System.Diagnostics.Debug.WriteLine($"✅ Created DrawingNavigationParameters: ProfileId={parameters.ProfileId}, DrawingId={parameters.DrawingId}");
+    
+      shellPage.NavigateToDrawingCanvas(parameters);
+  System.Diagnostics.Debug.WriteLine("✅ Navigation called!");
+    }
+         else
+    {
+         System.Diagnostics.Debug.WriteLine("❌ Could not get ShellPage from RootFrame");
+       }
+   }
+  else
+        {
+         System.Diagnostics.Debug.WriteLine("❌ MainWindow.Content is not Grid");
+        }
+   }
+  else
+        {
+         System.Diagnostics.Debug.WriteLine("❌ Could not get MainWindow");
         }
     }
 
