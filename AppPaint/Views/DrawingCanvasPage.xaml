@@ -178,20 +178,50 @@ Width="120" VerticalAlignment="Center"/>
 
  <!-- Right Toolbar - Actions -->
     <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-        <!-- Polygon Finish Button (visible only when drawing polygon) -->
-     <Button x:Name="FinishPolygonButton"
+        <!-- Canvas Size Picker -->
+        <ComboBox x:Name="CanvasSizeComboBox"
+    Header="Canvas Size"
+        SelectionChanged="CanvasSizeComboBox_SelectionChanged"
+SelectedIndex="2"
+             MinWidth="120"
+            ToolTipService.ToolTip="Select canvas size">
+       <ComboBoxItem Content="640x480" Tag="640x480"/>
+      <ComboBoxItem Content="800x600" Tag="800x600"/>
+            <ComboBoxItem Content="1024x768" Tag="1024x768"/>
+ <ComboBoxItem Content="1280x720" Tag="1280x720"/>
+   <ComboBoxItem Content="1920x1080" Tag="1920x1080"/>
+        </ComboBox>
+
+   <!-- Background Color Picker -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBlock Text="Background:" VerticalAlignment="Center"/>
+            <ColorPicker x:Name="BackgroundColorPicker"
+       ColorSpectrumShape="Ring"
+         IsColorSliderVisible="False"
+           IsColorChannelTextInputVisible="False"
+    IsHexInputVisible="False"
+     IsAlphaEnabled="False"
+ ColorChanged="BackgroundColorPicker_ColorChanged"
+                  Width="40" Height="40"
+                  ToolTipService.ToolTip="Canvas background color"/>
+   </StackPanel>
+
+        <Border Width="1" Background="{ThemeResource CardStrokeColorDefaultBrush}"/>
+
+<!-- Polygon Finish Button (visible only when drawing polygon) -->
+   <Button x:Name="FinishPolygonButton"
       Style="{StaticResource AppAccentButtonStyle}"
       Click="FinishPolygonButton_Click"
       Visibility="Collapsed"
-                ToolTipService.ToolTip="Finish Polygon (Complete shape)">
-      <StackPanel Orientation="Horizontal" Spacing="8">
-      <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE73E;"/>
+       ToolTipService.ToolTip="Finish Polygon (Complete shape)">
+ <StackPanel Orientation="Horizontal" Spacing="8">
+   <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE73E;"/>
    <TextBlock Text="Finish"/>
       </StackPanel>
         </Button>
 
         <!-- Canvas Size Info -->
-   <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
+ <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
       CornerRadius="4"
   Padding="8,4"
     VerticalAlignment="Center">
@@ -201,16 +231,16 @@ Width="120" VerticalAlignment="Center"/>
 <Run Text="x"/>
     <Run Text="{x:Bind ViewModel.CanvasHeight, Mode=OneWay}"/>
     </TextBlock>
-   </Border>
+ </Border>
 
         <Border Width="1" Background="{ThemeResource CardStrokeColorDefaultBrush}"/>
 
  <Button x:Name="ClearButton" 
-       Style="{StaticResource IconButtonStyle}" 
+     Style="{StaticResource IconButtonStyle}" 
   Command="{x:Bind ViewModel.ClearCanvasCommand}"
 ToolTipService.ToolTip="Clear Canvas">
     <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
-    </Button>
+  </Button>
      
       <Button x:Name="SaveButton" 
     Style="{StaticResource AppAccentButtonStyle}"
@@ -236,17 +266,19 @@ ToolTipService.ToolTip="Clear Canvas">
        <Grid>
   <!-- Canvas Background with Fixed Size -->
   <Border x:Name="CanvasBackground" 
-  Background="White"
-         CornerRadius="4"
+  CornerRadius="4"
       BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
      BorderThickness="1"
     Width="{x:Bind ViewModel.CanvasWidth, Mode=OneWay}"
-          Height="{x:Bind ViewModel.CanvasHeight, Mode=OneWay}">
-  
+       Height="{x:Bind ViewModel.CanvasHeight, Mode=OneWay}">
+            <Border.Background>
+    <SolidColorBrush x:Name="CanvasBackgroundBrush" Color="White"/>
+       </Border.Background>
+
         <!-- Drawing Canvas - Fixed Size -->
       <Canvas x:Name="DrawingCanvas" 
- Background="Transparent"
-    Width="{x:Bind ViewModel.CanvasWidth, Mode=OneWay}"
+     Background="Transparent"
+           Width="{x:Bind ViewModel.CanvasWidth, Mode=OneWay}"
 Height="{x:Bind ViewModel.CanvasHeight, Mode=OneWay}"/>
       </Border>
 

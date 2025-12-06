@@ -25,10 +25,10 @@ public partial class DrawingCanvasViewModel : BaseViewModel
     [ObservableProperty]
     private string _backgroundColor = "#FFFFFF";
 
- [ObservableProperty]
+    [ObservableProperty]
     private double _strokeThickness = 2.0;
 
-[ObservableProperty]
+    [ObservableProperty]
     private bool _isFilled;
 
     [ObservableProperty]
@@ -39,6 +39,9 @@ public partial class DrawingCanvasViewModel : BaseViewModel
 
  [ObservableProperty]
     private double _canvasHeight = 600;
+
+    [ObservableProperty]
+    private string _selectedCanvasSize = "800x600"; // For ComboBox binding
 
     [ObservableProperty]
  private Shape? _selectedShape;

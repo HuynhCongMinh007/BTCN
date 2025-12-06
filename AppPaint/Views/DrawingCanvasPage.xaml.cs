@@ -323,10 +323,41 @@ RectangleButton.IsChecked = false;
     private void StrokeStyleComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
   {
         if (sender is ComboBox comboBox && comboBox.SelectedItem is ComboBoxItem item)
-        {
-            var style = item.Tag?.ToString() ?? "Solid";
+  {
+        var style = item.Tag?.ToString() ?? "Solid";
           ViewModel.StrokeStyle = style;
-            System.Diagnostics.Debug.WriteLine($"Stroke style changed: {style}");
+          System.Diagnostics.Debug.WriteLine($"Stroke style changed: {style}");
     }
+    }
+
+    private void CanvasSizeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+   if (sender is ComboBox comboBox && comboBox.SelectedItem is ComboBoxItem item)
+   {
+   var size = item.Tag?.ToString() ?? "800x600";
+     var parts = size.Split('x');
+      
+       if (parts.Length == 2 && 
+     double.TryParse(parts[0], out double width) && 
+double.TryParse(parts[1], out double height))
+       {
+  ViewModel.CanvasWidth = width;
+  ViewModel.CanvasHeight = height;
+           ViewModel.SelectedCanvasSize = size;
+     
+     System.Diagnostics.Debug.WriteLine($"Canvas size changed: {width}x{height}");
+            }
+   }
+    }
+
+    private void BackgroundColorPicker_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
+    {
+   var color = args.NewColor;
+        ViewModel.BackgroundColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+     
+        // Update canvas background brush
+  CanvasBackgroundBrush.Color = color;
+    
+    System.Diagnostics.Debug.WriteLine($"Background color changed: {ViewModel.BackgroundColor}");
     }
 }
