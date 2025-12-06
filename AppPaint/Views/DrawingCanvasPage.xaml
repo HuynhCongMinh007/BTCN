@@ -55,19 +55,29 @@
     <Button x:Name="ClearButton" 
         Style="{StaticResource IconButtonStyle}" 
         Command="{x:Bind ViewModel.ClearCanvasCommand}"
-            ToolTipService.ToolTip="Clear Canvas">
+       ToolTipService.ToolTip="Clear Canvas">
         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
              </Button>
      
    <Button x:Name="SaveButton" 
          Style="{StaticResource AppAccentButtonStyle}"
-          Click="SaveButton_Click"
-        ToolTipService.ToolTip="Save as Template">
+   Click="SaveButton_Click"
+        ToolTipService.ToolTip="Save as Drawing">
      <StackPanel Orientation="Horizontal" Spacing="8">
-        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE74E;"/>
+     <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE74E;"/>
         <TextBlock Text="Save"/>
-       </StackPanel>
+</StackPanel>
          </Button>
+
+   <!-- Save as Template Button (visible only when shape is selected) -->
+            <Button x:Name="SaveAsTemplateButton"
+   Click="SaveAsTemplateButton_Click"
+        ToolTipService.ToolTip="Save selected shape as reusable template">
+     <StackPanel Orientation="Horizontal" Spacing="8">
+       <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8B7;"/>
+             <TextBlock Text="Save as Template"/>
+         </StackPanel>
+            </Button>
    </StackPanel>
             </Grid>
 
