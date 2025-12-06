@@ -1,9 +1,10 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using AppPaint.Services;
 using Data.Models;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,25 +12,25 @@ namespace AppPaint.ViewModels;
 
 public partial class TemplateManagerViewModel : BaseViewModel
 {
-  private readonly ITemplateService _templateService;
+    private readonly ITemplateService _templateService;
 
- [ObservableProperty]
-    private ObservableCollection<DrawingTemplate> _templates = new();
+    [ObservableProperty]
+ private ObservableCollection<DrawingTemplate> _templates = new();
 
- [ObservableProperty]
-    private DrawingTemplate? _selectedTemplate;
+[ObservableProperty]
+ private DrawingTemplate? _selectedTemplate;
 
     // Navigation events
-    public event EventHandler<int>? LoadTemplateRequested;
+  public event EventHandler<int>? LoadTemplateRequested;
     public event EventHandler? NavigateBackRequested;
 
     public TemplateManagerViewModel(ITemplateService templateService)
     {
-      _templateService = templateService;
-        Title = "Template Manager";
- }
+        _templateService = templateService;
+   Title = "Template Manager";
+    }
 
-    public override async void OnNavigatedTo(object? parameter = null)
+  public override async void OnNavigatedTo(object? parameter = null)
     {
    base.OnNavigatedTo(parameter);
    await LoadTemplatesAsync();
@@ -38,69 +39,81 @@ public partial class TemplateManagerViewModel : BaseViewModel
     [RelayCommand]
     private async Task LoadTemplatesAsync()
     {
-   try
-   {
-      IsBusy = true;
-   
-   // Use scoped service
-  using var scope = App.Services.CreateScope();
-        var templateService = scope.ServiceProvider.GetRequiredService<ITemplateService>();
-        
-   var templates = await templateService.GetAllTemplatesAsync();
+        try
+        {
+   IsBusy = true;
+  
+       using var scope = App.Services.CreateScope();
+   var templateService = scope.ServiceProvider.GetRequiredService<ITemplateService>();
+    
+            var templates = await templateService.GetAllTemplatesAsync();
+      
+   // Filter to show ONLY templates (IsTemplate = true) for saved drawings
    Templates.Clear();
-       foreach (var template in templates)
-{
-Templates.Add(template);
-   }
-    }
-   catch (Exception ex)
-    {
-      ErrorMessage = $"Error loading templates: {ex.Message}";
-    }
-finally
+       foreach (var template in templates.Where(t => t.IsTemplate))
    {
-       IsBusy = false;
+        Templates.Add(template);
+     }
+      
+            System.Diagnostics.Debug.WriteLine($"✅ Loaded {Templates.Count} templates (IsTemplate=true)");
+        }
+   catch (Exception ex)
+ {
+      ErrorMessage = $"Error loading templates: {ex.Message}";
+        }
+    finally
+   {
+      IsBusy = false;
+   }
   }
+
+ [RelayCommand(CanExecute = nameof(CanRefreshTemplates))]
+ private async Task RefreshTemplatesAsync()
+  {
+  await LoadTemplatesAsync();
     }
+
+    private bool CanRefreshTemplates() => !IsBusy;
 
     [RelayCommand]
     private async Task DeleteTemplateAsync(DrawingTemplate? template)
- {
-   if (template == null) return;
+    {
+        if (template == null) return;
 
-        try
-  {
-   IsBusy = true;
-      
-        using var scope = App.Services.CreateScope();
-   var templateService = scope.ServiceProvider.GetRequiredService<ITemplateService>();
-        
-   var success = await templateService.DeleteTemplateAsync(template.Id);
-  if (success)
-       {
-   Templates.Remove(template);
-    }
-     }
-   catch (Exception ex)
+try
    {
-   ErrorMessage = $"Error deleting template: {ex.Message}";
+      IsBusy = true;
+   
+   using var scope = App.Services.CreateScope();
+    var templateService = scope.ServiceProvider.GetRequiredService<ITemplateService>();
+   
+   var success = await templateService.DeleteTemplateAsync(template.Id);
+   if (success)
+      {
+   Templates.Remove(template);
+      System.Diagnostics.Debug.WriteLine($"✅ Deleted template: {template.Name}");
+    }
   }
-        finally
-  {
+   catch (Exception ex)
+        {
+ ErrorMessage = $"Error deleting template: {ex.Message}";
+ }
+  finally
+     {
       IsBusy = false;
    }
     }
 
     [RelayCommand]
     private void LoadTemplate(DrawingTemplate? template)
-  {
-   if (template == null) return;
-        LoadTemplateRequested?.Invoke(this, template.Id);
+    {
+        if (template == null) return;
+ LoadTemplateRequested?.Invoke(this, template.Id);
     }
 
- [RelayCommand]
+    [RelayCommand]
     private void GoBack()
-  {
-    NavigateBackRequested?.Invoke(this, EventArgs.Empty);
+    {
+        NavigateBackRequested?.Invoke(this, EventArgs.Empty);
     }
 }
