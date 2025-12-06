@@ -67,6 +67,7 @@ namespace AppPaint
             services.AddTransient<DrawingCanvasViewModel>();
             services.AddTransient<TemplateManagerViewModel>();
             services.AddTransient<ProfileViewModel>();
+            services.AddTransient<DashboardViewModel>();
 
             return services.BuildServiceProvider();
         }
