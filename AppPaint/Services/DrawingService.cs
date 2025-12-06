@@ -282,12 +282,28 @@ public class DrawingService
     }
 
     /// <summary>
-    /// Create an Ellipse (Circle or Oval)
+    /// Create an Ellipse (Circle or Oval) with optimizations
     /// </summary>
     public static Ellipse CreateEllipse(Point start, Point end, string strokeColor, double thickness, bool isCircle, bool isFilled, string strokeStyle = "Solid", string? fillColor = null)
     {
         double width = Math.Abs(end.X - start.X);
         double height = Math.Abs(end.Y - start.Y);
+
+        // Validate minimum size
+        if (width < 1 || height < 1)
+        {
+            var minEllipse = new Ellipse
+            {
+                Width = Math.Max(width, 1),
+                Height = Math.Max(height, 1),
+                Stroke = GetBrush(strokeColor),
+                StrokeThickness = thickness,
+                Opacity = 0.5
+            };
+            Canvas.SetLeft(minEllipse, Math.Min(start.X, end.X));
+            Canvas.SetTop(minEllipse, Math.Min(start.Y, end.Y));
+            return minEllipse;
+        }
 
         if (isCircle)
         {
@@ -300,9 +316,10 @@ public class DrawingService
         {
             Width = width,
             Height = height,
-            Stroke = new SolidColorBrush(ParseColor(strokeColor)),
+            Stroke = GetBrush(strokeColor), // Use cached brush
             StrokeThickness = thickness,
-            StrokeDashArray = GetStrokeDashArray(strokeStyle)
+            StrokeDashArray = GetStrokeDashArray(strokeStyle),
+            UseLayoutRounding = false // Anti-aliasing
         };
 
         Canvas.SetLeft(ellipse, Math.Min(start.X, end.X));
@@ -310,62 +327,175 @@ public class DrawingService
 
         if (isFilled && !string.IsNullOrEmpty(fillColor))
         {
-            ellipse.Fill = new SolidColorBrush(ParseColor(fillColor));
+            ellipse.Fill = GetBrush(fillColor); // Use cached brush
         }
 
         return ellipse;
     }
 
     /// <summary>
-    /// Create a Triangle shape
+    /// Get ellipse/circle dimensions
     /// </summary>
-    public static Polygon CreateTriangle(Point start, Point end, string strokeColor, double thickness, bool isFilled, string strokeStyle = "Solid", string? fillColor = null)
+    public static (double Width, double Height) GetEllipseDimensions(Point start, Point end, bool isCircle)
     {
+        double width = Math.Abs(end.X - start.X);
+        double height = Math.Abs(end.Y - start.Y);
+
+        if (isCircle)
+        {
+            double size = Math.Max(width, height);
+            return (size, size);
+        }
+
+        return (width, height);
+    }
+
+    /// <summary>
+    /// Get circle/ellipse area (approximation)
+    /// </summary>
+    public static double GetEllipseArea(Point start, Point end, bool isCircle)
+    {
+        var (width, height) = GetEllipseDimensions(start, end, isCircle);
+        double radiusX = width / 2;
+        double radiusY = height / 2;
+        return Math.PI * radiusX * radiusY;
+    }
+
+    /// <summary>
+    /// Get circle/ellipse circumference (approximation)
+    /// </summary>
+    public static double GetEllipseCircumference(Point start, Point end, bool isCircle)
+    {
+        var (width, height) = GetEllipseDimensions(start, end, isCircle);
+
+        if (isCircle)
+        {
+            // Perfect circle: C = 2πr
+            return Math.PI * width;
+        }
+
+        // Ramanujan approximation for ellipse
+        double a = width / 2;
+        double b = height / 2;
+        return Math.PI * (3 * (a + b) - Math.Sqrt((3 * a + b) * (a + 3 * b)));
+    }
+
+    /// <summary>
+    /// Format ellipse/circle info for display
+    /// </summary>
+    public static string GetEllipseInfo(Point start, Point end, bool isCircle)
+    {
+        var (width, height) = GetEllipseDimensions(start, end, isCircle);
+        double area = GetEllipseArea(start, end, isCircle);
+
+        if (isCircle)
+        {
+            double diameter = width;
+            double radius = width / 2;
+            return $"⌀: {diameter:F1}px  R: {radius:F1}px  A: {area:F0}px²";
+        }
+
+        return $"W: {width:F1}px  H: {height:F1}px  A: {area:F0}px²";
+    }
+
+    /// <summary>
+    /// Create a Triangle shape with optimizations
+    /// </summary>
+    public static Polygon CreateTriangle(Point start, Point end, string strokeColor, double thickness, bool isFilled, string strokeStyle = "Solid", string? fillColor = null, bool isEquilateral = false)
+    {
+        // Calculate triangle points
+        var points = CalculateTrianglePoints(start, end, isEquilateral);
+
         var triangle = new Polygon
         {
-            Stroke = new SolidColorBrush(ParseColor(strokeColor)),
+            Stroke = GetBrush(strokeColor), // Use cached brush
             StrokeThickness = thickness,
             StrokeDashArray = GetStrokeDashArray(strokeStyle),
-            Points = new PointCollection
-            {
-                new Point((start.X + end.X) / 2, start.Y), // Top center
-                new Point(start.X, end.Y),     // Bottom left
-                new Point(end.X, end.Y)       // Bottom right
-            }
+            StrokeLineJoin = PenLineJoin.Round, // Smooth corners
+            Points = new PointCollection(),
+            UseLayoutRounding = false // Anti-aliasing
         };
+
+        // Add points
+        foreach (var point in points)
+        {
+            triangle.Points.Add(point);
+        }
 
         if (isFilled && !string.IsNullOrEmpty(fillColor))
         {
-            triangle.Fill = new SolidColorBrush(ParseColor(fillColor));
+            triangle.Fill = GetBrush(fillColor); // Use cached brush
         }
 
         return triangle;
     }
 
     /// <summary>
-    /// Create a Polygon shape with multiple points
+    /// Calculate triangle points (isosceles by default, equilateral if flag set)
     /// </summary>
-    public static Polygon CreatePolygon(List<Point> points, string strokeColor, double thickness, bool isFilled, string strokeStyle = "Solid", string? fillColor = null)
+    private static List<Point> CalculateTrianglePoints(Point start, Point end, bool isEquilateral)
     {
-        var polygon = new Polygon
+        if (!isEquilateral)
         {
-            Stroke = new SolidColorBrush(ParseColor(strokeColor)),
-            StrokeThickness = thickness,
-            StrokeDashArray = GetStrokeDashArray(strokeStyle)
+            // Isosceles triangle (default)
+            return new List<Point>
+            {
+                new Point((start.X + end.X) / 2, start.Y), // Top center
+                new Point(start.X, end.Y),         // Bottom left
+                new Point(end.X, end.Y)        // Bottom right
+            };
+        }
+
+        // Equilateral triangle
+        double width = Math.Abs(end.X - start.X);
+        double height = width * Math.Sqrt(3) / 2; // Equilateral height
+
+        double centerX = (start.X + end.X) / 2;
+        double topY = Math.Min(start.Y, end.Y);
+
+        return new List<Point>
+        {
+            new Point(centerX, topY),    // Top center
+            new Point(start.X, topY + height),  // Bottom left
+            new Point(end.X, topY + height)        // Bottom right
         };
+    }
 
-        // Add points manually
-        foreach (var point in points)
-        {
-            polygon.Points.Add(point);
-        }
+    /// <summary>
+    /// Get triangle area
+    /// </summary>
+    public static double GetTriangleArea(Point start, Point end)
+    {
+        double baseWidth = Math.Abs(end.X - start.X);
+        double height = Math.Abs(end.Y - start.Y);
+        return (baseWidth * height) / 2;
+    }
 
-        if (isFilled && !string.IsNullOrEmpty(fillColor))
-        {
-            polygon.Fill = new SolidColorBrush(ParseColor(fillColor));
-        }
+    /// <summary>
+    /// Get triangle perimeter
+    /// </summary>
+    public static double GetTrianglePerimeter(Point start, Point end)
+    {
+        var points = CalculateTrianglePoints(start, end, false);
 
-        return polygon;
+        // Calculate distances between points
+        double side1 = GetLineLength(points[0], points[1]);
+        double side2 = GetLineLength(points[1], points[2]);
+        double side3 = GetLineLength(points[2], points[0]);
+
+        return side1 + side2 + side3;
+    }
+
+    /// <summary>
+    /// Format triangle info for display
+    /// </summary>
+    public static string GetTriangleInfo(Point start, Point end)
+    {
+        double area = GetTriangleArea(start, end);
+        double baseWidth = Math.Abs(end.X - start.X);
+        double height = Math.Abs(end.Y - start.Y);
+
+        return $"Base: {baseWidth:F1}px  H: {height:F1}px  A: {area:F0}px²";
     }
 
     /// <summary>
@@ -436,4 +566,67 @@ public class DrawingService
         public double X { get; set; }
         public double Y { get; set; }
     }
+
+    /// <summary>
+    /// Create a Polygon shape with multiple points
+    /// </summary>
+    public static Polygon CreatePolygon(List<Point> points, string strokeColor, double thickness, bool isFilled, string strokeStyle = "Solid", string? fillColor = null)
+    {
+        var polygon = new Polygon
+        {
+          Stroke = GetBrush(strokeColor), // Use cached brush
+   StrokeThickness = thickness,
+     StrokeDashArray = GetStrokeDashArray(strokeStyle),
+   StrokeLineJoin = PenLineJoin.Round, // Smooth corners
+            UseLayoutRounding = false // Anti-aliasing
+        };
+
+        // Add points manually
+        foreach (var point in points)
+        {
+   polygon.Points.Add(point);
+        }
+
+        if (isFilled && !string.IsNullOrEmpty(fillColor))
+        {
+        polygon.Fill = GetBrush(fillColor); // Use cached brush
+        }
+
+        return polygon;
+    }
+
+    /// <summary>
+    /// Get polygon area (using shoelace formula)
+    /// </summary>
+    public static double GetPolygonArea(List<Point> points)
+ {
+   if (points.Count < 3) return 0;
+
+        double area = 0;
+        for (int i = 0; i < points.Count; i++)
+      {
+   int j = (i + 1) % points.Count;
+            area += points[i].X * points[j].Y;
+area -= points[j].X * points[i].Y;
+   }
+
+     return Math.Abs(area / 2);
+    }
+
+  /// <summary>
+    /// Get polygon perimeter
+    /// </summary>
+    public static double GetPolygonPerimeter(List<Point> points)
+    {
+        if (points.Count < 2) return 0;
+
+   double perimeter = 0;
+   for (int i = 0; i < points.Count; i++)
+  {
+     int j = (i + 1) % points.Count;
+        perimeter += GetLineLength(points[i], points[j]);
+        }
+
+        return perimeter;
+  }
 }
