@@ -948,85 +948,106 @@ ViewModel.CurrentTemplateId = template.Id;
     private Data.Models.Shape? ConvertUIShapeToDataModel(UIShape uiShape, int templateId)
     {
         var shape = new Data.Models.Shape
-     {
-       TemplateId = templateId,
- CreatedAt = DateTime.Now
-   };
+        {
+      TemplateId = templateId,
+            CreatedAt = DateTime.Now
+        };
 
-        // Get stroke properties
+     // Get stroke properties
         if (uiShape.Stroke is SolidColorBrush strokeBrush)
         {
-     var color = strokeBrush.Color;
-            shape.Color = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
-        }
+            var color = strokeBrush.Color;
+     shape.Color = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+  }
 
-      shape.StrokeThickness = uiShape.StrokeThickness;
+        shape.StrokeThickness = uiShape.StrokeThickness;
+
+        // Get stroke style from StrokeDashArray
+        shape.StrokeStyle = GetStrokeStyleFromDashArray(uiShape.StrokeDashArray);
 
         // Get fill properties
-   shape.IsFilled = uiShape.Fill != null;
-        if (uiShape.Fill is SolidColorBrush fillBrush)
-  {
-         var fillColor = fillBrush.Color;
-      shape.FillColor = $"#{fillColor.R:X2}{fillColor.G:X2}{fillColor.B:X2}";
-   }
+        shape.IsFilled = uiShape.Fill != null;
+     if (uiShape.Fill is SolidColorBrush fillBrush)
+        {
+       var fillColor = fillBrush.Color;
+            shape.FillColor = $"#{fillColor.R:X2}{fillColor.G:X2}{fillColor.B:X2}";
+        }
 
-  // Convert based on shape type
+        // Convert based on shape type
         if (uiShape is Line line)
         {
-  shape.ShapeType = ShapeType.Line;
-       var points = new List<Point> 
-    { 
-         new Point(line.X1, line.Y1), 
-new Point(line.X2, line.Y2) 
-          };
-            shape.PointsData = DrawingService.PointsToJson(points);
-        }
-        else if (uiShape is Microsoft.UI.Xaml.Shapes.Rectangle rect)
-        {
-            shape.ShapeType = ShapeType.Rectangle;
- double left = Canvas.GetLeft(rect);
-   double top = Canvas.GetTop(rect);
-    var points = new List<Point>
-    {
-     new Point(left, top),
-       new Point(left + rect.Width, top + rect.Height)
-         };
-     shape.PointsData = DrawingService.PointsToJson(points);
-        }
-        else if (uiShape is Ellipse ellipse)
-        {
-            double left = Canvas.GetLeft(ellipse);
-    double top = Canvas.GetTop(ellipse);
-            
-      // Detect if it's a circle (width == height)
-            bool isCircle = Math.Abs(ellipse.Width - ellipse.Height) < 0.1;
- shape.ShapeType = isCircle ? ShapeType.Circle : ShapeType.Oval;
-   
-   var points = new List<Point>
-         {
-       new Point(left, top),
-   new Point(left + ellipse.Width, top + ellipse.Height)
-          };
+       shape.ShapeType = ShapeType.Line;
+     var points = new List<Point> 
+      { 
+      new Point(line.X1, line.Y1), 
+         new Point(line.X2, line.Y2) 
+            };
          shape.PointsData = DrawingService.PointsToJson(points);
         }
-  else if (uiShape is Microsoft.UI.Xaml.Shapes.Polygon polygon)
+   else if (uiShape is Microsoft.UI.Xaml.Shapes.Rectangle rect)
         {
-     // Check if it's a triangle (3 points) or polygon
-    shape.ShapeType = polygon.Points.Count == 3 ? ShapeType.Triangle : ShapeType.Polygon;
-  
-            var points = new List<Point>();
-       foreach (var point in polygon.Points)
-            {
-     points.Add(point);
-        }
-     shape.PointsData = DrawingService.PointsToJson(points);
-        }
-     else
+        shape.ShapeType = ShapeType.Rectangle;
+            double left = Canvas.GetLeft(rect);
+   double top = Canvas.GetTop(rect);
+       var points = new List<Point>
     {
-       return null; // Unknown shape type
+          new Point(left, top),
+           new Point(left + rect.Width, top + rect.Height)
+         };
+    shape.PointsData = DrawingService.PointsToJson(points);
+  }
+        else if (uiShape is Ellipse ellipse)
+ {
+double left = Canvas.GetLeft(ellipse);
+       double top = Canvas.GetTop(ellipse);
+          
+            // Detect if it's a circle (width == height)
+            bool isCircle = Math.Abs(ellipse.Width - ellipse.Height) < 0.1;
+            shape.ShapeType = isCircle ? ShapeType.Circle : ShapeType.Oval;
+            
+            var points = new List<Point>
+  {
+ new Point(left, top),
+     new Point(left + ellipse.Width, top + ellipse.Height)
+ };
+    shape.PointsData = DrawingService.PointsToJson(points);
         }
+        else if (uiShape is Microsoft.UI.Xaml.Shapes.Polygon polygon)
+        {
+          // Check if it's a triangle (3 points) or polygon
+       shape.ShapeType = polygon.Points.Count == 3 ? ShapeType.Triangle : ShapeType.Polygon;
 
-  return shape;
+ var points = new List<Point>();
+        foreach (var point in polygon.Points)
+       {
+     points.Add(point);
+ }
+            shape.PointsData = DrawingService.PointsToJson(points);
+        }
+        else
+        {
+ return null; // Unknown shape type
+      }
+
+        return shape;
+    }
+
+    private string GetStrokeStyleFromDashArray(DoubleCollection? dashArray)
+    {
+        if (dashArray == null || dashArray.Count == 0)
+ return "Solid";
+
+        // Match against known patterns
+        if (dashArray.Count == 2 && Math.Abs(dashArray[0] - 4) < 0.1 && Math.Abs(dashArray[1] - 2) < 0.1)
+            return "Dash";
+
+if (dashArray.Count == 2 && Math.Abs(dashArray[0] - 1) < 0.1 && Math.Abs(dashArray[1] - 2) < 0.1)
+  return "Dot";
+
+        if (dashArray.Count == 4)
+    return "DashDot";
+
+        return "Solid"; // Default
     }
 
 private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)

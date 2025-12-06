@@ -18,6 +18,9 @@ public class Shape
     // Stroke thickness
     public double StrokeThickness { get; set; } = 2.0;
     
+    // Stroke style: Solid, Dash, Dot, DashDot
+    public string StrokeStyle { get; set; } = "Solid";
+    
     // For filled shapes
     public bool IsFilled { get; set; } = false;
     
