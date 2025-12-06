@@ -262,14 +262,14 @@
     <TextBlock Text="Options" FontSize="11" Opacity="0.6"/>
      <StackPanel Spacing="4">
     <ComboBox x:Name="StrokeStyleComboBox"
- SelectedIndex="0"
-             SelectionChanged="StrokeStyleComboBox_SelectionChanged"
+           SelectedIndex="0"
+    SelectionChanged="StrokeStyleComboBox_SelectionChanged"
       MinWidth="100">
   <ComboBoxItem Content="Solid" Tag="Solid"/>
      <ComboBoxItem Content="Dash" Tag="Dash"/>
   <ComboBoxItem Content="Dot" Tag="Dot"/>
      <ComboBoxItem Content="Dash-Dot" Tag="DashDot"/>
-    </ComboBox>
+ </ComboBox>
      
      <!-- Fill Option with Color Picker Button -->
     <Grid>
@@ -326,71 +326,45 @@ Margin="4,0,0,0"
    </StackPanel>
      </Border>
 
-                <!-- Group 3: Canvas Settings -->
+                <!-- Group 3: Canvas Info (READ-ONLY from Profile) -->
           <Border Grid.Column="2" 
     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
          BorderThickness="1"
             CornerRadius="4"
          Padding="12"
-           Margin="0,0,8,0">
-      <StackPanel Spacing="8">
-        <TextBlock Text="Canvas" FontSize="12" Opacity="0.7"/>
-  <Grid>
-     <Grid.ColumnDefinitions>
-         <ColumnDefinition Width="Auto"/>
-     <ColumnDefinition Width="Auto"/>
-           </Grid.ColumnDefinitions>
-      
-          <!-- Size -->
-         <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,12,0">
-           <TextBlock Text="Size" FontSize="11" Opacity="0.6"/>
-          <ComboBox x:Name="CanvasSizeComboBox"
-           SelectionChanged="CanvasSizeComboBox_SelectionChanged"
-       SelectedIndex="2"
-    MinWidth="110">
-           <ComboBoxItem Content="640x480" Tag="640x480"/>
-       <ComboBoxItem Content="800x600" Tag="800x600"/>
-  <ComboBoxItem Content="1024x768" Tag="1024x768"/>
-        <ComboBoxItem Content="1280x720" Tag="1280x720"/>
-  <ComboBoxItem Content="1920x1080" Tag="1920x1080"/>
-            </ComboBox>
-</StackPanel>
-      
-         <!-- Background -->
-   <StackPanel Grid.Column="1" Spacing="4">
-            <TextBlock Text="Background" FontSize="11" Opacity="0.6"/>
-              <Button x:Name="BackgroundColorButton"
-   Width="36" Height="36">
-       <Button.Content>
-         <Border Width="24" Height="24"
-          CornerRadius="2"
-   BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-         BorderThickness="1">
-    <Border.Background>
-            <SolidColorBrush x:Name="BackgroundColorPreview" Color="White"/>
-     </Border.Background>
-        </Border>
-        </Button.Content>
-      <Button.Flyout>
-        <Flyout Placement="Bottom">
-        <StackPanel Spacing="12" Padding="8">
-           <TextBlock Text="Canvas Background" FontWeight="SemiBold"/>
-             <ColorPicker x:Name="BackgroundColorPicker"
-  ColorSpectrumShape="Ring"
-     IsColorSliderVisible="True"
-            IsColorChannelTextInputVisible="False"
-        IsHexInputVisible="False"
-     IsAlphaEnabled="False"
-     ColorChanged="BackgroundColorPicker_ColorChanged"/>
-       </StackPanel>
-              </Flyout>
-                </Button.Flyout>
-  </Button>
-      </StackPanel>
-            </Grid>
+Margin="0,0,8,0">
+  <StackPanel Spacing="8">
+<TextBlock Text="Canvas Info" FontSize="12" Opacity="0.7"/>
+ <StackPanel Spacing="4">
+   <!-- Size (READ-ONLY - from Profile) -->
+    <TextBlock Text="Size (from Profile)" FontSize="11" Opacity="0.6"/>
+      <TextBlock FontSize="13" FontWeight="SemiBold">
+<Run Text="{x:Bind ViewModel.CanvasWidth, Mode=OneWay}"/>
+        <Run Text="×"/>
+         <Run Text="{x:Bind ViewModel.CanvasHeight, Mode=OneWay}"/>
+   <Run Text="px"/>
+    </TextBlock>
+        
+         <!-- Background (READ-ONLY - from Profile) -->
+              <TextBlock Text="Background (from Profile)" FontSize="11" Opacity="0.6" Margin="0,8,0,0"/>
+     <Border Width="36" Height="36"
+       CornerRadius="4"
+     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+  BorderThickness="1"
+        HorizontalAlignment="Left">
+ <Border.Background>
+          <SolidColorBrush x:Name="BackgroundColorPreview" Color="White"/>
+         </Border.Background>
+      </Border>
+             <TextBlock Text="⚠️ Edit in Profile settings" 
+         FontSize="10" 
+     Opacity="0.5" 
+ TextWrapping="Wrap"
+           MaxWidth="120"/>
+            </StackPanel>
           </StackPanel>
-           </Border>
+    </Border>
 
             <!-- Polygon Finish Button (when needed) -->
        <StackPanel Grid.Column="3" VerticalAlignment="Center" Margin="12,0,0,0">
