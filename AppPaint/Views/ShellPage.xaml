@@ -115,16 +115,6 @@
 
                 <NavigationViewItemSeparator/>
 
-                <!-- Draw Canvas -->
-                <NavigationViewItem Content="Draw Canvas" 
-                                    Tag="DrawingCanvas"
-                                    ToolTipService.ToolTip="Create new drawings">
-                    <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                  Glyph="&#xE70F;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-
                 <!-- Management (Profiles, Drawings, Templates) -->
                 <NavigationViewItem Content="Management" 
                                     Tag="Management"
@@ -137,7 +127,7 @@
 
                 <NavigationViewItemSeparator/>
 
-                <!-- Profile (kept for backward compatibility, can remove later) -->
+                <!-- Profile -->
                 <NavigationViewItem Content="Profile" 
                                     Tag="Profile"
                                     ToolTipService.ToolTip="Manage profile and settings">
