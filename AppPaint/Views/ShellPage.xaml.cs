@@ -14,10 +14,9 @@ public sealed partial class ShellPage : Page
     private readonly Dictionary<string, Type> _pages = new()
     {
      { "Home", typeof(MainPage) },
- { "DrawingCanvas", typeof(DrawingCanvasPage) },
-      { "Management", typeof(ManagementPage) }, // ✅ Add Management page
-        { "Templates", typeof(TemplateManagerPage) },
+ { "Management", typeof(ManagementPage) }, // ✅ Add Management page
         { "Profile", typeof(ProfilePage) }
+        // DrawingCanvas removed - only accessible via MainPage or Management
     };
 
   private readonly List<(string Tag, string Title)> _breadcrumbs = new();
