@@ -34,6 +34,9 @@ namespace Data.Migrations
                     b.Property<double>("Height")
                         .HasColumnType("REAL");
 
+                    b.Property<bool>("IsTemplate")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("TEXT");
 
@@ -54,8 +57,9 @@ namespace Data.Migrations
                         {
                             Id = 1,
                             BackgroundColor = "#F0F0F0",
-                            CreatedAt = new DateTime(2025, 12, 6, 14, 59, 30, 539, DateTimeKind.Local).AddTicks(7625),
+                            CreatedAt = new DateTime(2025, 12, 7, 1, 35, 34, 990, DateTimeKind.Local).AddTicks(5235),
                             Height = 600.0,
+                            IsTemplate = false,
                             Name = "Sample Template 1",
                             Width = 800.0
                         },
@@ -63,8 +67,9 @@ namespace Data.Migrations
                         {
                             Id = 2,
                             BackgroundColor = "#E8F4F8",
-                            CreatedAt = new DateTime(2025, 12, 6, 14, 59, 30, 539, DateTimeKind.Local).AddTicks(7628),
+                            CreatedAt = new DateTime(2025, 12, 7, 1, 35, 34, 990, DateTimeKind.Local).AddTicks(5238),
                             Height = 768.0,
+                            IsTemplate = false,
                             Name = "Sample Template 2",
                             Width = 1024.0
                         });
@@ -127,7 +132,7 @@ namespace Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 12, 6, 14, 59, 30, 539, DateTimeKind.Local).AddTicks(7525),
+                            CreatedAt = new DateTime(2025, 12, 7, 1, 35, 34, 990, DateTimeKind.Local).AddTicks(5144),
                             DefaultBackgroundColor = "#FFFFFF",
                             DefaultCanvasHeight = 600.0,
                             DefaultCanvasWidth = 800.0,
@@ -188,7 +193,7 @@ namespace Data.Migrations
                         {
                             Id = 1,
                             Color = "#FF0000",
-                            CreatedAt = new DateTime(2025, 12, 6, 14, 59, 30, 539, DateTimeKind.Local).AddTicks(7643),
+                            CreatedAt = new DateTime(2025, 12, 7, 1, 35, 34, 990, DateTimeKind.Local).AddTicks(5251),
                             FillColor = "#FFCCCC",
                             IsFilled = true,
                             PointsData = "[{\"X\":100,\"Y\":100},{\"X\":300,\"Y\":250}]",
@@ -201,7 +206,7 @@ namespace Data.Migrations
                         {
                             Id = 2,
                             Color = "#0000FF",
-                            CreatedAt = new DateTime(2025, 12, 6, 14, 59, 30, 539, DateTimeKind.Local).AddTicks(7646),
+                            CreatedAt = new DateTime(2025, 12, 7, 1, 35, 34, 990, DateTimeKind.Local).AddTicks(5253),
                             IsFilled = false,
                             PointsData = "[{\"X\":500,\"Y\":300},{\"X\":600,\"Y\":300}]",
                             ShapeType = 3,
@@ -213,7 +218,7 @@ namespace Data.Migrations
                         {
                             Id = 3,
                             Color = "#00FF00",
-                            CreatedAt = new DateTime(2025, 12, 6, 14, 59, 30, 539, DateTimeKind.Local).AddTicks(7648),
+                            CreatedAt = new DateTime(2025, 12, 7, 1, 35, 34, 990, DateTimeKind.Local).AddTicks(5256),
                             IsFilled = false,
                             PointsData = "[{\"X\":50,\"Y\":50},{\"X\":400,\"Y\":400}]",
                             ShapeType = 0,
