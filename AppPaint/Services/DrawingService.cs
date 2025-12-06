@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml.Controls;
+ï»¿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
 using Microsoft.UI;
@@ -14,6 +14,24 @@ namespace AppPaint.Services;
 /// </summary>
 public class DrawingService
 {
+    // Brush cache for performance
+    private static readonly Dictionary<string, SolidColorBrush> _brushCache = new();
+
+    /// <summary>
+    /// Get or create cached brush for color
+    /// </summary>
+    private static SolidColorBrush GetBrush(string hexColor)
+    {
+        if (_brushCache.TryGetValue(hexColor, out var cachedBrush))
+        {
+            return cachedBrush;
+        }
+
+        var brush = new SolidColorBrush(ParseColor(hexColor));
+        _brushCache[hexColor] = brush;
+        return brush;
+    }
+
     /// <summary>
     /// Create a Line shape with optimizations
     /// </summary>
@@ -35,7 +53,7 @@ public class DrawingService
                 Y1 = start.Y,
                 X2 = start.X + 0.1,
                 Y2 = start.Y + 0.1,
-                Stroke = new SolidColorBrush(ParseColor(color)),
+                Stroke = GetBrush(color),
                 StrokeThickness = thickness,
                 Opacity = 0.5
             };
@@ -48,21 +66,52 @@ public class DrawingService
             Y1 = start.Y,
             X2 = end.X,
             Y2 = end.Y,
-            Stroke = new SolidColorBrush(ParseColor(color)), // Use ParseColor for consistency
+            Stroke = GetBrush(color), // Use cached brush for performance
             StrokeThickness = thickness,
             StrokeStartLineCap = PenLineCap.Round,
             StrokeEndLineCap = PenLineCap.Round,
             StrokeLineJoin = PenLineJoin.Round, // Smooth line joins
             StrokeDashArray = GetStrokeDashArray(strokeStyle),
-            // Anti-aliasing for smoother lines
-            UseLayoutRounding = false
+            UseLayoutRounding = false // Anti-aliasing for smoother lines
         };
 
         return line;
     }
 
     /// <summary>
-    /// Snap line to nearest 45-degree angle (0°, 45°, 90°, 135°, 180°, etc.)
+    /// Create arrow head at specific point and angle
+    /// </summary>
+    private static Polygon CreateArrowHead(Point position, double angleDegrees, double size, string color, double thickness)
+    {
+        double angleRadians = angleDegrees * Math.PI / 180.0;
+
+        // Arrow points (relative to position)
+        double arrowAngle = 25 * Math.PI / 180.0; // 25 degree arrow
+
+        Point tip = position;
+        Point left = new Point(
+            position.X - size * Math.Cos(angleRadians - arrowAngle),
+            position.Y - size * Math.Sin(angleRadians - arrowAngle)
+        );
+        Point right = new Point(
+            position.X - size * Math.Cos(angleRadians + arrowAngle),
+            position.Y - size * Math.Sin(angleRadians + arrowAngle)
+        );
+
+        var arrow = new Polygon
+        {
+            Points = new PointCollection { tip, left, right },
+            Fill = GetBrush(color),
+            Stroke = GetBrush(color),
+            StrokeThickness = thickness / 2,
+            StrokeLineJoin = PenLineJoin.Round
+        };
+
+        return arrow;
+    }
+
+    /// <summary>
+    /// Snap line to nearest 45-degree angle (0Â°, 45Â°, 90Â°, 135Â°, 180Â°, etc.)
     /// Useful when holding Shift key
     /// </summary>
     public static Point SnapToAngle(Point start, Point end)
@@ -84,6 +133,42 @@ public class DrawingService
         double newY = start.Y + distance * Math.Sin(snapAngle);
 
         return new Point(newX, newY);
+    }
+
+    /// <summary>
+    /// Calculate line length
+    /// </summary>
+    public static double GetLineLength(Point start, Point end)
+    {
+        double dx = end.X - start.X;
+        double dy = end.Y - start.Y;
+        return Math.Sqrt(dx * dx + dy * dy);
+    }
+
+    /// <summary>
+    /// Get line angle in degrees (0-360)
+    /// </summary>
+    public static double GetLineAngle(Point start, Point end)
+    {
+        double dx = end.X - start.X;
+        double dy = end.Y - start.Y;
+        double radians = Math.Atan2(dy, dx);
+        double degrees = radians * (180.0 / Math.PI);
+
+        // Normalize to 0-360
+        if (degrees < 0) degrees += 360;
+
+        return degrees;
+    }
+
+    /// <summary>
+    /// Format line info for display (length and angle)
+    /// </summary>
+    public static string GetLineInfo(Point start, Point end)
+    {
+        double length = GetLineLength(start, end);
+        double angle = GetLineAngle(start, end);
+        return $"L: {length:F1}px  âˆ : {angle:F1}Â°";
     }
 
     /// <summary>
