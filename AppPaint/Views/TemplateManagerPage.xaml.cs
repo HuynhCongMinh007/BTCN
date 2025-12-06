@@ -28,7 +28,9 @@ public sealed partial class TemplateManagerPage : Page
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
   base.OnNavigatedTo(e);
-    ViewModel.OnNavigatedTo(e.Parameter);
+        
+        // Pass true to load TEMPLATES (IsTemplate = true), not drawings!
+  ViewModel.OnNavigatedTo(true);
     }
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
