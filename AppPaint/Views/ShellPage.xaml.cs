@@ -91,22 +91,38 @@ public sealed partial class ShellPage : Page
 
     private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
     {
-  NavView.IsBackEnabled = ContentFrame.CanGoBack;
-  
-    // Update selected item
-      var pageType = e.SourcePageType;
-var selectedItem = NavView.MenuItems
-   .OfType<NavigationViewItem>()
-       .FirstOrDefault(item =>
-      {
-var tag = item.Tag?.ToString();
-    return tag != null && _pages.ContainsKey(tag) && _pages[tag] == pageType;
-   });
+     NavView.IsBackEnabled = ContentFrame.CanGoBack;
 
-if (selectedItem != null)
- {
-      NavView.SelectedItem = selectedItem;
-}
+ // ✅ Auto-update breadcrumb based on navigation
+  var pageType = e.SourcePageType;
+
+        // Update NavigationView selected item
+        var selectedItem = NavView.MenuItems
+            .OfType<NavigationViewItem>()
+  .FirstOrDefault(item =>
+            {
+     var tag = item.Tag?.ToString();
+return tag != null && _pages.ContainsKey(tag) && _pages[tag] == pageType;
+  });
+
+  if (selectedItem != null)
+    {
+        NavView.SelectedItem = selectedItem;
+          
+   // ✅ Update breadcrumb for main pages
+    var tag = selectedItem.Tag?.ToString() ?? "";
+       var title = selectedItem.Content?.ToString() ?? tag;
+    UpdateBreadcrumb(tag, title);
+        
+   System.Diagnostics.Debug.WriteLine($"🍞 Auto-updated breadcrumb: Home > {title}");
+        }
+        else if (pageType == typeof(ManagementPage))
+        {
+  // ✅ ManagementPage navigated directly (e.g., from MainPage Edit button)
+      // Update breadcrumb manually
+   UpdateBreadcrumb("Management", "Management");
+         System.Diagnostics.Debug.WriteLine("🍞 Auto-updated breadcrumb for ManagementPage");
+        }
     }
 
     private void UpdateBreadcrumb(string tag, string title)
