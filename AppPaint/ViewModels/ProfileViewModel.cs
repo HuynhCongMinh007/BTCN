@@ -162,16 +162,17 @@ try
 
        await profileService.UpdateProfileAsync(SelectedProfile);
   
-            System.Diagnostics.Debug.WriteLine($"✅ Saved profile: {SelectedProfile.Name}");
+     System.Diagnostics.Debug.WriteLine($"✅ Saved profile: {SelectedProfile.Name}");
+   System.Diagnostics.Debug.WriteLine($"   ⚠️ All drawings using this profile will use updated settings on next load");
     
          // Reload to get fresh data
      await LoadProfilesAsync();
         }
         catch (Exception ex)
-        {
+   {
      ErrorMessage = $"Error saving profile: {ex.Message}";
     System.Diagnostics.Debug.WriteLine($"Error saving profile: {ex}");
-        }
+      }
    finally
   {
    IsBusy = false;
