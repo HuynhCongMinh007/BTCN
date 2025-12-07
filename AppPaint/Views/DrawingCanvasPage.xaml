@@ -183,7 +183,7 @@
                                     <FontIcon
                                         FontFamily="{StaticResource FluentIconsFontFamily}"
                                         FontSize="20"
-                                        Glyph="&#xF3B1;" />
+                                        Glyph="&#xf683;" />
                                 </ToggleButton>
                             </StackPanel>
 
