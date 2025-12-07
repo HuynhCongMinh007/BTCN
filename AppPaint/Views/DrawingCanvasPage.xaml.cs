@@ -415,39 +415,40 @@ FontWeight = Microsoft.UI.Text.FontWeights.SemiBold
 
     private async Task SaveTemplateWithCanvasShapes(string name, int shapeCount, bool isUpdating)
     {
-        try
-        {
+  try
+    {
     ViewModel.IsBusy = true;
 
-            var template = await _saveService.SaveTemplateWithShapes(
+    var template = await _saveService.SaveTemplateWithShapes(
      ViewModel.CurrentTemplateId,
      name,
      (int)ViewModel.CanvasWidth,
       (int)ViewModel.CanvasHeight,
       ViewModel.BackgroundColor,
-      DrawingCanvas
+      DrawingCanvas,
+    ViewModel.CurrentProfileId // ✅ Pass ProfileId to link drawing with profile
             );
 
             if (template != null)
        {
-                ViewModel.CurrentTemplateId = template.Id;
+      ViewModel.CurrentTemplateId = template.Id;
 
      string successMessage = isUpdating
            ? $"'{name}' updated successfully with {shapeCount} shapes!"
          : $"'{name}' saved successfully with {shapeCount} shapes!";
 
-                await ShowSuccessDialog(successMessage);
+   await ShowSuccessDialog(successMessage);
         }
-     }
+   }
         catch (Exception ex)
         {
   ViewModel.ErrorMessage = $"Error saving: {ex.Message}";
         await ShowErrorDialog($"Failed to save drawing:\n{ex.Message}");
-        }
+    }
         finally
         {
         ViewModel.IsBusy = false;
-        }
+  }
     }
 
     private async void SaveAsTemplateButton_Click(object sender, RoutedEventArgs e)
