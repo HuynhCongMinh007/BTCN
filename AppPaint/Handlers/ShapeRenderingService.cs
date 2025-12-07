@@ -26,17 +26,17 @@ public class ShapeRenderingService
     /// <summary>
     /// Render all shapes from data models to canvas
     /// </summary>
-    public void RenderAllShapes(IEnumerable<Data.Models.Shape> shapes, Canvas canvas)
+    public void RenderAllShapes(IEnumerable<Data.Models.Shape> shapes, Canvas canvas, double scale = 1.0)
     {
-        System.Diagnostics.Debug.WriteLine($"🎨 Rendering {shapes.Count()} shapes from data");
+        System.Diagnostics.Debug.WriteLine($"🎨 Rendering {shapes.Count()} shapes from data (scale: {scale})");
 
         // Clear canvas
         canvas.Children.Clear();
 
-        // Render each shape
+        // Render each shape with scale
         foreach (var shape in shapes)
         {
-            RenderShape(shape, canvas);
+            RenderShape(shape, canvas, scale);
         }
 
         System.Diagnostics.Debug.WriteLine($"✅ Rendered shapes to canvas");
@@ -45,7 +45,7 @@ public class ShapeRenderingService
     /// <summary>
     /// Render a single shape from data model to UI canvas
     /// </summary>
-    public UIShape? RenderShape(Data.Models.Shape shape, Canvas canvas)
+    public UIShape? RenderShape(Data.Models.Shape shape, Canvas canvas, double scale = 1.0)
     {
         try
         {
@@ -55,6 +55,12 @@ public class ShapeRenderingService
             {
                 System.Diagnostics.Debug.WriteLine($"⚠️ Invalid points data for shape {shape.Id}");
                 return null;
+            }
+
+            // Apply scale to points
+            if (scale != 1.0)
+            {
+                points = points.Select(p => new Point(p.X * scale, p.Y * scale)).ToList();
             }
 
             UIShape? uiShape = null;
@@ -67,7 +73,7 @@ public class ShapeRenderingService
                         uiShape = DrawingService.CreateLine(
                points[0], points[1],
                  shape.Color,
-              shape.StrokeThickness,
+              shape.StrokeThickness * scale,
                      shape.StrokeStyle
                );
                     }
@@ -79,7 +85,7 @@ public class ShapeRenderingService
                         uiShape = DrawingService.CreateRectangle(
                           points[0], points[1],
                      shape.Color,
-               shape.StrokeThickness,
+               shape.StrokeThickness * scale,
                           shape.IsFilled,
                shape.StrokeStyle,
                     shape.FillColor
@@ -93,7 +99,7 @@ public class ShapeRenderingService
                         uiShape = DrawingService.CreateEllipse(
                        points[0], points[1],
                   shape.Color,
-                          shape.StrokeThickness,
+                          shape.StrokeThickness * scale,
                  isCircle: true,
                           shape.IsFilled,
                     shape.StrokeStyle,
@@ -108,7 +114,7 @@ public class ShapeRenderingService
                         uiShape = DrawingService.CreateEllipse(
                             points[0], points[1],
                                  shape.Color,
-                       shape.StrokeThickness,
+                       shape.StrokeThickness * scale,
                            isCircle: false,
                                        shape.IsFilled,
                                shape.StrokeStyle,
@@ -123,7 +129,7 @@ public class ShapeRenderingService
                         uiShape = DrawingService.CreateTriangle(
                        points[0], points[1],
               shape.Color,
-                  shape.StrokeThickness,
+                  shape.StrokeThickness * scale,
                   shape.IsFilled,
                           shape.StrokeStyle,
               shape.FillColor
@@ -137,7 +143,7 @@ public class ShapeRenderingService
                         uiShape = DrawingService.CreatePolygon(
                           points,
                         shape.Color,
-                  shape.StrokeThickness,
+                  shape.StrokeThickness * scale,
                     shape.IsFilled,
                      shape.StrokeStyle,
                               shape.FillColor
