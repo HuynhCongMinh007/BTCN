@@ -624,19 +624,29 @@
                             <ItemsRepeater.ItemTemplate>
                                 <DataTemplate x:DataType="models:DrawingTemplate">
                                     <Border
+                                        x:Name="TemplateCard"
                                         Padding="16"
                                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                                         BorderThickness="1"
                                         CanDrag="True"
                                         CornerRadius="8"
-                                        DragStarting="Template_DragStarting">
+                                        DragStarting="Template_DragStarting"
+                                        PointerEntered="TemplateCard_PointerEntered"
+                                        PointerExited="TemplateCard_PointerExited">
+                                        <Border.RenderTransform>
+                                            <ScaleTransform x:Name="CardScale" CenterX="148" CenterY="100" ScaleX="1" ScaleY="1" />
+                                        </Border.RenderTransform>
+                                        <Border.Transitions>
+                                            <TransitionCollection>
+                                                <RepositionThemeTransition />
+                                            </TransitionCollection>
+                                        </Border.Transitions>
+
                                         <Grid>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="140" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
                                             </Grid.RowDefinitions>
 
                                             <!--  Name  -->
@@ -651,7 +661,6 @@
                                             <!--  Clickable Preview with Hover Effect  -->
                                             <Button
                                                 Grid.Row="1"
-                                                Margin="0,0,0,12"
                                                 Padding="0"
                                                 HorizontalAlignment="Stretch"
                                                 VerticalAlignment="Stretch"
@@ -670,6 +679,12 @@
                                                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                                                     BorderThickness="1"
                                                     CornerRadius="6">
+                                                    <Border.Transitions>
+                                                        <TransitionCollection>
+                                                            <AddDeleteThemeTransition />
+                                                        </TransitionCollection>
+                                                    </Border.Transitions>
+
                                                     <Grid>
                                                         <Viewbox
                                                             Margin="12"
@@ -683,44 +698,90 @@
                                                                 Tag="{x:Bind}" />
                                                         </Viewbox>
 
-                                                        <!--  Hover Overlay  -->
+                                                        <!--  Hover Overlay with Animation  -->
                                                         <Border
                                                             x:Name="HoverOverlay"
-                                                            Background="#20000000"
+                                                            Background="#30000000"
                                                             CornerRadius="6"
                                                             Opacity="0">
+                                                            <Border.Transitions>
+                                                                <TransitionCollection>
+                                                                    <AddDeleteThemeTransition />
+                                                                </TransitionCollection>
+                                                            </Border.Transitions>
+
                                                             <StackPanel
                                                                 HorizontalAlignment="Center"
                                                                 VerticalAlignment="Center"
-                                                                Spacing="8">
+                                                                Spacing="12">
                                                                 <FontIcon
                                                                     FontFamily="{StaticResource FluentIconsFontFamily}"
-                                                                    FontSize="32"
+                                                                    FontSize="40"
                                                                     Foreground="White"
-                                                                    Glyph="&#xE710;" />
+                                                                    Glyph="&#xE710;">
+                                                                    <FontIcon.Shadow>
+                                                                        <ThemeShadow />
+                                                                    </FontIcon.Shadow>
+                                                                </FontIcon>
                                                                 <TextBlock
-                                                                    FontSize="14"
+                                                                    FontSize="15"
                                                                     FontWeight="SemiBold"
                                                                     Foreground="White"
-                                                                    Text="Click to Insert" />
+                                                                    Text="Click to Insert">
+                                                                    <TextBlock.Shadow>
+                                                                        <ThemeShadow />
+                                                                    </TextBlock.Shadow>
+                                                                </TextBlock>
                                                             </StackPanel>
                                                         </Border>
                                                     </Grid>
 
                                                     <VisualStateManager.VisualStateGroups>
                                                         <VisualStateGroup x:Name="CommonStates">
-                                                            <VisualState x:Name="Normal" />
+                                                            <VisualState x:Name="Normal">
+                                                                <Storyboard>
+                                                                    <DoubleAnimation
+                                                                        Storyboard.TargetName="HoverOverlay"
+                                                                        Storyboard.TargetProperty="Opacity"
+                                                                        To="0"
+                                                                        Duration="0:0:0.2">
+                                                                        <DoubleAnimation.EasingFunction>
+                                                                            <CubicEase EasingMode="EaseOut" />
+                                                                        </DoubleAnimation.EasingFunction>
+                                                                    </DoubleAnimation>
+                                                                </Storyboard>
+                                                            </VisualState>
                                                             <VisualState x:Name="PointerOver">
+                                                                <Storyboard>
+                                                                    <DoubleAnimation
+                                                                        Storyboard.TargetName="HoverOverlay"
+                                                                        Storyboard.TargetProperty="Opacity"
+                                                                        To="1"
+                                                                        Duration="0:0:0.2">
+                                                                        <DoubleAnimation.EasingFunction>
+                                                                            <CubicEase EasingMode="EaseOut" />
+                                                                        </DoubleAnimation.EasingFunction>
+                                                                    </DoubleAnimation>
+                                                                </Storyboard>
                                                                 <VisualState.Setters>
-                                                                    <Setter Target="HoverOverlay.Opacity" Value="1" />
                                                                     <Setter Target="PreviewBorder.BorderBrush" Value="{ThemeResource AccentFillColorDefaultBrush}" />
                                                                     <Setter Target="PreviewBorder.BorderThickness" Value="2" />
                                                                 </VisualState.Setters>
                                                             </VisualState>
                                                             <VisualState x:Name="Pressed">
+                                                                <Storyboard>
+                                                                    <DoubleAnimation
+                                                                        Storyboard.TargetName="HoverOverlay"
+                                                                        Storyboard.TargetProperty="Opacity"
+                                                                        To="1"
+                                                                        Duration="0:0:0.1">
+                                                                        <DoubleAnimation.EasingFunction>
+                                                                            <CubicEase EasingMode="EaseOut" />
+                                                                        </DoubleAnimation.EasingFunction>
+                                                                    </DoubleAnimation>
+                                                                </Storyboard>
                                                                 <VisualState.Setters>
-                                                                    <Setter Target="HoverOverlay.Opacity" Value="1" />
-                                                                    <Setter Target="HoverOverlay.Background" Value="#40000000" />
+                                                                    <Setter Target="HoverOverlay.Background" Value="#50000000" />
                                                                     <Setter Target="PreviewBorder.BorderBrush" Value="{ThemeResource AccentFillColorDefaultBrush}" />
                                                                     <Setter Target="PreviewBorder.BorderThickness" Value="2" />
                                                                 </VisualState.Setters>
@@ -729,28 +790,6 @@
                                                     </VisualStateManager.VisualStateGroups>
                                                 </Border>
                                             </Button>
-
-                                            <!--  Info  -->
-                                            <StackPanel
-                                                Grid.Row="2"
-                                                Margin="0,0,0,12"
-                                                Orientation="Horizontal"
-                                                Spacing="8">
-                                                <FontIcon
-                                                    FontFamily="{StaticResource FluentIconsFontFamily}"
-                                                    FontSize="12"
-                                                    Glyph="&#xE91B;"
-                                                    Opacity="0.6" />
-                                                <TextBlock FontSize="12" Opacity="0.6">
-                                                    <Run Text="{x:Bind Shapes.Count}" />
-                                                    <Run Text="shape(s)" />
-                                                </TextBlock>
-                                                <TextBlock
-                                                    FontSize="11"
-                                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                                    Opacity="0.7"
-                                                    Text="• Drag or Click" />
-                                            </StackPanel>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
