@@ -79,12 +79,23 @@ namespace AppPaint
             {
                 using var scope = Services.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<AppPaintDbContext>();
+
+                // ✅ Log database file location
+                var dbPath = System.IO.Path.Combine(
+     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+      "apppaint.db"
+                );
+                System.Diagnostics.Debug.WriteLine($"📂 Database location: {dbPath}");
+                System.Diagnostics.Debug.WriteLine($"📊 Database exists: {System.IO.File.Exists(dbPath)}");
+
                 context.Database.Migrate();
+
+                System.Diagnostics.Debug.WriteLine("✅ Database migration completed successfully");
             }
             catch (Exception ex)
             {
                 // Log error - don't crash app
-                System.Diagnostics.Debug.WriteLine($"Database migration error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ Database migration error: {ex.Message}");
             }
         }
 
