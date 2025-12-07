@@ -33,79 +33,85 @@ public class TemplateSaveService
      int canvasWidth,
         int canvasHeight,
     string backgroundColor,
-        Canvas canvas)
+      Canvas canvas,
+  int? profileId = null)
     {
         try
         {
             using var scope = _serviceProvider.CreateScope();
             var templateService = scope.ServiceProvider.GetRequiredService<ITemplateService>();
-            var shapeService = scope.ServiceProvider.GetRequiredService<IShapeService>();
+var shapeService = scope.ServiceProvider.GetRequiredService<IShapeService>();
 
-            DrawingTemplate template;
+     DrawingTemplate template;
             bool isUpdating = currentTemplateId.HasValue;
 
-            if (isUpdating)
-            {
-                // UPDATE existing template
-                System.Diagnostics.Debug.WriteLine($"📝 Updating existing drawing ID: {currentTemplateId.Value}");
+  if (isUpdating)
+ {
+       // UPDATE existing template
+        System.Diagnostics.Debug.WriteLine($"📝 Updating existing drawing ID: {currentTemplateId.Value}");
 
-                var existingTemplate = await templateService.GetTemplateByIdAsync(currentTemplateId.Value);
-                if (existingTemplate != null)
-                {
-                    existingTemplate.Name = templateName;
-                    existingTemplate.Width = canvasWidth;
-                    existingTemplate.Height = canvasHeight;
-                    existingTemplate.BackgroundColor = backgroundColor;
-                    existingTemplate.ModifiedAt = DateTime.Now;
+         var existingTemplate = await templateService.GetTemplateByIdAsync(currentTemplateId.Value);
+      if (existingTemplate != null)
+      {
+      existingTemplate.Name = templateName;
+       existingTemplate.Width = canvasWidth;
+         existingTemplate.Height = canvasHeight;
+           existingTemplate.BackgroundColor = backgroundColor;
+  existingTemplate.ModifiedAt = DateTime.Now;
+       // Keep existing ProfileId unless explicitly changed
+  if (profileId.HasValue)
+       {
+      existingTemplate.ProfileId = profileId.Value;
+    }
 
-                    template = await templateService.UpdateTemplateAsync(existingTemplate);
-                    System.Diagnostics.Debug.WriteLine($"✅ Updated template: {template.Name}");
-                }
+ template = await templateService.UpdateTemplateAsync(existingTemplate);
+        System.Diagnostics.Debug.WriteLine($"✅ Updated template: {template.Name}");
+ }
                 else
-                {
-                    System.Diagnostics.Debug.WriteLine($"⚠️ Template {currentTemplateId.Value} not found, creating new");
-                    template = await CreateNewTemplate(templateService, templateName, canvasWidth, canvasHeight, backgroundColor, false);
-                    isUpdating = false;
+     {
+            System.Diagnostics.Debug.WriteLine($"⚠️ Template {currentTemplateId.Value} not found, creating new");
+    template = await CreateNewTemplate(templateService, templateName, canvasWidth, canvasHeight, backgroundColor, false, profileId);
+        isUpdating = false;
                 }
-            }
-            else
-            {
-                // CREATE new template
-                System.Diagnostics.Debug.WriteLine($"📝 Creating new drawing: {templateName}");
-                template = await CreateNewTemplate(templateService, templateName, canvasWidth, canvasHeight, backgroundColor, false);
-            }
+     }
+      else
+  {
+    // CREATE new template
+         System.Diagnostics.Debug.WriteLine($"📝 Creating new drawing: {templateName}");
+         template = await CreateNewTemplate(templateService, templateName, canvasWidth, canvasHeight, backgroundColor, false, profileId);
+   }
 
-            // Clear old shapes if updating
+       // Clear old shapes if updating
             if (isUpdating && template.Shapes != null && template.Shapes.Any())
             {
-                System.Diagnostics.Debug.WriteLine($"🗑️ Clearing {template.Shapes.Count} old shapes");
-                foreach (var oldShape in template.Shapes.ToList())
-                {
-                    await shapeService.DeleteShapeAsync(oldShape.Id);
-                }
-            }
-
-            // Save all shapes from canvas
-            var canvasShapes = canvas.Children.OfType<UIShape>().ToList();
-            System.Diagnostics.Debug.WriteLine($"💾 Saving {canvasShapes.Count} shapes to database");
-
-            int savedCount = 0;
-            foreach (var uiShape in canvasShapes)
-            {
-                var shape = _renderingService.ConvertToDataModel(uiShape, template.Id);
-                if (shape != null)
-                {
-                    await shapeService.CreateShapeAsync(shape);
-                    savedCount++;
-                }
-            }
-
-            System.Diagnostics.Debug.WriteLine($"✅ {(isUpdating ? "Updated" : "Saved")} template '{template.Name}' with {savedCount} shapes");
-            return template;
+      System.Diagnostics.Debug.WriteLine($"🗑️ Clearing {template.Shapes.Count} old shapes");
+      foreach (var oldShape in template.Shapes.ToList())
+       {
+ await shapeService.DeleteShapeAsync(oldShape.Id);
+     }
         }
-        catch (Exception ex)
+
+        // Save all shapes from canvas
+  var canvasShapes = canvas.Children.OfType<UIShape>().ToList();
+         System.Diagnostics.Debug.WriteLine($"💾 Saving {canvasShapes.Count} shapes to database");
+
+       int savedCount = 0;
+            foreach (var uiShape in canvasShapes)
+  {
+       var shape = _renderingService.ConvertToDataModel(uiShape, template.Id);
+          if (shape != null)
+  {
+    await shapeService.CreateShapeAsync(shape);
+        savedCount++;
+                }
+      }
+
+    System.Diagnostics.Debug.WriteLine($"✅ {(isUpdating ? "Updated" : "Saved")} template '{template.Name}' with {savedCount} shapes (ProfileId: {template.ProfileId})");
+            return template;
+   }
+     catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Save error: {ex}");
+        System.Diagnostics.Debug.WriteLine($"❌ Save error: {ex}");
             throw;
         }
     }
@@ -148,7 +154,8 @@ public class TemplateSaveService
            int width,
          int height,
            string backgroundColor,
-           bool isTemplate)
+           bool isTemplate,
+    int? profileId = null)
     {
         var template = new DrawingTemplate
         {
@@ -156,11 +163,12 @@ public class TemplateSaveService
             Width = width,
             Height = height,
             BackgroundColor = backgroundColor,
-            IsTemplate = isTemplate
+            IsTemplate = isTemplate,
+            ProfileId = profileId
         };
 
         var savedTemplate = await templateService.CreateTemplateAsync(template);
-        System.Diagnostics.Debug.WriteLine($"✅ Created {(isTemplate ? "TEMPLATE" : "DRAWING")}: {savedTemplate.Name} (ID: {savedTemplate.Id})");
+        System.Diagnostics.Debug.WriteLine($"✅ Created {(isTemplate ? "TEMPLATE" : "DRAWING")}: {savedTemplate.Name} (ID: {savedTemplate.Id}, ProfileId: {savedTemplate.ProfileId})");
 
         return savedTemplate;
     }
