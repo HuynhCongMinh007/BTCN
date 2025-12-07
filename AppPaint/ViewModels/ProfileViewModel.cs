@@ -156,15 +156,18 @@ var createdProfile = await profileService.CreateProfileAsync(newProfile);
 
 try
  {
-   IsBusy = true;
+ IsBusy = true;
 
   using var scope = App.Services.CreateScope();
    var profileService = scope.ServiceProvider.GetRequiredService<IProfileService>();
 
-       await profileService.UpdateProfileAsync(SelectedProfile);
+    await profileService.UpdateProfileAsync(SelectedProfile);
   
      System.Diagnostics.Debug.WriteLine($"✅ Saved profile: {SelectedProfile.Name}");
    System.Diagnostics.Debug.WriteLine($"   ⚠️ All drawings using this profile will use updated settings on next load");
+  
+  // ✅ Trigger success event with profile name
+            SaveProfileSuccess?.Invoke(this, SelectedProfile.Name);
     
          // Reload to get fresh data
      await LoadProfilesAsync();
