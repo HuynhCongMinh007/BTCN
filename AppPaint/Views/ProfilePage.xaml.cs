@@ -21,6 +21,8 @@ public sealed partial class ProfilePage : Page
         // Subscribe to events
         ViewModel.NavigateBackRequested += OnNavigateBackRequested;
         ViewModel.SaveProfileSuccess += OnSaveProfileSuccess;
+    ViewModel.SetActiveProfileSuccess += OnSetActiveProfileSuccess;
+        ViewModel.DeleteProfileSuccess += OnDeleteProfileSuccess;
         
      this.InitializeComponent();
     }
@@ -33,12 +35,14 @@ public sealed partial class ProfilePage : Page
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
     {
-        base.OnNavigatedFrom(e);
-        
+    base.OnNavigatedFrom(e);
+    
     // Unsubscribe
         ViewModel.NavigateBackRequested -= OnNavigateBackRequested;
         ViewModel.SaveProfileSuccess -= OnSaveProfileSuccess;
-    
+      ViewModel.SetActiveProfileSuccess -= OnSetActiveProfileSuccess;
+        ViewModel.DeleteProfileSuccess -= OnDeleteProfileSuccess;
+  
         ViewModel.OnNavigatedFrom();
     }
 
