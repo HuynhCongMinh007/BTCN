@@ -23,7 +23,9 @@
         <Grid
             x:Name="AppTitleBar"
             Grid.Row="0"
-            Background="Transparent">
+            Background="Transparent"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="0,0,0,1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -37,24 +39,31 @@
                 VerticalAlignment="Center"
                 Orientation="Horizontal"
                 Spacing="12">
-                <Image
-                    Width="20"
-                    Height="20"
-                    Source="/Assets/Square44x44Logo.png" />
+                <Border
+                    Width="24"
+                    Height="24"
+                    Background="{ThemeResource AccentFillColorDefaultBrush}"
+                    CornerRadius="6">
+                    <Image
+                        Width="16"
+                        Height="16"
+                        Source="/Assets/Square44x44Logo.png" />
+                </Border>
                 <TextBlock
                     VerticalAlignment="Center"
+                    FontSize="13"
                     FontWeight="SemiBold"
-                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
                     Text="AppPaint" />
             </StackPanel>
 
             <!--  Subtitle  -->
             <TextBlock
                 Grid.Column="1"
-                Margin="12,0,0,0"
+                Margin="16,0,0,0"
                 VerticalAlignment="Center"
-                Opacity="0.7"
-                Style="{StaticResource CaptionTextBlockStyle}"
+                FontSize="12"
+                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
                 Text="Professional Drawing Application" />
         </Grid>
 
