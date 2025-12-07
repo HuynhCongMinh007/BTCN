@@ -3,13 +3,20 @@
     <!--  Windows 11 Fluent Icons Font Family  -->
     <FontFamily x:Key="FluentIconsFontFamily">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
 
-    <!--  App Color Palette  -->
+    <!--  Enhanced App Color Palette (Modern & Vibrant)  -->
     <Color x:Key="AppPrimaryColor">#0078D4</Color>
     <Color x:Key="AppSecondaryColor">#005A9E</Color>
     <Color x:Key="AppAccentColor">#0063B1</Color>
     <Color x:Key="AppSuccessColor">#107C10</Color>
-    <Color x:Key="AppWarningColor">#FFC83D</Color>
+    <Color x:Key="AppWarningColor">#FFB900</Color>
     <Color x:Key="AppErrorColor">#E81123</Color>
+    <Color x:Key="AppInfoColor">#00BCF2</Color>
+
+    <!--  Drawing Tool Colors  -->
+    <Color x:Key="DefaultStrokeColor">#2D2D2D</Color>
+    <Color x:Key="DefaultFillColor">#FFB900</Color>
+    <Color x:Key="CanvasBackgroundLight">#FFFFFF</Color>
+    <Color x:Key="CanvasBackgroundDark">#1E1E1E</Color>
 
     <!--  Brushes  -->
     <SolidColorBrush x:Key="AppPrimaryBrush" Color="{StaticResource AppPrimaryColor}" />
@@ -18,17 +25,21 @@
     <SolidColorBrush x:Key="AppSuccessBrush" Color="{StaticResource AppSuccessColor}" />
     <SolidColorBrush x:Key="AppWarningBrush" Color="{StaticResource AppWarningColor}" />
     <SolidColorBrush x:Key="AppErrorBrush" Color="{StaticResource AppErrorColor}" />
+    <SolidColorBrush x:Key="AppInfoBrush" Color="{StaticResource AppInfoColor}" />
 
-    <!--  Spacing  -->
+    <!--  Spacing (Windows 11 Design System)  -->
     <x:Double x:Key="SpacingXSmall">4</x:Double>
     <x:Double x:Key="SpacingSmall">8</x:Double>
     <x:Double x:Key="SpacingMedium">16</x:Double>
     <x:Double x:Key="SpacingLarge">24</x:Double>
     <x:Double x:Key="SpacingXLarge">32</x:Double>
+    <x:Double x:Key="SpacingXXLarge">48</x:Double>
 
-    <!--  Corner Radius (Windows 11 style - slightly more rounded)  -->
+    <!--  Corner Radius (Windows 11 Fluent Design)  -->
     <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
+    <CornerRadius x:Key="ControlCornerRadiusMedium">6</CornerRadius>
     <CornerRadius x:Key="CardCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="CardCornerRadiusLarge">12</CornerRadius>
     <CornerRadius x:Key="OverlayCornerRadius">8</CornerRadius>
 
     <!--  Shadow  -->
@@ -41,27 +52,54 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
         <Setter Property="Padding" Value="{StaticResource SpacingLarge}" />
+        <Setter Property="Shadow">
+    <Setter.Value>
+      <ThemeShadow />
+       </Setter.Value>
+        </Setter>
+    </Style>
+
+<!--  Elevated Card Style  -->
+    <Style x:Key="AppElevatedCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+   <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+   <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadiusLarge}" />
+        <Setter Property="Padding" Value="{StaticResource SpacingLarge}" />
+        <Setter Property="Shadow">
+            <Setter.Value>
+      <ThemeShadow />
+        </Setter.Value>
+        </Setter>
     </Style>
 
     <!--  Accent Card Style  -->
     <Style x:Key="AppAccentCardStyle" TargetType="Border">
         <Setter Property="Background" Value="{ThemeResource AccentFillColorDefaultBrush}" />
         <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
-        <Setter Property="Padding" Value="{StaticResource SpacingLarge}" />
+     <Setter Property="Padding" Value="{StaticResource SpacingLarge}" />
     </Style>
 
     <!--  Section Title Style  -->
     <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="24" />
-        <Setter Property="FontWeight" Value="SemiBold" />
+ <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Margin" Value="0,0,0,16" />
     </Style>
 
     <!--  Section Subtitle Style  -->
     <Style x:Key="SectionSubtitleStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="18" />
+  <Setter Property="FontSize" Value="18" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Margin" Value="0,0,0,12" />
+    </Style>
+
+    <!--  Label Style  -->
+ <Style x:Key="LabelStyle" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="11" />
+     <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+        <Setter Property="Margin" Value="0,0,0,6" />
     </Style>
 
     <!--  Page Header Style  -->
@@ -72,7 +110,7 @@
 
     <!--  Toolbar Style  -->
     <Style x:Key="ToolbarStyle" TargetType="StackPanel">
-        <Setter Property="Orientation" Value="Horizontal" />
+  <Setter Property="Orientation" Value="Horizontal" />
         <Setter Property="Spacing" Value="8" />
         <Setter Property="Padding" Value="12" />
         <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
@@ -80,56 +118,69 @@
 
     <!--  Icon Button Style (Windows 11 Fluent)  -->
     <Style x:Key="IconButtonStyle" TargetType="Button">
-        <Setter Property="Width" Value="40" />
-        <Setter Property="Height" Value="40" />
-        <Setter Property="CornerRadius" Value="4" />
+     <Setter Property="Width" Value="40" />
+     <Setter Property="Height" Value="40" />
+        <Setter Property="CornerRadius" Value="6" />
         <Setter Property="Padding" Value="0" />
-        <Setter Property="Background" Value="{ThemeResource SubtleFillColorTransparentBrush}" />
+   <Setter Property="Background" Value="{ThemeResource SubtleFillColorTransparentBrush}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
     </Style>
 
     <!--  Accent Button Style (Windows 11 Fluent)  -->
     <Style
         x:Key="AppAccentButtonStyle"
-        BasedOn="{StaticResource AccentButtonStyle}"
-        TargetType="Button">
-        <Setter Property="CornerRadius" Value="4" />
-        <Setter Property="Padding" Value="16,8" />
+    BasedOn="{StaticResource AccentButtonStyle}"
+      TargetType="Button">
+        <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="20,10" />
+      <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
-    <!--  Color Picker Item Style  -->
+  <!--  Color Picker Item Style  -->
     <Style x:Key="ColorPickerItemStyle" TargetType="Border">
-        <Setter Property="Width" Value="32" />
-        <Setter Property="Height" Value="32" />
-        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+    <Setter Property="CornerRadius" Value="8" />
         <Setter Property="BorderThickness" Value="2" />
-        <Setter Property="BorderBrush" Value="Transparent" />
+   <Setter Property="BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
     </Style>
 
     <!--  Empty State Style  -->
     <Style x:Key="EmptyStateStyle" TargetType="StackPanel">
-        <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Spacing" Value="16" />
-        <Setter Property="Padding" Value="24" />
+        <Setter Property="Spacing" Value="20" />
+        <Setter Property="Padding" Value="32" />
     </Style>
 
-    <!--  Page Container Style  -->
+    <!--Page Container Style  -->
     <Style x:Key="PageContainerStyle" TargetType="Grid">
-        <Setter Property="Padding" Value="24" />
+      <Setter Property="Padding" Value="24" />
         <Setter Property="MaxWidth" Value="1400" />
         <Setter Property="HorizontalAlignment" Value="Center" />
     </Style>
 
-    <!--  Entrance Animation (Windows 11 Fluent Motion)  -->
-    <Storyboard x:Key="EntranceStoryboard">
+ <!--  Entrance Animation (Windows 11 Fluent Motion)  -->
+  <Storyboard x:Key="EntranceStoryboard">
         <DoubleAnimation
             From="0"
-            To="1"
+         To="1"
             Duration="0:0:0.3">
             <DoubleAnimation.EasingFunction>
-                <CubicEase EasingMode="EaseOut" />
-            </DoubleAnimation.EasingFunction>
+<CubicEase EasingMode="EaseOut" />
+     </DoubleAnimation.EasingFunction>
         </DoubleAnimation>
+    </Storyboard>
+
+    <!--  Hover Animation  -->
+  <Storyboard x:Key="HoverStoryboard">
+        <DoubleAnimation
+  From="1"
+            To="1.05"
+      Duration="0:0:0.2">
+     <DoubleAnimation.EasingFunction>
+                <CubicEase EasingMode="EaseOut" />
+ </DoubleAnimation.EasingFunction>
+   </DoubleAnimation>
     </Storyboard>
 </ResourceDictionary>
