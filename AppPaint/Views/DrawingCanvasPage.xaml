@@ -183,14 +183,12 @@
                                     <FontIcon
                                         FontFamily="{StaticResource FluentIconsFontFamily}"
                                         FontSize="20"
-                                        Glyph="&#xE71C;" />
+                                        Glyph="&#xF3B1;" />
                                 </ToggleButton>
                             </StackPanel>
 
                             <!--  Divider  -->
-                            <Border
-                                Height="1"
-                                Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                            <Border Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
                             <!--  Shape Tools Grid (3x2)  -->
                             <StackPanel Spacing="8">
