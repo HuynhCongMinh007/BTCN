@@ -20,12 +20,12 @@ public sealed partial class ManagementPage : Page
  // Navigate to default page or specific page from parameter
  if (e.Parameter is string pageName)
      {
-     NavigateToPage(pageName);
+  NavigateToPage(pageName);
    }
    else
-    {
-      // Default to Profiles
-      NavigateToPage("Profiles");
+  {
+      // Default to Dashboard (was Profiles)
+      NavigateToPage("Dashboard");
         }
  }
 
@@ -41,23 +41,24 @@ public sealed partial class ManagementPage : Page
     private void NavigateToPage(string tag)
     {
    Type? pageType = tag switch
-        {
+  {
+     "Dashboard" => typeof(DashboardPage),
  "Profiles" => typeof(ProfilePage),
     "Drawings" => typeof(DrawingsPage),
-        "Templates" => typeof(TemplateManagerPage),
-   _ => typeof(ProfilePage)
+      "Templates" => typeof(TemplateManagerPage),
+   _ => typeof(DashboardPage) // Default to Dashboard
         };
 
 if (pageType != null && ContentFrame.CurrentSourcePageType != pageType)
    {
-      ContentFrame.Navigate(pageType);
-      
+ContentFrame.Navigate(pageType);
+
    // Update breadcrumb
       UpdateShellBreadcrumb(tag);
         
    // Update NavigationView selection
      var navItem = ManagementNav.MenuItems
-   .OfType<NavigationViewItem>()
+ .OfType<NavigationViewItem>()
     .FirstOrDefault(item => item.Tag?.ToString() == tag);
    if (navItem != null)
       {
