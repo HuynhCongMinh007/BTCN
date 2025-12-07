@@ -15,55 +15,65 @@ public sealed partial class ManagementPage : Page
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        base.OnNavigatedTo(e);
+ base.OnNavigatedTo(e);
 
- // Navigate to default page or specific page from parameter
- if (e.Parameter is string pageName)
-     {
-  NavigateToPage(pageName);
-   }
-   else
+        // ✅ Parse parameter: can be "PageName" or "PageName:ProfileId"
+        if (e.Parameter is string param && !string.IsNullOrEmpty(param))
   {
-      // Default to Dashboard (was Profiles)
-      NavigateToPage("Dashboard");
-        }
+var parts = param.Split(':');
+     string pageName = parts[0];
+   int? profileId = null;
+
+ if (parts.Length > 1 && int.TryParse(parts[1], out int parsedId))
+            {
+       profileId = parsedId;
+   System.Diagnostics.Debug.WriteLine($"📍 ManagementPage received: {pageName} with ProfileId: {profileId}");
  }
 
+      NavigateToPage(pageName, profileId);
+     }
+    else
+ {
+  // Default to Dashboard
+  NavigateToPage("Dashboard");
+ }
+    }
+
     private void ManagementNav_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
- {
-  if (args.SelectedItem is NavigationViewItem item)
- {
-       string tag = item.Tag?.ToString() ?? "";
-    NavigateToPage(tag);
-        }
-}
-
-    private void NavigateToPage(string tag)
     {
-   Type? pageType = tag switch
-  {
+     if (args.SelectedItem is NavigationViewItem item)
+    {
+          string tag = item.Tag?.ToString() ?? "";
+   NavigateToPage(tag);
+    }
+    }
+
+    private void NavigateToPage(string tag, object? parameter = null)
+    {
+        Type? pageType = tag switch
+        {
      "Dashboard" => typeof(DashboardPage),
- "Profiles" => typeof(ProfilePage),
-    "Drawings" => typeof(DrawingsPage),
-      "Templates" => typeof(TemplateManagerPage),
-   _ => typeof(DashboardPage) // Default to Dashboard
-        };
+            "Profiles" => typeof(ProfilePage),
+      "Drawings" => typeof(DrawingsPage),
+       "Templates" => typeof(TemplateManagerPage),
+       _ => typeof(DashboardPage) // Default to Dashboard
+  };
 
-if (pageType != null && ContentFrame.CurrentSourcePageType != pageType)
-   {
-ContentFrame.Navigate(pageType);
+        if (pageType != null && (ContentFrame.CurrentSourcePageType != pageType || parameter != null))
+    {
+  ContentFrame.Navigate(pageType, parameter);
 
-   // Update breadcrumb
+            // Update breadcrumb
       UpdateShellBreadcrumb(tag);
-        
-   // Update NavigationView selection
-     var navItem = ManagementNav.MenuItems
- .OfType<NavigationViewItem>()
-    .FirstOrDefault(item => item.Tag?.ToString() == tag);
-   if (navItem != null)
-      {
-      ManagementNav.SelectedItem = navItem;
-       }
+
+       // Update NavigationView selection
+       var navItem = ManagementNav.MenuItems
+   .OfType<NavigationViewItem>()
+   .FirstOrDefault(item => item.Tag?.ToString() == tag);
+     if (navItem != null)
+          {
+        ManagementNav.SelectedItem = navItem;
+      }
         }
     }
 
