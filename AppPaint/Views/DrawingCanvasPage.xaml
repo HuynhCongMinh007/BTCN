@@ -55,24 +55,48 @@
                         HorizontalAlignment="Left"
                         Orientation="Horizontal"
                         Spacing="32">
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            FontSize="13"
-                            FontWeight="SemiBold"
-                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                            Text="🎨 Tools" />
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            FontSize="13"
-                            FontWeight="SemiBold"
-                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                            Text="✏️ Brushes" />
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            FontSize="13"
-                            FontWeight="SemiBold"
-                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                            Text="🖼️ Canvas" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon
+                                VerticalAlignment="Center"
+                                FontFamily="{StaticResource FluentIconsFontFamily}"
+                                FontSize="16"
+                                Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                Glyph="&#xE771;" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="13"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                Text="Tools" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon
+                                VerticalAlignment="Center"
+                                FontFamily="{StaticResource FluentIconsFontFamily}"
+                                FontSize="16"
+                                Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                Glyph="&#xE70F;" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="13"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                Text="Brushes" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon
+                                VerticalAlignment="Center"
+                                FontFamily="{StaticResource FluentIconsFontFamily}"
+                                FontSize="16"
+                                Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                Glyph="&#xE8B9;" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="13"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                Text="Canvas" />
+                        </StackPanel>
                     </StackPanel>
 
                     <!--  Right: Actions  -->
@@ -544,7 +568,7 @@
                                     MaxWidth="140"
                                     FontSize="9"
                                     Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                    Text="⚙️ Edit in Profile settings"
+                                    Text="Edit in Profile settings"
                                     TextWrapping="Wrap" />
                             </StackPanel>
                         </StackPanel>
@@ -665,12 +689,28 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel Grid.Column="0" Spacing="6">
-                            <TextBlock
-                                FontSize="18"
-                                FontWeight="Bold"
-                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                Text="📦 Templates" />
+                        <StackPanel Grid.Column="0" Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <Border
+                                    Width="32"
+                                    Height="32"
+                                    Background="{ThemeResource AccentFillColorSecondaryBrush}"
+                                    CornerRadius="6">
+                                    <FontIcon
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontFamily="{StaticResource FluentIconsFontFamily}"
+                                        FontSize="16"
+                                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                        Glyph="&#xE8B7;" />
+                                </Border>
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                    Text="Templates" />
+                            </StackPanel>
                             <TextBlock
                                 FontSize="11"
                                 Foreground="{ThemeResource TextFillColorTertiaryBrush}"
