@@ -847,10 +847,11 @@ public sealed partial class DrawingCanvasPage : Page
 
     private void TemplatePreviewCanvas_Loaded(object sender, RoutedEventArgs e)
     {
-        if (sender is Canvas canvas && canvas.Tag is DrawingTemplate template)
+      if (sender is Canvas canvas && canvas.Tag is DrawingTemplate template)
 {
-          _renderingService.RenderAllShapes(template.Shapes, canvas, scale: 0.5);
-        }
+            // Use auto-fit to scale shapes optimally to fill the preview area
+_renderingService.RenderShapesWithAutoFit(template.Shapes, canvas, padding: 10);
+      }
     }
 
     private void Template_DragStarting(Microsoft.UI.Xaml.UIElement sender, Microsoft.UI.Xaml.DragStartingEventArgs args)
