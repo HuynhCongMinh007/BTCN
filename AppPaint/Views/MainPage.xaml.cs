@@ -417,24 +417,11 @@ public sealed partial class MainPage : Page
         {
             System.Diagnostics.Debug.WriteLine($"✏️ Edit Profile clicked: {profile.Name} (ID: {profile.Id})");
 
-            // Navigate to Management > Profiles with profile ID
-            if (App.MainWindow is MainWindow mainWindow)
-            {
-                var rootFrame = mainWindow.Content as Grid;
-                if (rootFrame != null)
-                {
-                    var frameElement = rootFrame.FindName("RootFrame") as Frame;
-                    if (frameElement != null)
-                    {
-                        // Navigate to ManagementPage with profile navigation info
-                        // Format: "Profiles:{profileId}"
-                        string navigationParam = $"Profiles:{profile.Id}";
-                        frameElement.Navigate(typeof(ManagementPage), navigationParam);
+            // ✅ Simple: Just navigate through Frame (breadcrumb will auto-update in ShellPage)
+            string navigationParam = $"Profiles:{profile.Id}";
+            Frame.Navigate(typeof(ManagementPage), navigationParam);
 
-                        System.Diagnostics.Debug.WriteLine($"✅ Navigating to Management with: {navigationParam}");
-                    }
-                }
-            }
+            System.Diagnostics.Debug.WriteLine($"✅ Navigating to Management/Profiles with ProfileId: {profile.Id}");
         }
     }
 }
