@@ -903,7 +903,7 @@ System.Diagnostics.Debug.WriteLine($"📍 Dropped at: {dropPoint.X}, {dropPoint.
     private async Task InsertTemplateAtPosition(int templateId, Point position)
     {
   try
-        {
+{
          ViewModel.IsBusy = true;
 
  using var scope = App.Services.CreateScope();
@@ -917,7 +917,7 @@ System.Diagnostics.Debug.WriteLine($"📍 Dropped at: {dropPoint.X}, {dropPoint.
     return;
    }
 
-            // Calculate offset to center template at drop position
+// Calculate offset to center template at drop position
       var templateShapes = template.Shapes.ToList();
     var points = new List<Point>();
    
@@ -925,32 +925,32 @@ System.Diagnostics.Debug.WriteLine($"📍 Dropped at: {dropPoint.X}, {dropPoint.
           {
    var shapePoints = DrawingService.JsonToPoints(shape.PointsData);
  points.AddRange(shapePoints);
-        }
+     }
 
     if (points.Count == 0) return;
 
-            // Find template bounds
-            double minX = points.Min(p => p.X);
+         // Find template bounds
+      double minX = points.Min(p => p.X);
   double minY = points.Min(p => p.Y);
-       double maxX = points.Max(p => p.X);
+ double maxX = points.Max(p => p.X);
   double maxY = points.Max(p => p.Y);
       
  double templateCenterX = (minX + maxX) / 2;
  double templateCenterY = (minY + maxY) / 2;
 
    double offsetX = position.X - templateCenterX;
-            double offsetY = position.Y - templateCenterY;
+          double offsetY = position.Y - templateCenterY;
 
             // Insert shapes with offset
    foreach (var originalShape in templateShapes)
  {
     var shapePoints = DrawingService.JsonToPoints(originalShape.PointsData);
-        var offsetPoints = shapePoints.Select(p => new Point(p.X + offsetX, p.Y + offsetY)).ToList();
+  var offsetPoints = shapePoints.Select(p => new Point(p.X + offsetX, p.Y + offsetY)).ToList();
 
  var newShape = new Data.Models.Shape
   {
        ShapeType = originalShape.ShapeType,
-        PointsData = DrawingService.PointsToJson(offsetPoints),
+     PointsData = DrawingService.PointsToJson(offsetPoints),
     Color = originalShape.Color,
      StrokeThickness = originalShape.StrokeThickness,
          StrokeStyle = originalShape.StrokeStyle,
@@ -961,9 +961,10 @@ System.Diagnostics.Debug.WriteLine($"📍 Dropped at: {dropPoint.X}, {dropPoint.
    };
 
    await ViewModel.AddShapeCommand.ExecuteAsync(newShape);
-            }
+   }
 
- await ShowSuccessDialog($"Inserted template '{template.Name}' successfully!");
+      // Silent success - no dialog, just log
+ System.Diagnostics.Debug.WriteLine($"✅ Inserted template '{template.Name}' with {templateShapes.Count} shapes");
         }
         catch (Exception ex)
       {
@@ -971,7 +972,7 @@ System.Diagnostics.Debug.WriteLine($"📍 Dropped at: {dropPoint.X}, {dropPoint.
         }
         finally
 {
-     ViewModel.IsBusy = false;
+ ViewModel.IsBusy = false;
         }
     }
 
