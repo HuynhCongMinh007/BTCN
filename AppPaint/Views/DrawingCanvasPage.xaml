@@ -22,6 +22,9 @@
             Background="{ThemeResource LayerFillColorDefaultBrush}"
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
             BorderThickness="0,0,0,1">
+            <Border.Shadow>
+                <ThemeShadow />
+            </Border.Shadow>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -29,7 +32,7 @@
                 </Grid.RowDefinitions>
 
                 <!--  Top Row: Main Groups  -->
-                <Grid Grid.Row="0" Padding="12,8,12,4">
+                <Grid Grid.Row="0" Padding="16,12,16,8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
@@ -48,35 +51,44 @@
                     <!--  Center: Group Labels  -->
                     <StackPanel
                         Grid.Column="1"
-                        Margin="16,0,0,0"
+                        Margin="20,0,0,0"
                         HorizontalAlignment="Left"
                         Orientation="Horizontal"
-                        Spacing="24">
+                        Spacing="32">
                         <TextBlock
                             VerticalAlignment="Center"
+                            FontSize="13"
                             FontWeight="SemiBold"
-                            Text="Tools" />
+                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                            Text="🎨 Tools" />
                         <TextBlock
                             VerticalAlignment="Center"
+                            FontSize="13"
                             FontWeight="SemiBold"
-                            Text="Brushes" />
+                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                            Text="✏️ Brushes" />
                         <TextBlock
                             VerticalAlignment="Center"
+                            FontSize="13"
                             FontWeight="SemiBold"
-                            Text="Canvas" />
+                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                            Text="🖼️ Canvas" />
                     </StackPanel>
 
                     <!--  Right: Actions  -->
                     <StackPanel
                         Grid.Column="2"
                         Orientation="Horizontal"
-                        Spacing="8">
+                        Spacing="12">
                         <Button
                             x:Name="ClearButton"
                             Command="{x:Bind ViewModel.ClearCanvasCommand}"
                             Style="{StaticResource IconButtonStyle}"
                             ToolTipService.ToolTip="Clear Canvas">
-                            <FontIcon FontFamily="{StaticResource FluentIconsFontFamily}" Glyph="&#xE894;" />
+                            <FontIcon
+                                FontFamily="{StaticResource FluentIconsFontFamily}"
+                                Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                Glyph="&#xE894;" />
                         </Button>
 
                         <Button
@@ -86,18 +98,19 @@
                             ToolTipService.ToolTip="Save as Drawing">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon FontFamily="{StaticResource FluentIconsFontFamily}" Glyph="&#xE74E;" />
-                                <TextBlock Text="Save" />
+                                <TextBlock FontWeight="SemiBold" Text="Save" />
                             </StackPanel>
                         </Button>
 
-                        <!--  Save as Template Button (visible only when shape is selected)  -->
+                        <!--  Save as Template Button  -->
                         <Button
                             x:Name="SaveAsTemplateButton"
+                            Background="{ThemeResource AccentFillColorSecondaryBrush}"
                             Click="SaveAsTemplateButton_Click"
                             ToolTipService.ToolTip="Save selected shape as reusable template">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon FontFamily="{StaticResource FluentIconsFontFamily}" Glyph="&#xE8B7;" />
-                                <TextBlock Text="Save as Template" />
+                                <TextBlock FontWeight="SemiBold" Text="Save as Template" />
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -107,7 +120,7 @@
                 <Grid
                     x:Name="ToolbarContent"
                     Grid.Row="1"
-                    Padding="12,4,12,12">
+                    Padding="16,8,16,16">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
@@ -118,37 +131,46 @@
                     <!--  Group 1: Tools (Shapes)  -->
                     <Border
                         Grid.Column="0"
-                        Margin="0,0,8,0"
-                        Padding="12"
+                        Margin="0,0,12,0"
+                        Padding="16"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
-                        CornerRadius="4">
-                        <StackPanel Spacing="8">
+                        CornerRadius="8">
+                        <Border.Shadow>
+                            <ThemeShadow />
+                        </Border.Shadow>
+                        <StackPanel Spacing="12">
                             <TextBlock
-                                FontSize="12"
-                                Opacity="0.7"
-                                Text="Shapes" />
-                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                FontSize="11"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="SHAPE TOOLS" />
+                            <StackPanel Orientation="Horizontal" Spacing="6">
                                 <!--  Select/Edit Button  -->
                                 <ToggleButton
                                     x:Name="SelectButton"
-                                    Width="36"
-                                    Height="36"
+                                    Width="40"
+                                    Height="40"
                                     Click="SelectButton_Click"
+                                    CornerRadius="6"
                                     Tag="Select"
                                     ToolTipService.ToolTip="Select">
-                                    <FontIcon FontFamily="{StaticResource FluentIconsFontFamily}" Glyph="&#xE71C;" />
+                                    <FontIcon
+                                        FontFamily="{StaticResource FluentIconsFontFamily}"
+                                        FontSize="18"
+                                        Glyph="&#xE71C;" />
                                 </ToggleButton>
 
                                 <ToggleButton
                                     x:Name="LineButton"
-                                    Width="36"
-                                    Height="36"
+                                    Width="40"
+                                    Height="40"
                                     Click="ShapeButton_Click"
+                                    CornerRadius="6"
                                     Tag="Line"
                                     ToolTipService.ToolTip="Line">
-                                    <Viewbox Width="18" Height="18">
+                                    <Viewbox Width="20" Height="20">
                                         <Canvas Width="24" Height="24">
                                             <Line
                                                 Stroke="{ThemeResource TextFillColorPrimaryBrush}"
@@ -163,12 +185,13 @@
 
                                 <ToggleButton
                                     x:Name="RectangleButton"
-                                    Width="36"
-                                    Height="36"
+                                    Width="40"
+                                    Height="40"
                                     Click="ShapeButton_Click"
+                                    CornerRadius="6"
                                     Tag="Rectangle"
                                     ToolTipService.ToolTip="Rectangle">
-                                    <Viewbox Width="18" Height="18">
+                                    <Viewbox Width="20" Height="20">
                                         <Canvas Width="24" Height="24">
                                             <Rectangle
                                                 Canvas.Left="4"
@@ -183,12 +206,13 @@
 
                                 <ToggleButton
                                     x:Name="OvalButton"
-                                    Width="36"
-                                    Height="36"
+                                    Width="40"
+                                    Height="40"
                                     Click="ShapeButton_Click"
+                                    CornerRadius="6"
                                     Tag="Oval"
                                     ToolTipService.ToolTip="Oval">
-                                    <Viewbox Width="18" Height="18">
+                                    <Viewbox Width="20" Height="20">
                                         <Canvas Width="24" Height="24">
                                             <Ellipse
                                                 Canvas.Left="4"
@@ -203,12 +227,13 @@
 
                                 <ToggleButton
                                     x:Name="CircleButton"
-                                    Width="36"
-                                    Height="36"
+                                    Width="40"
+                                    Height="40"
                                     Click="ShapeButton_Click"
+                                    CornerRadius="6"
                                     Tag="Circle"
                                     ToolTipService.ToolTip="Circle">
-                                    <Viewbox Width="18" Height="18">
+                                    <Viewbox Width="20" Height="20">
                                         <Canvas Width="24" Height="24">
                                             <Ellipse
                                                 Canvas.Left="5"
@@ -223,12 +248,13 @@
 
                                 <ToggleButton
                                     x:Name="TriangleButton"
-                                    Width="36"
-                                    Height="36"
+                                    Width="40"
+                                    Height="40"
                                     Click="ShapeButton_Click"
+                                    CornerRadius="6"
                                     Tag="Triangle"
                                     ToolTipService.ToolTip="Triangle">
-                                    <Viewbox Width="18" Height="18">
+                                    <Viewbox Width="20" Height="20">
                                         <Canvas Width="24" Height="24">
                                             <Polygon
                                                 Points="12,4 4,20 20,20"
@@ -240,12 +266,13 @@
 
                                 <ToggleButton
                                     x:Name="PolygonButton"
-                                    Width="36"
-                                    Height="36"
+                                    Width="40"
+                                    Height="40"
                                     Click="ShapeButton_Click"
+                                    CornerRadius="6"
                                     Tag="Polygon"
                                     ToolTipService.ToolTip="Polygon">
-                                    <Viewbox Width="18" Height="18">
+                                    <Viewbox Width="20" Height="20">
                                         <Canvas Width="24" Height="24">
                                             <Polygon
                                                 Points="12,3 20,8 18,18 6,18 4,8"
@@ -261,17 +288,21 @@
                     <!--  Group 2: Brushes (Color, Thickness, Style)  -->
                     <Border
                         Grid.Column="1"
-                        Margin="0,0,8,0"
-                        Padding="12"
+                        Margin="0,0,12,0"
+                        Padding="16"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
-                        CornerRadius="4">
-                        <StackPanel Spacing="8">
+                        CornerRadius="8">
+                        <Border.Shadow>
+                            <ThemeShadow />
+                        </Border.Shadow>
+                        <StackPanel Spacing="12">
                             <TextBlock
-                                FontSize="12"
-                                Opacity="0.7"
-                                Text="Brushes" />
+                                FontSize="11"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="BRUSH SETTINGS" />
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -282,44 +313,50 @@
                                 <!--  Color  -->
                                 <StackPanel
                                     Grid.Column="0"
-                                    Margin="0,0,12,0"
-                                    Spacing="4">
+                                    Margin="0,0,16,0"
+                                    Spacing="6">
                                     <TextBlock
-                                        FontSize="11"
-                                        Opacity="0.6"
-                                        Text="Color" />
+                                        FontSize="10"
+                                        FontWeight="Medium"
+                                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                        Text="STROKE COLOR" />
 
                                     <!--  Stroke Color Button with Flyout  -->
                                     <Button
                                         x:Name="StrokeColorButton"
-                                        Width="36"
-                                        Height="36"
-                                        ToolTipService.ToolTip="Stroke Color (Nét vẽ)">
+                                        Width="44"
+                                        Height="44"
+                                        Padding="0"
+                                        CornerRadius="8"
+                                        ToolTipService.ToolTip="Stroke Color">
                                         <Button.Content>
                                             <Border
-                                                Width="24"
-                                                Height="24"
-                                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                                BorderThickness="1"
-                                                CornerRadius="2">
+                                                Width="36"
+                                                Height="36"
+                                                BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                                BorderThickness="2"
+                                                CornerRadius="6">
                                                 <Border.Background>
-                                                    <SolidColorBrush x:Name="StrokeColorPreview" Color="Black" />
+                                                    <SolidColorBrush x:Name="StrokeColorPreview" Color="#2D2D2D" />
                                                 </Border.Background>
                                             </Border>
                                         </Button.Content>
                                         <Button.Flyout>
                                             <Flyout Placement="Bottom">
-                                                <StackPanel Padding="8" Spacing="12">
-                                                    <TextBlock FontWeight="SemiBold" Text="Stroke Color (Màu nét vẽ)" />
+                                                <StackPanel Padding="16" Spacing="16">
+                                                    <TextBlock
+                                                        FontSize="14"
+                                                        FontWeight="SemiBold"
+                                                        Text="Stroke Color" />
                                                     <ColorPicker
                                                         x:Name="StrokeColorPicker"
                                                         ColorChanged="StrokeColorPicker_ColorChanged"
                                                         ColorSpectrumShape="Ring"
                                                         IsAlphaEnabled="False"
-                                                        IsColorChannelTextInputVisible="False"
+                                                        IsColorChannelTextInputVisible="True"
                                                         IsColorSliderVisible="True"
-                                                        IsHexInputVisible="False"
-                                                        Color="Black" />
+                                                        IsHexInputVisible="True"
+                                                        Color="#2D2D2D" />
                                                 </StackPanel>
                                             </Flyout>
                                         </Button.Flyout>
@@ -329,50 +366,60 @@
                                 <!--  Thickness  -->
                                 <StackPanel
                                     Grid.Column="1"
-                                    Margin="0,0,12,0"
-                                    Spacing="4">
+                                    Margin="0,0,16,0"
+                                    Spacing="6">
                                     <TextBlock
-                                        FontSize="11"
-                                        Opacity="0.6"
-                                        Text="Size" />
-                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        FontSize="10"
+                                        FontWeight="Medium"
+                                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                        Text="THICKNESS" />
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
                                         <Slider
                                             x:Name="StrokeThicknessSlider"
-                                            Width="100"
+                                            Width="120"
                                             VerticalAlignment="Center"
                                             Maximum="20"
                                             Minimum="1"
                                             Value="{x:Bind ViewModel.StrokeThickness, Mode=TwoWay}" />
-                                        <TextBlock
-                                            Width="24"
-                                            VerticalAlignment="Center"
-                                            Text="{x:Bind StrokeThicknessSlider.Value, Mode=OneWay}" />
+                                        <Border
+                                            MinWidth="32"
+                                            Padding="8,4"
+                                            Background="{ThemeResource AccentFillColorSecondaryBrush}"
+                                            CornerRadius="4">
+                                            <TextBlock
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontWeight="SemiBold"
+                                                Text="{x:Bind StrokeThicknessSlider.Value, Mode=OneWay}" />
+                                        </Border>
                                     </StackPanel>
                                 </StackPanel>
 
                                 <!--  Style & Fill  -->
-                                <StackPanel Grid.Column="2" Spacing="4">
+                                <StackPanel Grid.Column="2" Spacing="6">
                                     <TextBlock
-                                        FontSize="11"
-                                        Opacity="0.6"
-                                        Text="Options" />
-                                    <StackPanel Spacing="4">
+                                        FontSize="10"
+                                        FontWeight="Medium"
+                                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                        Text="STYLE &amp; FILL" />
+                                    <StackPanel Spacing="8">
                                         <ComboBox
                                             x:Name="StrokeStyleComboBox"
-                                            MinWidth="100"
+                                            MinWidth="130"
+                                            CornerRadius="6"
                                             SelectedIndex="0"
                                             SelectionChanged="StrokeStyleComboBox_SelectionChanged">
-                                            <ComboBoxItem Content="Solid" Tag="Solid" />
-                                            <ComboBoxItem Content="Dash" Tag="Dash" />
-                                            <ComboBoxItem Content="Dot" Tag="Dot" />
-                                            <ComboBoxItem Content="Dash-Dot" Tag="DashDot" />
+                                            <ComboBoxItem Content="━ Solid" Tag="Solid" />
+                                            <ComboBoxItem Content="╌ Dash" Tag="Dash" />
+                                            <ComboBoxItem Content="··· Dot" Tag="Dot" />
+                                            <ComboBoxItem Content="━·━ Dash-Dot" Tag="DashDot" />
                                         </ComboBox>
 
                                         <!--  Fill Option with Color Picker Button  -->
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
 
                                             <CheckBox
@@ -380,43 +427,50 @@
                                                 Grid.Column="0"
                                                 VerticalAlignment="Center"
                                                 Content="Fill"
-                                                FontSize="11"
+                                                FontSize="12"
+                                                FontWeight="Medium"
                                                 IsChecked="{x:Bind ViewModel.IsFilled, Mode=TwoWay}" />
 
-                                            <!--  Fill Color Button (visible when Fill is checked)  -->
+                                            <!--  Fill Color Button  -->
                                             <Button
                                                 x:Name="FillColorButton"
                                                 Grid.Column="1"
-                                                Width="24"
-                                                Height="24"
-                                                Margin="4,0,0,0"
+                                                Width="32"
+                                                Height="32"
+                                                Margin="8,0,0,0"
+                                                Padding="0"
+                                                HorizontalAlignment="Right"
+                                                CornerRadius="6"
                                                 ToolTipService.ToolTip="Fill Color"
                                                 Visibility="{x:Bind FillCheckBox.IsChecked, Mode=OneWay}">
                                                 <Button.Content>
                                                     <Border
-                                                        Width="18"
-                                                        Height="18"
-                                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                                        BorderThickness="1"
-                                                        CornerRadius="2">
+                                                        Width="24"
+                                                        Height="24"
+                                                        BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                                        BorderThickness="2"
+                                                        CornerRadius="4">
                                                         <Border.Background>
-                                                            <SolidColorBrush x:Name="FillColorPreview" Color="#FFFF00" />
+                                                            <SolidColorBrush x:Name="FillColorPreview" Color="#FFB900" />
                                                         </Border.Background>
                                                     </Border>
                                                 </Button.Content>
                                                 <Button.Flyout>
                                                     <Flyout Placement="Bottom">
-                                                        <StackPanel Padding="8" Spacing="12">
-                                                            <TextBlock FontWeight="SemiBold" Text="Fill Color (Màu tô)" />
+                                                        <StackPanel Padding="16" Spacing="16">
+                                                            <TextBlock
+                                                                FontSize="14"
+                                                                FontWeight="SemiBold"
+                                                                Text="Fill Color" />
                                                             <ColorPicker
                                                                 x:Name="FillColorPicker"
                                                                 ColorChanged="FillColorPicker_ColorChanged"
                                                                 ColorSpectrumShape="Ring"
                                                                 IsAlphaEnabled="False"
-                                                                IsColorChannelTextInputVisible="False"
+                                                                IsColorChannelTextInputVisible="True"
                                                                 IsColorSliderVisible="True"
-                                                                IsHexInputVisible="False"
-                                                                Color="#FFFF00" />
+                                                                IsHexInputVisible="True"
+                                                                Color="#FFB900" />
                                                         </StackPanel>
                                                     </Flyout>
                                                 </Button.Flyout>
@@ -431,70 +485,85 @@
                     <!--  Group 3: Canvas Info (READ-ONLY from Profile)  -->
                     <Border
                         Grid.Column="2"
-                        Margin="0,0,8,0"
-                        Padding="12"
+                        Margin="0,0,12,0"
+                        Padding="16"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
-                        CornerRadius="4">
-                        <StackPanel Spacing="8">
+                        CornerRadius="8">
+                        <Border.Shadow>
+                            <ThemeShadow />
+                        </Border.Shadow>
+                        <StackPanel Spacing="12">
                             <TextBlock
-                                FontSize="12"
-                                Opacity="0.7"
-                                Text="Canvas Info" />
-                            <StackPanel Spacing="4">
-                                <!--  Size (READ-ONLY - from Profile)  -->
+                                FontSize="11"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="CANVAS INFO" />
+                            <StackPanel Spacing="8">
+                                <!--  Size  -->
                                 <TextBlock
-                                    FontSize="11"
-                                    Opacity="0.6"
-                                    Text="Size (from Profile)" />
-                                <TextBlock FontSize="13" FontWeight="SemiBold">
-                                    <Run Text="{x:Bind ViewModel.CanvasWidth, Mode=OneWay}" />
-                                    <Run Text="×" />
-                                    <Run Text="{x:Bind ViewModel.CanvasHeight, Mode=OneWay}" />
-                                    <Run Text="px" />
-                                </TextBlock>
+                                    FontSize="10"
+                                    FontWeight="Medium"
+                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                    Text="SIZE (FROM PROFILE)" />
+                                <Border
+                                    Padding="12,8"
+                                    Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                    CornerRadius="6">
+                                    <TextBlock
+                                        FontSize="14"
+                                        FontWeight="SemiBold"
+                                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}">
+                                        <Run Text="{x:Bind ViewModel.CanvasWidth, Mode=OneWay}" />
+                                        <Run Text="×" />
+                                        <Run Text="{x:Bind ViewModel.CanvasHeight, Mode=OneWay}" />
+                                        <Run FontSize="11" Text="px" />
+                                    </TextBlock>
+                                </Border>
 
-                                <!--  Background (READ-ONLY - from Profile)  -->
+                                <!--  Background  -->
                                 <TextBlock
                                     Margin="0,8,0,0"
-                                    FontSize="11"
-                                    Opacity="0.6"
-                                    Text="Background (from Profile)" />
+                                    FontSize="10"
+                                    FontWeight="Medium"
+                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                    Text="BACKGROUND" />
                                 <Border
-                                    Width="36"
-                                    Height="36"
+                                    Width="44"
+                                    Height="44"
                                     HorizontalAlignment="Left"
-                                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="4">
+                                    BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                    BorderThickness="2"
+                                    CornerRadius="8">
                                     <Border.Background>
                                         <SolidColorBrush x:Name="BackgroundColorPreview" Color="White" />
                                     </Border.Background>
                                 </Border>
                                 <TextBlock
-                                    MaxWidth="120"
-                                    FontSize="10"
-                                    Opacity="0.5"
-                                    Text="⚠️ Edit in Profile settings"
+                                    MaxWidth="140"
+                                    FontSize="9"
+                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                    Text="⚙️ Edit in Profile settings"
                                     TextWrapping="Wrap" />
                             </StackPanel>
                         </StackPanel>
                     </Border>
 
-                    <!--  Polygon Finish Button (when needed)  -->
+                    <!--  Polygon Finish Button  -->
                     <StackPanel
                         Grid.Column="3"
-                        Margin="12,0,0,0"
+                        Margin="16,0,0,0"
                         VerticalAlignment="Center">
                         <Button
                             x:Name="FinishPolygonButton"
                             Click="FinishPolygonButton_Click"
+                            CornerRadius="6"
                             Style="{StaticResource AppAccentButtonStyle}"
                             Visibility="Collapsed">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
                                 <FontIcon FontFamily="{StaticResource FluentIconsFontFamily}" Glyph="&#xE73E;" />
-                                <TextBlock Text="Finish Polygon" />
+                                <TextBlock FontWeight="SemiBold" Text="Finish Polygon" />
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -512,13 +581,16 @@
             <!--  Main Canvas Area  -->
             <ScrollViewer
                 Grid.Column="0"
-                Padding="24"
+                Padding="32"
                 HorizontalScrollBarVisibility="Auto"
                 VerticalScrollBarVisibility="Auto">
                 <Border
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
-                    Style="{StaticResource AppCardStyle}">
+                    CornerRadius="12">
+                    <Border.Shadow>
+                        <ThemeShadow />
+                    </Border.Shadow>
                     <Grid>
                         <!--  Canvas Background with Fixed Size  -->
                         <Border
@@ -526,13 +598,13 @@
                             Width="{x:Bind ViewModel.CanvasWidth, Mode=OneWay}"
                             Height="{x:Bind ViewModel.CanvasHeight, Mode=OneWay}"
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                            BorderThickness="1"
-                            CornerRadius="4">
+                            BorderThickness="2"
+                            CornerRadius="8">
                             <Border.Background>
                                 <SolidColorBrush x:Name="CanvasBackgroundBrush" Color="White" />
                             </Border.Background>
 
-                            <!--  Drawing Canvas - Fixed Size  -->
+                            <!--  Drawing Canvas  -->
                             <Canvas
                                 x:Name="DrawingCanvas"
                                 Width="{x:Bind ViewModel.CanvasWidth, Mode=OneWay}"
@@ -550,14 +622,18 @@
                             Visibility="Collapsed">
                             <FontIcon
                                 FontFamily="{StaticResource FluentIconsFontFamily}"
-                                FontSize="64"
-                                Glyph="&#xE70F;"
-                                Opacity="0.3" />
+                                FontSize="72"
+                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                Glyph="&#xE70F;" />
                             <TextBlock
-                                Opacity="0.6"
-                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                FontSize="18"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Text="Select a tool and start drawing" />
-                            <TextBlock Opacity="0.5" Text="Choose a shape from the toolbar above" />
+                            <TextBlock
+                                FontSize="13"
+                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                Text="Choose a shape from the toolbar above" />
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -567,7 +643,7 @@
             <Border
                 x:Name="TemplatePanel"
                 Grid.Column="1"
-                Width="320"
+                Width="340"
                 Background="{ThemeResource LayerFillColorDefaultBrush}"
                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                 BorderThickness="1,0,0,0">
@@ -580,7 +656,7 @@
                     <!--  Header  -->
                     <Grid
                         Grid.Row="0"
-                        Padding="16,12"
+                        Padding="20,16"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="0,0,0,1">
@@ -589,24 +665,26 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel Grid.Column="0" Spacing="4">
+                        <StackPanel Grid.Column="0" Spacing="6">
                             <TextBlock
-                                FontSize="16"
-                                FontWeight="SemiBold"
-                                Text="Templates" />
+                                FontSize="18"
+                                FontWeight="Bold"
+                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                Text="📦 Templates" />
                             <TextBlock
                                 FontSize="11"
-                                Opacity="0.6"
-                                Text="Drag to canvas or click Insert" />
+                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                Text="Drag to canvas or click to insert" />
                         </StackPanel>
 
                         <Button
                             x:Name="ToggleTemplatePanelButton"
                             Grid.Column="1"
-                            Width="32"
-                            Height="32"
+                            Width="36"
+                            Height="36"
                             Padding="0"
                             Click="ToggleTemplatePanel_Click"
+                            CornerRadius="6"
                             ToolTipService.ToolTip="Hide Templates">
                             <FontIcon
                                 FontFamily="{StaticResource FluentIconsFontFamily}"
@@ -616,10 +694,10 @@
                     </Grid>
 
                     <!--  Templates List  -->
-                    <ScrollViewer Grid.Row="1" Padding="12">
+                    <ScrollViewer Grid.Row="1" Padding="16">
                         <ItemsRepeater x:Name="TemplatesRepeater" ItemsSource="{x:Bind ViewModel.AvailableTemplates, Mode=OneWay}">
                             <ItemsRepeater.Layout>
-                                <StackLayout Spacing="12" />
+                                <StackLayout Spacing="16" />
                             </ItemsRepeater.Layout>
                             <ItemsRepeater.ItemTemplate>
                                 <DataTemplate x:DataType="models:DrawingTemplate">
@@ -630,12 +708,15 @@
                                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                                         BorderThickness="1"
                                         CanDrag="True"
-                                        CornerRadius="8"
+                                        CornerRadius="12"
                                         DragStarting="Template_DragStarting"
                                         PointerEntered="TemplateCard_PointerEntered"
                                         PointerExited="TemplateCard_PointerExited">
+                                        <Border.Shadow>
+                                            <ThemeShadow />
+                                        </Border.Shadow>
                                         <Border.RenderTransform>
-                                            <ScaleTransform x:Name="CardScale" CenterX="148" CenterY="100" ScaleX="1" ScaleY="1" />
+                                            <ScaleTransform x:Name="CardScale" CenterX="154" CenterY="100" ScaleX="1" ScaleY="1" />
                                         </Border.RenderTransform>
                                         <Border.Transitions>
                                             <TransitionCollection>
@@ -646,15 +727,16 @@
                                         <Grid>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="140" />
+                                                <RowDefinition Height="150" />
                                             </Grid.RowDefinitions>
 
                                             <!--  Name  -->
                                             <TextBlock
                                                 Grid.Row="0"
                                                 Margin="0,0,0,12"
-                                                FontSize="14"
+                                                FontSize="15"
                                                 FontWeight="SemiBold"
+                                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
                                                 Text="{x:Bind Name}"
                                                 TextTrimming="CharacterEllipsis" />
 
@@ -667,7 +749,7 @@
                                                 Background="Transparent"
                                                 BorderThickness="0"
                                                 Click="TemplatePreview_Click"
-                                                CornerRadius="6"
+                                                CornerRadius="8"
                                                 Tag="{x:Bind}">
                                                 <Button.Resources>
                                                     <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
@@ -675,10 +757,15 @@
                                                 </Button.Resources>
                                                 <Border
                                                     x:Name="PreviewBorder"
-                                                    Background="White"
                                                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                                    BorderThickness="1"
-                                                    CornerRadius="6">
+                                                    BorderThickness="2"
+                                                    CornerRadius="8">
+                                                    <Border.Background>
+                                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                            <GradientStop Offset="0" Color="{ThemeResource SystemFillColorNeutralBackgroundBrush}" />
+                                                            <GradientStop Offset="1" Color="{ThemeResource SystemFillColorSolidNeutralBackgroundBrush}" />
+                                                        </LinearGradientBrush>
+                                                    </Border.Background>
                                                     <Border.Transitions>
                                                         <TransitionCollection>
                                                             <AddDeleteThemeTransition />
@@ -687,7 +774,7 @@
 
                                                     <Grid>
                                                         <Viewbox
-                                                            Margin="12"
+                                                            Margin="16"
                                                             Stretch="Uniform"
                                                             StretchDirection="DownOnly">
                                                             <Canvas
@@ -698,12 +785,17 @@
                                                                 Tag="{x:Bind}" />
                                                         </Viewbox>
 
-                                                        <!--  Hover Overlay with Animation  -->
+                                                        <!--  Hover Overlay  -->
                                                         <Border
                                                             x:Name="HoverOverlay"
-                                                            Background="#30000000"
-                                                            CornerRadius="6"
+                                                            CornerRadius="8"
                                                             Opacity="0">
+                                                            <Border.Background>
+                                                                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                                                    <GradientStop Offset="0" Color="#60000000" />
+                                                                    <GradientStop Offset="1" Color="#80000000" />
+                                                                </LinearGradientBrush>
+                                                            </Border.Background>
                                                             <Border.Transitions>
                                                                 <TransitionCollection>
                                                                     <AddDeleteThemeTransition />
@@ -713,19 +805,25 @@
                                                             <StackPanel
                                                                 HorizontalAlignment="Center"
                                                                 VerticalAlignment="Center"
-                                                                Spacing="12">
-                                                                <FontIcon
-                                                                    FontFamily="{StaticResource FluentIconsFontFamily}"
-                                                                    FontSize="40"
-                                                                    Foreground="White"
-                                                                    Glyph="&#xE710;">
-                                                                    <FontIcon.Shadow>
-                                                                        <ThemeShadow />
-                                                                    </FontIcon.Shadow>
-                                                                </FontIcon>
+                                                                Spacing="16">
+                                                                <Border
+                                                                    Width="64"
+                                                                    Height="64"
+                                                                    Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                                                    CornerRadius="32">
+                                                                    <FontIcon
+                                                                        FontFamily="{StaticResource FluentIconsFontFamily}"
+                                                                        FontSize="32"
+                                                                        Foreground="White"
+                                                                        Glyph="&#xE710;">
+                                                                        <FontIcon.Shadow>
+                                                                            <ThemeShadow />
+                                                                        </FontIcon.Shadow>
+                                                                    </FontIcon>
+                                                                </Border>
                                                                 <TextBlock
-                                                                    FontSize="15"
-                                                                    FontWeight="SemiBold"
+                                                                    FontSize="16"
+                                                                    FontWeight="Bold"
                                                                     Foreground="White"
                                                                     Text="Click to Insert">
                                                                     <TextBlock.Shadow>
@@ -744,7 +842,7 @@
                                                                         Storyboard.TargetName="HoverOverlay"
                                                                         Storyboard.TargetProperty="Opacity"
                                                                         To="0"
-                                                                        Duration="0:0:0.2">
+                                                                        Duration="0:0:0.3">
                                                                         <DoubleAnimation.EasingFunction>
                                                                             <CubicEase EasingMode="EaseOut" />
                                                                         </DoubleAnimation.EasingFunction>
@@ -757,7 +855,7 @@
                                                                         Storyboard.TargetName="HoverOverlay"
                                                                         Storyboard.TargetProperty="Opacity"
                                                                         To="1"
-                                                                        Duration="0:0:0.2">
+                                                                        Duration="0:0:0.25">
                                                                         <DoubleAnimation.EasingFunction>
                                                                             <CubicEase EasingMode="EaseOut" />
                                                                         </DoubleAnimation.EasingFunction>
@@ -765,7 +863,7 @@
                                                                 </Storyboard>
                                                                 <VisualState.Setters>
                                                                     <Setter Target="PreviewBorder.BorderBrush" Value="{ThemeResource AccentFillColorDefaultBrush}" />
-                                                                    <Setter Target="PreviewBorder.BorderThickness" Value="2" />
+                                                                    <Setter Target="PreviewBorder.BorderThickness" Value="3" />
                                                                 </VisualState.Setters>
                                                             </VisualState>
                                                             <VisualState x:Name="Pressed">
@@ -774,16 +872,15 @@
                                                                         Storyboard.TargetName="HoverOverlay"
                                                                         Storyboard.TargetProperty="Opacity"
                                                                         To="1"
-                                                                        Duration="0:0:0.1">
+                                                                        Duration="0:0:0.15">
                                                                         <DoubleAnimation.EasingFunction>
                                                                             <CubicEase EasingMode="EaseOut" />
                                                                         </DoubleAnimation.EasingFunction>
                                                                     </DoubleAnimation>
                                                                 </Storyboard>
                                                                 <VisualState.Setters>
-                                                                    <Setter Target="HoverOverlay.Background" Value="#50000000" />
-                                                                    <Setter Target="PreviewBorder.BorderBrush" Value="{ThemeResource AccentFillColorDefaultBrush}" />
-                                                                    <Setter Target="PreviewBorder.BorderThickness" Value="2" />
+                                                                    <Setter Target="PreviewBorder.BorderBrush" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
+                                                                    <Setter Target="PreviewBorder.BorderThickness" Value="3" />
                                                                 </VisualState.Setters>
                                                             </VisualState>
                                                         </VisualStateGroup>
@@ -803,22 +900,24 @@
             <Button
                 x:Name="ShowTemplatePanelButton"
                 Grid.Column="1"
-                Width="48"
-                Height="120"
-                Margin="0,20,0,0"
-                Padding="8"
+                Width="56"
+                Height="140"
+                Margin="0,24,0,0"
+                Padding="12"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
                 Click="ToggleTemplatePanel_Click"
+                CornerRadius="8,0,0,8"
                 ToolTipService.ToolTip="Show Templates"
                 Visibility="Collapsed">
-                <StackPanel HorizontalAlignment="Center" Spacing="8">
+                <StackPanel HorizontalAlignment="Center" Spacing="12">
                     <FontIcon
                         FontFamily="{StaticResource FluentIconsFontFamily}"
-                        FontSize="20"
+                        FontSize="24"
                         Glyph="&#xE76B;" />
                     <TextBlock
-                        FontSize="11"
+                        FontSize="12"
+                        FontWeight="SemiBold"
                         Text="Templates"
                         TextAlignment="Center"
                         TextWrapping="Wrap" />
