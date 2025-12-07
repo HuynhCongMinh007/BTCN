@@ -43,11 +43,17 @@ public class AppPaintDbContext : DbContext
 
         // DrawingTemplate configuration
         modelBuilder.Entity<DrawingTemplate>(entity =>
-             {
-                 entity.HasKey(e => e.Id);
-                 entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
-                 entity.Property(e => e.BackgroundColor).IsRequired().HasMaxLength(20);
-             });
+      {
+          entity.HasKey(e => e.Id);
+          entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+          entity.Property(e => e.BackgroundColor).IsRequired().HasMaxLength(20);
+
+          // Relationship with Profile
+          entity.HasOne(e => e.Profile)
+   .WithMany(p => p.DrawingTemplates)
+    .HasForeignKey(e => e.ProfileId)
+   .OnDelete(DeleteBehavior.SetNull); // When profile deleted, set ProfileId to null
+        });
 
         // Profile configuration
         modelBuilder.Entity<Profile>(entity =>

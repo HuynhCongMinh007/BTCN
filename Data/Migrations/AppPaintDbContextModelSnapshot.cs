@@ -45,10 +45,15 @@ namespace Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("ProfileId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<double>("Width")
                         .HasColumnType("REAL");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProfileId");
 
                     b.ToTable("DrawingTemplates");
 
@@ -57,7 +62,7 @@ namespace Data.Migrations
                         {
                             Id = 1,
                             BackgroundColor = "#F0F0F0",
-                            CreatedAt = new DateTime(2025, 12, 7, 1, 35, 34, 990, DateTimeKind.Local).AddTicks(5235),
+                            CreatedAt = new DateTime(2025, 12, 7, 12, 39, 30, 918, DateTimeKind.Local).AddTicks(5998),
                             Height = 600.0,
                             IsTemplate = false,
                             Name = "Sample Template 1",
@@ -67,7 +72,7 @@ namespace Data.Migrations
                         {
                             Id = 2,
                             BackgroundColor = "#E8F4F8",
-                            CreatedAt = new DateTime(2025, 12, 7, 1, 35, 34, 990, DateTimeKind.Local).AddTicks(5238),
+                            CreatedAt = new DateTime(2025, 12, 7, 12, 39, 30, 918, DateTimeKind.Local).AddTicks(6000),
                             Height = 768.0,
                             IsTemplate = false,
                             Name = "Sample Template 2",
@@ -132,7 +137,7 @@ namespace Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 12, 7, 1, 35, 34, 990, DateTimeKind.Local).AddTicks(5144),
+                            CreatedAt = new DateTime(2025, 12, 7, 12, 39, 30, 918, DateTimeKind.Local).AddTicks(5905),
                             DefaultBackgroundColor = "#FFFFFF",
                             DefaultCanvasHeight = 600.0,
                             DefaultCanvasWidth = 800.0,
@@ -193,7 +198,7 @@ namespace Data.Migrations
                         {
                             Id = 1,
                             Color = "#FF0000",
-                            CreatedAt = new DateTime(2025, 12, 7, 1, 35, 34, 990, DateTimeKind.Local).AddTicks(5251),
+                            CreatedAt = new DateTime(2025, 12, 7, 12, 39, 30, 918, DateTimeKind.Local).AddTicks(6014),
                             FillColor = "#FFCCCC",
                             IsFilled = true,
                             PointsData = "[{\"X\":100,\"Y\":100},{\"X\":300,\"Y\":250}]",
@@ -206,7 +211,7 @@ namespace Data.Migrations
                         {
                             Id = 2,
                             Color = "#0000FF",
-                            CreatedAt = new DateTime(2025, 12, 7, 1, 35, 34, 990, DateTimeKind.Local).AddTicks(5253),
+                            CreatedAt = new DateTime(2025, 12, 7, 12, 39, 30, 918, DateTimeKind.Local).AddTicks(6016),
                             IsFilled = false,
                             PointsData = "[{\"X\":500,\"Y\":300},{\"X\":600,\"Y\":300}]",
                             ShapeType = 3,
@@ -218,7 +223,7 @@ namespace Data.Migrations
                         {
                             Id = 3,
                             Color = "#00FF00",
-                            CreatedAt = new DateTime(2025, 12, 7, 1, 35, 34, 990, DateTimeKind.Local).AddTicks(5256),
+                            CreatedAt = new DateTime(2025, 12, 7, 12, 39, 30, 918, DateTimeKind.Local).AddTicks(6018),
                             IsFilled = false,
                             PointsData = "[{\"X\":50,\"Y\":50},{\"X\":400,\"Y\":400}]",
                             ShapeType = 0,
@@ -226,6 +231,16 @@ namespace Data.Migrations
                             StrokeThickness = 5.0,
                             TemplateId = 2
                         });
+                });
+
+            modelBuilder.Entity("Data.Models.DrawingTemplate", b =>
+                {
+                    b.HasOne("Data.Models.Profile", "Profile")
+                        .WithMany("DrawingTemplates")
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("Data.Models.Shape", b =>
@@ -241,6 +256,11 @@ namespace Data.Migrations
             modelBuilder.Entity("Data.Models.DrawingTemplate", b =>
                 {
                     b.Navigation("Shapes");
+                });
+
+            modelBuilder.Entity("Data.Models.Profile", b =>
+                {
+                    b.Navigation("DrawingTemplates");
                 });
 #pragma warning restore 612, 618
         }

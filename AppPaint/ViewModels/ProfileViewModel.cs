@@ -32,6 +32,7 @@ public partial class ProfileViewModel : BaseViewModel
 
     // Navigation events
  public event EventHandler? NavigateBackRequested;
+  public event EventHandler<string>? SaveProfileSuccess; // ✅ Event with profile name
 
     public ProfileViewModel()
   {

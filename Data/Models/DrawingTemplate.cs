@@ -22,10 +22,16 @@ public class DrawingTemplate
     // Is this a reusable template (vs a saved drawing)?
     public bool IsTemplate { get; set; } = false;
     
+    // Link to Profile that created this drawing
+    public int? ProfileId { get; set; }
+    
     public DateTime CreatedAt { get; set; } = DateTime.Now;
   
     public DateTime? ModifiedAt { get; set; }
     
     // Navigation property
     public virtual ICollection<Shape> Shapes { get; set; } = new List<Shape>();
+  
+    // Navigation property to Profile
+    public virtual Profile? Profile { get; set; }
 }

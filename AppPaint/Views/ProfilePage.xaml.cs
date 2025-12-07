@@ -17,11 +17,12 @@ public sealed partial class ProfilePage : Page
     {
         ViewModel = App.Services.GetRequiredService<ProfileViewModel>();
         this.DataContext = ViewModel;
-        
+
         // Subscribe to events
         ViewModel.NavigateBackRequested += OnNavigateBackRequested;
+        ViewModel.SaveProfileSuccess += OnSaveProfileSuccess;
         
-        this.InitializeComponent();
+     this.InitializeComponent();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -34,8 +35,9 @@ public sealed partial class ProfilePage : Page
     {
         base.OnNavigatedFrom(e);
         
-        // Unsubscribe
+    // Unsubscribe
         ViewModel.NavigateBackRequested -= OnNavigateBackRequested;
+        ViewModel.SaveProfileSuccess -= OnSaveProfileSuccess;
     
         ViewModel.OnNavigatedFrom();
     }
@@ -126,5 +128,96 @@ private void StrokeColor_Changed(ColorPicker sender, ColorChangedEventArgs args)
    var color = args.NewColor;
           ViewModel.SelectedProfile.DefaultBackgroundColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
         }
+    }
+
+    private async void OnSaveProfileSuccess(object? sender, string profileName)
+    {
+        var dialog = new ContentDialog
+        {
+   XamlRoot = this.XamlRoot,
+      Title = "Profile Saved Successfully",
+       CloseButtonText = "OK",
+       DefaultButton = ContentDialogButton.Close
+      };
+
+        var stackPanel = new StackPanel { Spacing = 16 };
+
+        // Success message
+    stackPanel.Children.Add(new TextBlock
+   {
+         Text = $"Profile '{profileName}' has been saved successfully!",
+            FontSize = 14,
+            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+            Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green),
+TextWrapping = TextWrapping.Wrap
+        });
+
+        // Info about drawings
+ var infoPanel = new StackPanel { Spacing = 8 };
+ 
+     infoPanel.Children.Add(new TextBlock
+   {
+            Text = "What happens next:",
+     FontSize = 13,
+            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+          Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DarkSlateGray)
+        });
+
+        // Info items
+        var info1 = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+        info1.Children.Add(new FontIcon 
+        { 
+            FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
+      Glyph = "\uE73E",
+            FontSize = 16,
+     Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DodgerBlue)
+        });
+        info1.Children.Add(new TextBlock
+        {
+ Text = "New drawings will use these updated settings",
+            FontSize = 12,
+   TextWrapping = TextWrapping.Wrap,
+        VerticalAlignment = VerticalAlignment.Center
+        });
+        infoPanel.Children.Add(info1);
+
+        var info2 = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+    info2.Children.Add(new FontIcon 
+      { 
+  FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
+            Glyph = "\uE8B7",
+       FontSize = 16,
+ Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange)
+    });
+        info2.Children.Add(new TextBlock
+        {
+            Text = "Existing drawings linked to this profile will reload with updated settings",
+            FontSize = 12,
+            TextWrapping = TextWrapping.Wrap,
+          VerticalAlignment = VerticalAlignment.Center
+    });
+        infoPanel.Children.Add(info2);
+
+        var info3 = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+      info3.Children.Add(new FontIcon 
+        { 
+     FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
+            Glyph = "\uE946",
+         FontSize = 16,
+            Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Gray)
+        });
+        info3.Children.Add(new TextBlock
+{
+            Text = "Already drawn shapes will keep their colors",
+            FontSize = 12,
+     TextWrapping = TextWrapping.Wrap,
+      VerticalAlignment = VerticalAlignment.Center
+        });
+        infoPanel.Children.Add(info3);
+
+  stackPanel.Children.Add(infoPanel);
+
+ dialog.Content = stackPanel;
+        await dialog.ShowAsync();
     }
 }
