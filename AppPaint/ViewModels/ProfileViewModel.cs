@@ -33,6 +33,8 @@ public partial class ProfileViewModel : BaseViewModel
     // Navigation events
  public event EventHandler? NavigateBackRequested;
   public event EventHandler<string>? SaveProfileSuccess; // ✅ Event with profile name
+    public event EventHandler<string>? SetActiveProfileSuccess; // ✅ Event for set active
+    public event EventHandler<string>? DeleteProfileSuccess; // ✅ Event for delete
 
     public ProfileViewModel()
   {
@@ -192,13 +194,13 @@ try
   if (SelectedProfile.IsActive)
 {
    ErrorMessage = "Cannot delete the active profile. Please set another profile as active first.";
-    return;
+  return;
         }
 
-        // Cannot delete if only one profile
+    // Cannot delete if only one profile
    if (Profiles.Count <= 1)
-        {
-        ErrorMessage = "Cannot delete the last profile. At least one profile must exist.";
+  {
+    ErrorMessage = "Cannot delete the last profile. At least one profile must exist.";
      return;
         }
 
@@ -209,14 +211,17 @@ try
       using var scope = App.Services.CreateScope();
   var profileService = scope.ServiceProvider.GetRequiredService<IProfileService>();
 
-       var success = await profileService.DeleteProfileAsync(SelectedProfile.Id);
+     var success = await profileService.DeleteProfileAsync(SelectedProfile.Id);
     if (success)
    {
    var deletedProfile = SelectedProfile;
       Profiles.Remove(deletedProfile);
   SelectedProfile = Profiles.FirstOrDefault();
-         
+ 
           System.Diagnostics.Debug.WriteLine($"✅ Deleted profile: {deletedProfile.Name}");
+    
+     // ✅ Trigger success event
+            DeleteProfileSuccess?.Invoke(this, deletedProfile.Name);
    }
    }
         catch (Exception ex)
@@ -235,29 +240,32 @@ try
     {
         if (SelectedProfile == null) return;
 
-        try
+     try
 {
          IsBusy = true;
 
   using var scope = App.Services.CreateScope();
-        var profileService = scope.ServiceProvider.GetRequiredService<IProfileService>();
+     var profileService = scope.ServiceProvider.GetRequiredService<IProfileService>();
 
     await profileService.SetActiveProfileAsync(SelectedProfile.Id);
       
           // Update all profiles' IsActive status
-      foreach (var profile in Profiles)
-            {
+    foreach (var profile in Profiles)
+ {
   profile.IsActive = profile.Id == SelectedProfile.Id;
     }
 
      System.Diagnostics.Debug.WriteLine($"✅ Set active profile: {SelectedProfile.Name}");
      
-        // Reload to refresh UI
+   // ✅ Trigger success event
+            SetActiveProfileSuccess?.Invoke(this, SelectedProfile.Name);
+     
+ // Reload to refresh UI
 await LoadProfilesAsync();
         }
    catch (Exception ex)
   {
-            ErrorMessage = $"Error setting active profile: {ex.Message}";
+   ErrorMessage = $"Error setting active profile: {ex.Message}";
         System.Diagnostics.Debug.WriteLine($"Error setting active profile: {ex}");
     }
    finally
