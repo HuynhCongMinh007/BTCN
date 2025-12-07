@@ -1,153 +1,175 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Page
-    x:Class="AppPaint.Views.ShellPage"
+  x:Class="AppPaint.Views.ShellPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:AppPaint.Views"
+ xmlns:local="using:AppPaint.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d">
 
     <Page.Resources>
-        <!--  Entrance Animation  -->
+    <!--  Entrance Animation  -->
         <Storyboard x:Name="EntranceAnimation">
-            <DoubleAnimation
-                Storyboard.TargetName="ContentFrame"
-                Storyboard.TargetProperty="Opacity"
-                From="0"
-                To="1"
-                Duration="0:0:0.3">
-                <DoubleAnimation.EasingFunction>
-                    <CubicEase EasingMode="EaseOut" />
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
+      <DoubleAnimation
+Storyboard.TargetName="ContentFrame"
+  Storyboard.TargetProperty="Opacity"
+   From="0"
+   To="1"
+  Duration="0:0:0.3">
+  <DoubleAnimation.EasingFunction>
+ <CubicEase EasingMode="EaseOut" />
+   </DoubleAnimation.EasingFunction>
+    </DoubleAnimation>
         </Storyboard>
     </Page.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <RowDefinition Height="Auto" />
+  <RowDefinition Height="*" />
+   </Grid.RowDefinitions>
 
         <!--  BreadcrumbBar Header  -->
-        <Grid
-            Grid.Row="0"
-            Padding="16,8"
-            Background="{ThemeResource LayerFillColorDefaultBrush}"
-            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-            BorderThickness="0,0,0,1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+<Border
+Grid.Row="0"
+   Padding="20,12"
+Background="{ThemeResource LayerFillColorDefaultBrush}"
+  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+        BorderThickness="0,0,0,1">
+  <Border.Shadow>
+        <ThemeShadow />
+    </Border.Shadow>
+      <Grid>
+     <Grid.ColumnDefinitions>
+  <ColumnDefinition Width="*" />
+<ColumnDefinition Width="Auto" />
+</Grid.ColumnDefinitions>
 
-            <BreadcrumbBar
-                x:Name="BreadcrumbNav"
-                Grid.Column="0"
-                VerticalAlignment="Center">
-                <BreadcrumbBar.ItemTemplate>
-                    <DataTemplate x:DataType="x:String">
-                        <TextBlock FontWeight="SemiBold" Text="{x:Bind}" />
-                    </DataTemplate>
-                </BreadcrumbBar.ItemTemplate>
-            </BreadcrumbBar>
+    <BreadcrumbBar
+    x:Name="BreadcrumbNav"
+    Grid.Column="0"
+       VerticalAlignment="Center">
+   <BreadcrumbBar.ItemTemplate>
+ <DataTemplate x:DataType="x:String">
+     <TextBlock 
+      FontSize="14"
+     FontWeight="SemiBold"
+      Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+      Text="{x:Bind}" />
+  </DataTemplate>
+     </BreadcrumbBar.ItemTemplate>
+ </BreadcrumbBar>
 
-            <!--  Theme Toggle with Windows 11 Fluent Icons  -->
-            <StackPanel
-                Grid.Column="1"
-                Orientation="Horizontal"
-                Spacing="12">
-                <FontIcon
-                    VerticalAlignment="Center"
-                    FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                    FontSize="16"
-                    Glyph="&#xE793;"
-                    Opacity="0.8" />
-                <TextBlock VerticalAlignment="Center" Text="Theme:" />
-                <ToggleSwitch
-                    x:Name="ThemeToggle"
-                    MinWidth="0"
-                    OffContent="Light"
-                    OnContent="Dark"
-                    Toggled="ThemeToggle_Toggled">
-                    <ToggleSwitch.OnContentTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon
-                                    FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                    FontSize="14"
-                                    Glyph="&#xE708;" />
-                                <TextBlock Text="Dark" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ToggleSwitch.OnContentTemplate>
-                    <ToggleSwitch.OffContentTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon
-                                    FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                    FontSize="14"
-                                    Glyph="&#xE706;" />
-                                <TextBlock Text="Light" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ToggleSwitch.OffContentTemplate>
-                </ToggleSwitch>
-            </StackPanel>
-        </Grid>
+      <!--  Theme Toggle  -->
+     <StackPanel
+ Grid.Column="1"
+  Orientation="Horizontal"
+ Spacing="16">
+   <Border
+      Padding="12,6"
+    Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+BorderThickness="1"
+     CornerRadius="6">
+ <StackPanel Orientation="Horizontal" Spacing="12">
+     <FontIcon
+      VerticalAlignment="Center"
+       FontFamily="{StaticResource FluentIconsFontFamily}"
+FontSize="16"
+       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+       Glyph="&#xE793;" />
+    <TextBlock 
+      VerticalAlignment="Center"
+  FontSize="13"
+    FontWeight="Medium"
+ Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+     Text="Theme:" />
+  <ToggleSwitch
+   x:Name="ThemeToggle"
+      MinWidth="0"
+     OffContent="Light"
+   OnContent="Dark"
+  Toggled="ThemeToggle_Toggled">
+<ToggleSwitch.OnContentTemplate>
+  <DataTemplate>
+<StackPanel Orientation="Horizontal" Spacing="8">
+       <FontIcon
+      FontFamily="{StaticResource FluentIconsFontFamily}"
+      FontSize="14"
+       Glyph="&#xE708;" />
+    <TextBlock FontWeight="Medium" Text="Dark" />
+   </StackPanel>
+ </DataTemplate>
+     </ToggleSwitch.OnContentTemplate>
+  <ToggleSwitch.OffContentTemplate>
+        <DataTemplate>
+     <StackPanel Orientation="Horizontal" Spacing="8">
+      <FontIcon
+        FontFamily="{StaticResource FluentIconsFontFamily}"
+   FontSize="14"
+      Glyph="&#xE706;" />
+     <TextBlock FontWeight="Medium" Text="Light" />
+  </StackPanel>
+ </DataTemplate>
+  </ToggleSwitch.OffContentTemplate>
+   </ToggleSwitch>
+      </StackPanel>
+   </Border>
+  </StackPanel>
+ </Grid>
+        </Border>
 
-        <!--  NavigationView with Windows 11 Fluent Icons  -->
-        <NavigationView
-            x:Name="NavView"
-            Grid.Row="1"
-            BackRequested="NavView_BackRequested"
-            CompactPaneLength="48"
-            IsBackButtonVisible="Auto"
-            IsPaneToggleButtonVisible="True"
-            IsSettingsVisible="False"
-            ItemInvoked="NavView_ItemInvoked"
-            OpenPaneLength="240"
-            PaneDisplayMode="Left">
+<!--  NavigationView  -->
+  <NavigationView
+ x:Name="NavView"
+  Grid.Row="1"
+    BackRequested="NavView_BackRequested"
+      CompactPaneLength="48"
+    IsBackButtonVisible="Auto"
+   IsPaneToggleButtonVisible="True"
+   IsSettingsVisible="False"
+  ItemInvoked="NavView_ItemInvoked"
+OpenPaneLength="260"
+   PaneDisplayMode="Left">
 
-            <NavigationView.MenuItems>
-                <!--  Home with Windows 11 Fluent Icon  -->
-                <NavigationViewItem
-                    Content="Home"
-                    Tag="Home"
-                    ToolTipService.ToolTip="Go to Home Dashboard">
-                    <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE80F;" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
+    <NavigationView.MenuItems>
+       <!--  Home  -->
+     <NavigationViewItem
+    Content="Home"
+  Tag="Home"
+     ToolTipService.ToolTip="Go to Home Dashboard">
+    <NavigationViewItem.Icon>
+<FontIcon FontFamily="{StaticResource FluentIconsFontFamily}" Glyph="&#xE80F;" />
+  </NavigationViewItem.Icon>
+   </NavigationViewItem>
 
-                <NavigationViewItemSeparator />
+   <NavigationViewItemSeparator />
 
-                <!--  Management with Windows 11 Fluent Icon  -->
-                <NavigationViewItem
-                    Content="Management"
-                    Tag="Management"
-                    ToolTipService.ToolTip="Manage profiles, drawings, and templates">
-                    <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Glyph="&#xE8F1;" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-            </NavigationView.MenuItems>
+       <!--  Management  -->
+   <NavigationViewItem
+   Content="Management"
+ Tag="Management"
+ToolTipService.ToolTip="Manage profiles, drawings, and templates">
+       <NavigationViewItem.Icon>
+ <FontIcon FontFamily="{StaticResource FluentIconsFontFamily}" Glyph="&#xE8F1;" />
+      </NavigationViewItem.Icon>
+    </NavigationViewItem>
+   </NavigationView.MenuItems>
 
-            <!--  Content Frame with Animation  -->
-            <Frame x:Name="ContentFrame" Navigated="ContentFrame_Navigated">
-                <Frame.ContentTransitions>
-                    <TransitionCollection>
-                        <NavigationThemeTransition>
-                            <NavigationThemeTransition.DefaultNavigationTransitionInfo>
-                                <EntranceNavigationTransitionInfo />
-                            </NavigationThemeTransition.DefaultNavigationTransitionInfo>
-                        </NavigationThemeTransition>
-                    </TransitionCollection>
-                </Frame.ContentTransitions>
-            </Frame>
-
-        </NavigationView>
+       <!--  Content Frame with Animation  -->
+   <Frame x:Name="ContentFrame" Navigated="ContentFrame_Navigated">
+ <Frame.ContentTransitions>
+  <TransitionCollection>
+   <NavigationThemeTransition>
+       <NavigationThemeTransition.DefaultNavigationTransitionInfo>
+    <EntranceNavigationTransitionInfo />
+  </NavigationThemeTransition.DefaultNavigationTransitionInfo>
+      </NavigationThemeTransition>
+ </TransitionCollection>
+  </Frame.ContentTransitions>
+  </Frame>
+</NavigationView>
     </Grid>
 </Page>
