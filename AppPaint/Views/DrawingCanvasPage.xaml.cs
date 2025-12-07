@@ -9,6 +9,8 @@ using AppPaint.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Windows.Foundation;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Data.Models;
 using UIShape = Microsoft.UI.Xaml.Shapes.Shape;
@@ -821,6 +823,155 @@ public sealed partial class DrawingCanvasPage : Page
             CloseButtonText = "OK"
         };
         await dialog.ShowAsync();
+    }
+
+    #endregion
+
+    #region Template Panel
+
+    private void ToggleTemplatePanel_Click(object sender, RoutedEventArgs e)
+    {
+        if (TemplatePanel.Visibility == Visibility.Visible)
+        {
+            // Hide panel
+            TemplatePanel.Visibility = Visibility.Collapsed;
+  ShowTemplatePanelButton.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            // Show panel
+   TemplatePanel.Visibility = Visibility.Visible;
+   ShowTemplatePanelButton.Visibility = Visibility.Collapsed;
+   }
+    }
+
+    private void TemplatePreviewCanvas_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is Canvas canvas && canvas.Tag is DrawingTemplate template)
+{
+          _renderingService.RenderAllShapes(template.Shapes, canvas, scale: 0.5);
+        }
+    }
+
+    private void Template_DragStarting(Microsoft.UI.Xaml.UIElement sender, Microsoft.UI.Xaml.DragStartingEventArgs args)
+    {
+     if (sender is Border border && border.DataContext is DrawingTemplate template)
+   {
+       args.Data.Properties.Add("TemplateId", template.Id);
+      args.Data.RequestedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy;
+          System.Diagnostics.Debug.WriteLine($"🎯 Drag started: Template '{template.Name}' (ID: {template.Id})");
+   }
+    }
+
+    private void DrawingCanvas_DragOver(object sender, DragEventArgs e)
+    {
+        e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy;
+        e.DragUIOverride.Caption = "Drop to insert template";
+        e.DragUIOverride.IsCaptionVisible = true;
+  e.DragUIOverride.IsGlyphVisible = true;
+    }
+
+  private async void DrawingCanvas_Drop(object sender, DragEventArgs e)
+{
+        try
+  {
+     if (e.DataView.Properties.TryGetValue("TemplateId", out var templateIdObj) && templateIdObj is int templateId)
+            {
+ var dropPoint = e.GetPosition(DrawingCanvas);
+System.Diagnostics.Debug.WriteLine($"📍 Dropped at: {dropPoint.X}, {dropPoint.Y}");
+
+           await InsertTemplateAtPosition(templateId, dropPoint);
+    }
+        }
+        catch (Exception ex)
+{
+   await ShowErrorDialog($"Failed to insert template: {ex.Message}");
+      }
+    }
+
+    private async void InsertTemplateButton_Click(object sender, RoutedEventArgs e)
+{
+        if (sender is Button button && button.Tag is DrawingTemplate template)
+   {
+       // Insert at center of canvas
+          var centerPoint = new Point(ViewModel.CanvasWidth / 2, ViewModel.CanvasHeight / 2);
+  await InsertTemplateAtPosition(template.Id, centerPoint);
+        }
+    }
+
+    private async Task InsertTemplateAtPosition(int templateId, Point position)
+    {
+  try
+        {
+         ViewModel.IsBusy = true;
+
+ using var scope = App.Services.CreateScope();
+  var templateService = scope.ServiceProvider.GetRequiredService<ITemplateService>();
+  var shapeService = scope.ServiceProvider.GetRequiredService<IShapeService>();
+
+   var template = await templateService.GetTemplateByIdAsync(templateId);
+     if (template == null || template.Shapes.Count == 0)
+   {
+ await ShowErrorDialog("Template is empty or not found.");
+    return;
+   }
+
+            // Calculate offset to center template at drop position
+      var templateShapes = template.Shapes.ToList();
+    var points = new List<Point>();
+   
+   foreach (var shape in templateShapes)
+          {
+   var shapePoints = DrawingService.JsonToPoints(shape.PointsData);
+ points.AddRange(shapePoints);
+        }
+
+    if (points.Count == 0) return;
+
+            // Find template bounds
+            double minX = points.Min(p => p.X);
+  double minY = points.Min(p => p.Y);
+       double maxX = points.Max(p => p.X);
+  double maxY = points.Max(p => p.Y);
+      
+ double templateCenterX = (minX + maxX) / 2;
+ double templateCenterY = (minY + maxY) / 2;
+
+   double offsetX = position.X - templateCenterX;
+            double offsetY = position.Y - templateCenterY;
+
+            // Insert shapes with offset
+   foreach (var originalShape in templateShapes)
+ {
+    var shapePoints = DrawingService.JsonToPoints(originalShape.PointsData);
+        var offsetPoints = shapePoints.Select(p => new Point(p.X + offsetX, p.Y + offsetY)).ToList();
+
+ var newShape = new Data.Models.Shape
+  {
+       ShapeType = originalShape.ShapeType,
+        PointsData = DrawingService.PointsToJson(offsetPoints),
+    Color = originalShape.Color,
+     StrokeThickness = originalShape.StrokeThickness,
+         StrokeStyle = originalShape.StrokeStyle,
+ IsFilled = originalShape.IsFilled,
+ FillColor = originalShape.FillColor,
+   TemplateId = ViewModel.CurrentTemplateId,
+      CreatedAt = DateTime.Now
+   };
+
+   await ViewModel.AddShapeCommand.ExecuteAsync(newShape);
+            }
+
+ await ShowSuccessDialog($"Inserted template '{template.Name}' successfully!");
+        }
+        catch (Exception ex)
+      {
+   await ShowErrorDialog($"Failed to insert template: {ex.Message}");
+        }
+        finally
+{
+     ViewModel.IsBusy = false;
+        }
     }
 
     #endregion
