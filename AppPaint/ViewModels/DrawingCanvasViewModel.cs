@@ -4,6 +4,7 @@ using AppPaint.Services;
 using Data.Models;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
@@ -15,7 +16,7 @@ namespace AppPaint.ViewModels;
 public partial class DrawingCanvasViewModel : BaseViewModel
 {
     [ObservableProperty]
- private ObservableCollection<Shape> _shapes = new();
+    private ObservableCollection<Shape> _shapes = new();
 
     [ObservableProperty]
     private ShapeType _selectedShapeType = ShapeType.Line;
@@ -38,23 +39,26 @@ public partial class DrawingCanvasViewModel : BaseViewModel
     [ObservableProperty]
     private string _strokeStyle = "Solid"; // New: Solid, Dash, Dot, DashDot
 
-  [ObservableProperty]
- private double _canvasWidth = 800;
+    [ObservableProperty]
+    private double _canvasWidth = 800;
 
- [ObservableProperty]
+    [ObservableProperty]
     private double _canvasHeight = 600;
 
     [ObservableProperty]
     private string _selectedCanvasSize = "800x600"; // For ComboBox binding
 
     [ObservableProperty]
- private Shape? _selectedShape;
+    private Shape? _selectedShape;
 
     [ObservableProperty]
     private string _templateName = "New Drawing";
 
- [ObservableProperty]
+    [ObservableProperty]
     private int? _currentTemplateId;
+
+    [ObservableProperty]
+    private ObservableCollection<DrawingTemplate> _availableTemplates = new();
 
     // Navigation events
     public event EventHandler? NavigateBackRequested;
@@ -62,38 +66,41 @@ public partial class DrawingCanvasViewModel : BaseViewModel
 
     public DrawingCanvasViewModel()
     {
-   Title = "Drawing Canvas";
-        
+        Title = "Drawing Canvas";
+
         // Set default color
-   SelectedColor = "#000000";
+        SelectedColor = "#000000";
+
+        // Load available templates
+        _ = LoadAvailableTemplatesAsync();
     }
 
     public override async void OnNavigatedTo(object? parameter = null)
-  {
+    {
         base.OnNavigatedTo(parameter);
 
-  // Handle DrawingNavigationParameters (with ProfileId + DrawingId)
-  if (parameter is AppPaint.Models.DrawingNavigationParameters navParams)
-  {
-     // Load Profile settings first
-            await LoadProfileSettingsAsync(navParams.ProfileId);
-  
-            // Then load drawing if specified
-      if (navParams.DrawingId.HasValue)
-   {
-      await LoadTemplateAsync(navParams.DrawingId.Value);
-      }
-    }
-        // Fallback: Handle old int parameter (just drawingId)
-   else if (parameter is int templateId)
+        // Handle DrawingNavigationParameters (with ProfileId + DrawingId)
+        if (parameter is AppPaint.Models.DrawingNavigationParameters navParams)
         {
-    await LoadTemplateAsync(templateId);
+            // Load Profile settings first
+            await LoadProfileSettingsAsync(navParams.ProfileId);
+
+            // Then load drawing if specified
+            if (navParams.DrawingId.HasValue)
+            {
+                await LoadTemplateAsync(navParams.DrawingId.Value);
+            }
+        }
+        // Fallback: Handle old int parameter (just drawingId)
+        else if (parameter is int templateId)
+        {
+            await LoadTemplateAsync(templateId);
         }
         // No parameter: New blank canvas with default settings
-      else
-    {
+        else
+        {
             System.Diagnostics.Debug.WriteLine("New blank canvas - using default settings");
-  }
+        }
     }
 
     /// <summary>
@@ -101,192 +108,222 @@ public partial class DrawingCanvasViewModel : BaseViewModel
     /// </summary>
     private async System.Threading.Tasks.Task LoadProfileSettingsAsync(int profileId)
     {
-     try
-   {
-        IsBusy = true;
-    
-  using var scope = App.Services.CreateScope();
-      var profileService = scope.ServiceProvider.GetRequiredService<IProfileService>();
-    var themeService = scope.ServiceProvider.GetRequiredService<IThemeService>();
-     
-        var profile = await profileService.GetProfileByIdAsync(profileId);
-  if (profile != null)
+        try
         {
-          // Apply Profile settings to ViewModel
+            IsBusy = true;
+
+            using var scope = App.Services.CreateScope();
+            var profileService = scope.ServiceProvider.GetRequiredService<IProfileService>();
+            var themeService = scope.ServiceProvider.GetRequiredService<IThemeService>();
+
+            var profile = await profileService.GetProfileByIdAsync(profileId);
+            if (profile != null)
+            {
+                // Apply Profile settings to ViewModel
                 CanvasWidth = profile.DefaultCanvasWidth;
                 CanvasHeight = profile.DefaultCanvasHeight;
-         SelectedColor = profile.DefaultStrokeColor;
-       FillColor = profile.DefaultFillColor;
-         BackgroundColor = profile.DefaultBackgroundColor;
+                SelectedColor = profile.DefaultStrokeColor;
+                FillColor = profile.DefaultFillColor;
+                BackgroundColor = profile.DefaultBackgroundColor;
                 StrokeThickness = profile.DefaultStrokeThickness;
-     
-    // ✅ Apply theme from Profile
- ElementTheme theme = profile.Theme switch
+
+                // ✅ Apply theme from Profile
+                ElementTheme theme = profile.Theme switch
                 {
-         "Light" => ElementTheme.Light,
-  "Dark" => ElementTheme.Dark,
-_ => ElementTheme.Default
-      };
-     themeService.ApplyTheme(theme);
-        
-      System.Diagnostics.Debug.WriteLine($"✅ Applied Profile '{profile.Name}' settings:");
-       System.Diagnostics.Debug.WriteLine($"   Canvas: {CanvasWidth}x{CanvasHeight}");
-            System.Diagnostics.Debug.WriteLine($"   Stroke Color: {SelectedColor}");
+                    "Light" => ElementTheme.Light,
+                    "Dark" => ElementTheme.Dark,
+                    _ => ElementTheme.Default
+                };
+                themeService.ApplyTheme(theme);
+
+                System.Diagnostics.Debug.WriteLine($"✅ Applied Profile '{profile.Name}' settings:");
+                System.Diagnostics.Debug.WriteLine($"   Canvas: {CanvasWidth}x{CanvasHeight}");
+                System.Diagnostics.Debug.WriteLine($"   Stroke Color: {SelectedColor}");
                 System.Diagnostics.Debug.WriteLine($"   Background: {BackgroundColor}");
-  System.Diagnostics.Debug.WriteLine($"   Theme: {profile.Theme}");
-      }
-   else
+                System.Diagnostics.Debug.WriteLine($"   Theme: {profile.Theme}");
+            }
+            else
             {
                 System.Diagnostics.Debug.WriteLine($"❌ Profile {profileId} not found");
-      }
-     }
+            }
+        }
         catch (Exception ex)
         {
             ErrorMessage = $"Error loading profile: {ex.Message}";
-        System.Diagnostics.Debug.WriteLine($"Error loading profile: {ex}");
+            System.Diagnostics.Debug.WriteLine($"Error loading profile: {ex}");
         }
         finally
-  {
-         IsBusy = false;
+        {
+            IsBusy = false;
         }
     }
 
     [RelayCommand]
     private async Task LoadTemplateAsync(int templateId)
     {
-   try
+        try
         {
-      IsBusy = true;
-   
-        using var scope = App.Services.CreateScope();
-     var templateService = scope.ServiceProvider.GetRequiredService<ITemplateService>();
-        
-   var template = await templateService.GetTemplateByIdAsync(templateId);
-   if (template != null)
-   {
-   CurrentTemplateId = template.Id;
-    TemplateName = template.Name;
-       CanvasWidth = template.Width;
-    CanvasHeight = template.Height;
-    BackgroundColor = template.BackgroundColor;
+            IsBusy = true;
 
-  Shapes.Clear();
-   foreach (var shape in template.Shapes)
-       {
-        Shapes.Add(shape);
-    }
-   }
-}
-   catch (Exception ex)
-   {
-ErrorMessage = $"Error loading template: {ex.Message}";
-   }
-   finally
-{
-  IsBusy = false;
-   }
+            using var scope = App.Services.CreateScope();
+            var templateService = scope.ServiceProvider.GetRequiredService<ITemplateService>();
+
+            var template = await templateService.GetTemplateByIdAsync(templateId);
+            if (template != null)
+            {
+                CurrentTemplateId = template.Id;
+                TemplateName = template.Name;
+                CanvasWidth = template.Width;
+                CanvasHeight = template.Height;
+                BackgroundColor = template.BackgroundColor;
+
+                Shapes.Clear();
+                foreach (var shape in template.Shapes)
+                {
+                    Shapes.Add(shape);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error loading template: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     [RelayCommand]
     private async Task SaveAsTemplateAsync()
     {
-   try
-   {
- IsBusy = true;
+        try
+        {
+            IsBusy = true;
 
-   using var scope = App.Services.CreateScope();
-    var templateService = scope.ServiceProvider.GetRequiredService<ITemplateService>();
-   var shapeService = scope.ServiceProvider.GetRequiredService<IShapeService>();
+            using var scope = App.Services.CreateScope();
+            var templateService = scope.ServiceProvider.GetRequiredService<ITemplateService>();
+            var shapeService = scope.ServiceProvider.GetRequiredService<IShapeService>();
 
- var template = new DrawingTemplate
-   {
-Name = TemplateName,
-     Width = CanvasWidth,
-  Height = CanvasHeight,
-     BackgroundColor = BackgroundColor
-   };
+            var template = new DrawingTemplate
+            {
+                Name = TemplateName,
+                Width = CanvasWidth,
+                Height = CanvasHeight,
+                BackgroundColor = BackgroundColor
+            };
 
-   var savedTemplate = await templateService.CreateTemplateAsync(template);
-   CurrentTemplateId = savedTemplate.Id;
+            var savedTemplate = await templateService.CreateTemplateAsync(template);
+            CurrentTemplateId = savedTemplate.Id;
 
-   // Update all shapes to belong to this template
-   foreach (var shape in Shapes)
-  {
-    shape.TemplateId = savedTemplate.Id;
-    await shapeService.UpdateShapeAsync(shape);
-      }
-}
-   catch (Exception ex)
-    {
-   ErrorMessage = $"Error saving template: {ex.Message}";
-    }
-   finally
-   {
-      IsBusy = false;
-   }
+            // Update all shapes to belong to this template
+            foreach (var shape in Shapes)
+            {
+                shape.TemplateId = savedTemplate.Id;
+                await shapeService.UpdateShapeAsync(shape);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error saving template: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     [RelayCommand]
     private async Task AddShapeAsync(Shape shape)
     {
-  try
+        try
         {
-        using var scope = App.Services.CreateScope();
-        var shapeService = scope.ServiceProvider.GetRequiredService<IShapeService>();
+            using var scope = App.Services.CreateScope();
+            var shapeService = scope.ServiceProvider.GetRequiredService<IShapeService>();
 
-     shape.TemplateId = CurrentTemplateId;
-       var savedShape = await shapeService.CreateShapeAsync(shape);
-       Shapes.Add(savedShape);
+            shape.TemplateId = CurrentTemplateId;
+            var savedShape = await shapeService.CreateShapeAsync(shape);
+            Shapes.Add(savedShape);
         }
-   catch (Exception ex)
-   {
-   ErrorMessage = $"Error adding shape: {ex.Message}";
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error adding shape: {ex.Message}";
         }
-}
+    }
 
     [RelayCommand]
- private async Task DeleteSelectedShapeAsync()
-{
-   if (SelectedShape == null) return;
+    private async Task DeleteSelectedShapeAsync()
+    {
+        if (SelectedShape == null) return;
 
-   try
-   {
-        using var scope = App.Services.CreateScope();
- var shapeService = scope.ServiceProvider.GetRequiredService<IShapeService>();
-        
-   var success = await shapeService.DeleteShapeAsync(SelectedShape.Id);
-   if (success)
-   {
-   Shapes.Remove(SelectedShape);
-    SelectedShape = null;
- }
- }
-   catch (Exception ex)
+        try
         {
-   ErrorMessage = $"Error deleting shape: {ex.Message}";
-   }
+            using var scope = App.Services.CreateScope();
+            var shapeService = scope.ServiceProvider.GetRequiredService<IShapeService>();
+
+            var success = await shapeService.DeleteShapeAsync(SelectedShape.Id);
+            if (success)
+            {
+                Shapes.Remove(SelectedShape);
+                SelectedShape = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error deleting shape: {ex.Message}";
+        }
     }
 
     [RelayCommand]
     private void ClearCanvas()
-{
-   Shapes.Clear();
-CurrentTemplateId = null;
-   TemplateName = "New Drawing";
-        
+    {
+        Shapes.Clear();
+        CurrentTemplateId = null;
+        TemplateName = "New Drawing";
+
         // Raise event to clear UI canvas
-  ClearCanvasRequested?.Invoke(this, EventArgs.Empty);
+        ClearCanvasRequested?.Invoke(this, EventArgs.Empty);
     }
 
- [RelayCommand]
+    [RelayCommand]
     private void SelectShape(ShapeType shapeType)
     {
-   SelectedShapeType = shapeType;
- }
+        SelectedShapeType = shapeType;
+    }
 
     [RelayCommand]
- private void GoBack()
+    private void GoBack()
     {
-   NavigateBackRequested?.Invoke(this, EventArgs.Empty);
+        NavigateBackRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Load available shape templates for insertion
+    /// </summary>
+    [RelayCommand]
+    private async Task LoadAvailableTemplatesAsync()
+    {
+        try
+        {
+            using var scope = App.Services.CreateScope();
+            var templateService = scope.ServiceProvider.GetRequiredService<ITemplateService>();
+
+            var allTemplates = await templateService.GetAllTemplatesAsync();
+
+            // Filter only SHAPE TEMPLATES (IsTemplate = true), not drawings
+            var shapeTemplates = allTemplates.Where(t => t.IsTemplate).ToList();
+
+            AvailableTemplates.Clear();
+            foreach (var template in shapeTemplates)
+            {
+                AvailableTemplates.Add(template);
+            }
+
+            System.Diagnostics.Debug.WriteLine($"✅ Loaded {AvailableTemplates.Count} shape templates");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Error loading templates: {ex.Message}");
+        }
     }
 }
