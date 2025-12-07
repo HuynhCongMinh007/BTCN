@@ -10,46 +10,60 @@
     Background="Transparent"
     mc:Ignorable="d">
 
-    <!--  REMOVE Header - chỉ giữ content  -->
     <ScrollViewer>
-        <Grid Padding="0">
+        <Grid Padding="24,0,24,24">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="280" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <!--  Profile List  -->
             <Border
                 Grid.Column="0"
-                Margin="0,0,16,0"
+                Margin="0,0,24,0"
+                Padding="20"
                 VerticalAlignment="Stretch"
-                Style="{StaticResource AppCardStyle}">
-                <StackPanel Spacing="12">
-                    <TextBlock Style="{StaticResource SectionSubtitleStyle}" Text="Profiles" />
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="12">
+                <Border.Shadow>
+                    <ThemeShadow />
+                </Border.Shadow>
+                <StackPanel Spacing="16">
+                    <TextBlock
+                        FontSize="18"
+                        FontWeight="SemiBold"
+                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                        Text="Profiles" />
 
                     <Button
                         HorizontalAlignment="Stretch"
                         Click="CreateProfile_Click"
+                        CornerRadius="6"
                         Style="{StaticResource AppAccentButtonStyle}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE710;" />
-                            <TextBlock Text="New Profile" />
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <FontIcon FontFamily="{StaticResource FluentIconsFontFamily}" Glyph="&#xE710;" />
+                            <TextBlock FontWeight="SemiBold" Text="New Profile" />
                         </StackPanel>
                     </Button>
 
                     <ListView
-                        Height="400"
+                        Height="450"
                         ItemsSource="{x:Bind ViewModel.Profiles, Mode=OneWay}"
                         SelectedItem="{x:Bind ViewModel.SelectedProfile, Mode=TwoWay}"
                         SelectionMode="Single">
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="models:Profile">
-                                <StackPanel Padding="8" Spacing="4">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock FontWeight="SemiBold" Text="{x:Bind Name}" />
+                                <StackPanel Padding="12,8" Spacing="6">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock
+                                            FontWeight="SemiBold"
+                                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                            Text="{x:Bind Name}" />
                                         <Border
                                             Padding="6,2"
-                                            Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                            Background="{ThemeResource AccentFillColorBrush}"
                                             CornerRadius="4"
                                             Visibility="{x:Bind IsActive, Mode=OneWay}">
                                             <TextBlock
@@ -59,7 +73,7 @@
                                                 Text="ACTIVE" />
                                         </Border>
                                     </StackPanel>
-                                    <TextBlock Opacity="0.7" Style="{StaticResource CaptionTextBlockStyle}">
+                                    <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}">
                                         <Run Text="{x:Bind DefaultCanvasWidth}" />
                                         <Run Text="×" />
                                         <Run Text="{x:Bind DefaultCanvasHeight}" />
@@ -75,14 +89,27 @@
 
             <!--  Profile Details  -->
             <ScrollViewer Grid.Column="1">
-                <StackPanel Spacing="24">
+                <StackPanel Spacing="20">
                     <!--  Profile Info Card  -->
-                    <Border Style="{StaticResource AppCardStyle}">
-                        <StackPanel Spacing="16">
-                            <TextBlock Style="{StaticResource SectionSubtitleStyle}" Text="Profile Information" />
+                    <Border
+                        Padding="24"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="12">
+                        <Border.Shadow>
+                            <ThemeShadow />
+                        </Border.Shadow>
+                        <StackPanel Spacing="20">
+                            <TextBlock
+                                FontSize="18"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                Text="Profile Information" />
 
                             <TextBox
                                 Header="Profile Name"
+                                HeaderTemplate="{StaticResource LabelStyle}"
                                 IsEnabled="{x:Bind ViewModel.HasSelectedProfile, Mode=OneWay}"
                                 PlaceholderText="Enter profile name"
                                 Text="{x:Bind ViewModel.SelectedProfile.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -101,20 +128,32 @@
                     </Border>
 
                     <!--  Canvas Settings Card  -->
-                    <Border Style="{StaticResource AppCardStyle}">
-                        <StackPanel Spacing="16">
-                            <TextBlock Style="{StaticResource SectionSubtitleStyle}" Text="Default Canvas Settings" />
+                    <Border
+                        Padding="24"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="12">
+                        <Border.Shadow>
+                            <ThemeShadow />
+                        </Border.Shadow>
+                        <StackPanel Spacing="20">
+                            <TextBlock
+                                FontSize="18"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                Text="Default Canvas Settings" />
 
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="20" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
                                 <NumberBox
                                     Grid.Column="0"
-                                    Header="Canvas Width"
+                                    Header="Canvas Width (px)"
                                     IsEnabled="{x:Bind ViewModel.HasSelectedProfile, Mode=OneWay}"
                                     Maximum="2000"
                                     Minimum="400"
@@ -124,7 +163,7 @@
 
                                 <NumberBox
                                     Grid.Column="2"
-                                    Header="Canvas Height"
+                                    Header="Canvas Height (px)"
                                     IsEnabled="{x:Bind ViewModel.HasSelectedProfile, Mode=OneWay}"
                                     Maximum="1500"
                                     Minimum="300"
@@ -136,21 +175,37 @@
                     </Border>
 
                     <!--  Color Preferences Card  -->
-                    <Border Style="{StaticResource AppCardStyle}">
-                        <StackPanel Spacing="16">
-                            <TextBlock Style="{StaticResource SectionSubtitleStyle}" Text="Default Colors" />
+                    <Border
+                        Padding="24"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="12">
+                        <Border.Shadow>
+                            <ThemeShadow />
+                        </Border.Shadow>
+                        <StackPanel Spacing="20">
+                            <TextBlock
+                                FontSize="18"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                Text="Default Colors" />
 
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="20" />
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="20" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <StackPanel Grid.Column="0" Spacing="8">
-                                    <TextBlock Text="Stroke Color" />
+                                <StackPanel Grid.Column="0" Spacing="10">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="SemiBold"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Text="Stroke Color" />
                                     <ColorPicker
                                         ColorChanged="StrokeColor_Changed"
                                         ColorSpectrumShape="Ring"
@@ -159,8 +214,12 @@
                                         IsEnabled="{x:Bind ViewModel.HasSelectedProfile, Mode=OneWay}" />
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="2" Spacing="8">
-                                    <TextBlock Text="Fill Color" />
+                                <StackPanel Grid.Column="2" Spacing="10">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="SemiBold"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Text="Fill Color" />
                                     <ColorPicker
                                         ColorChanged="FillColor_Changed"
                                         ColorSpectrumShape="Ring"
@@ -169,8 +228,12 @@
                                         IsEnabled="{x:Bind ViewModel.HasSelectedProfile, Mode=OneWay}" />
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="4" Spacing="8">
-                                    <TextBlock Text="Background" />
+                                <StackPanel Grid.Column="4" Spacing="10">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="SemiBold"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Text="Background" />
                                     <ColorPicker
                                         ColorChanged="BackgroundColor_Changed"
                                         ColorSpectrumShape="Ring"
@@ -194,24 +257,34 @@
                     <StackPanel Orientation="Horizontal" Spacing="12">
                         <Button
                             Command="{x:Bind ViewModel.SaveProfileCommand}"
+                            CornerRadius="6"
                             IsEnabled="{x:Bind ViewModel.HasSelectedProfile, Mode=OneWay}"
                             Style="{StaticResource AppAccentButtonStyle}">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE74E;" />
-                                <TextBlock Text="Save Changes" />
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <FontIcon FontFamily="{StaticResource FluentIconsFontFamily}" Glyph="&#xE74E;" />
+                                <TextBlock FontWeight="SemiBold" Text="Save Changes" />
                             </StackPanel>
                         </Button>
 
-                        <Button Command="{x:Bind ViewModel.DeleteProfileCommand}" IsEnabled="{x:Bind ViewModel.CanDeleteProfile, Mode=OneWay}">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE74D;" />
+                        <Button
+                            Command="{x:Bind ViewModel.DeleteProfileCommand}"
+                            CornerRadius="6"
+                            IsEnabled="{x:Bind ViewModel.CanDeleteProfile, Mode=OneWay}">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <FontIcon
+                                    FontFamily="{StaticResource FluentIconsFontFamily}"
+                                    Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                    Glyph="&#xE74D;" />
                                 <TextBlock Text="Delete Profile" />
                             </StackPanel>
                         </Button>
 
-                        <Button Command="{x:Bind ViewModel.SetActiveProfileCommand}" IsEnabled="{x:Bind ViewModel.CanSetActiveProfile, Mode=OneWay}">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8FB;" />
+                        <Button
+                            Command="{x:Bind ViewModel.SetActiveProfileCommand}"
+                            CornerRadius="6"
+                            IsEnabled="{x:Bind ViewModel.CanSetActiveProfile, Mode=OneWay}">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <FontIcon FontFamily="{StaticResource FluentIconsFontFamily}" Glyph="&#xE8FB;" />
                                 <TextBlock Text="Set as Active" />
                             </StackPanel>
                         </Button>
