@@ -58,6 +58,9 @@ public partial class DrawingCanvasViewModel : BaseViewModel
     private int? _currentTemplateId;
 
     [ObservableProperty]
+    private int? _currentProfileId; // Track which profile this drawing belongs to
+
+    [ObservableProperty]
     private ObservableCollection<DrawingTemplate> _availableTemplates = new();
 
     // Navigation events
@@ -119,6 +122,9 @@ public partial class DrawingCanvasViewModel : BaseViewModel
             var profile = await profileService.GetProfileByIdAsync(profileId);
             if (profile != null)
             {
+                // Store ProfileId for later saving
+                CurrentProfileId = profileId;
+
                 // Apply Profile settings to ViewModel
                 CanvasWidth = profile.DefaultCanvasWidth;
                 CanvasHeight = profile.DefaultCanvasHeight;
@@ -173,20 +179,36 @@ public partial class DrawingCanvasViewModel : BaseViewModel
             {
                 CurrentTemplateId = template.Id;
                 TemplateName = template.Name;
-                CanvasWidth = template.Width;
-                CanvasHeight = template.Height;
-                BackgroundColor = template.BackgroundColor;
 
+                // ✅ If drawing has ProfileId, reload profile settings
+                if (template.ProfileId.HasValue)
+                {
+                    System.Diagnostics.Debug.WriteLine($"🔄 Drawing linked to Profile {template.ProfileId.Value}, reloading profile settings...");
+                    await LoadProfileSettingsAsync(template.ProfileId.Value);
+                }
+                else
+                {
+                    // ⚠️ No profile linked, use template's saved settings
+                    System.Diagnostics.Debug.WriteLine("⚠️ Drawing has no linked profile, using saved template settings");
+                    CanvasWidth = template.Width;
+                    CanvasHeight = template.Height;
+                    BackgroundColor = template.BackgroundColor;
+                }
+
+                // Load shapes
                 Shapes.Clear();
                 foreach (var shape in template.Shapes)
                 {
                     Shapes.Add(shape);
                 }
+
+                System.Diagnostics.Debug.WriteLine($"✅ Loaded drawing '{template.Name}' with {template.Shapes.Count} shapes");
             }
         }
         catch (Exception ex)
         {
             ErrorMessage = $"Error loading template: {ex.Message}";
+            System.Diagnostics.Debug.WriteLine($"❌ Error loading template: {ex}");
         }
         finally
         {
