@@ -14,7 +14,8 @@ public sealed partial class ShellPage : Page
     private readonly Dictionary<string, Type> _pages = new()
     {
      { "Home", typeof(MainPage) },
- { "Management", typeof(ManagementPage) } 
+    { "Management", typeof(ManagementPage) } 
+        // Dashboard removed - now a tab inside Management
         // DrawingCanvas removed - only accessible via MainPage or Management
     };
 
@@ -24,11 +25,11 @@ public sealed partial class ShellPage : Page
   {
  this.InitializeComponent();
    
-   // Navigate to Home by default
+ // Navigate to Home by default
         ContentFrame.Navigate(typeof(MainPage));
   UpdateBreadcrumb("Home", "Home");
   
-        // Update back button state
+// Update back button state
         NavView.IsBackEnabled = false;
   
     // Load theme asynchronously
