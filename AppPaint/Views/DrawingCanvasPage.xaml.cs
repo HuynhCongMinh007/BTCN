@@ -892,11 +892,21 @@ System.Diagnostics.Debug.WriteLine($"📍 Dropped at: {dropPoint.X}, {dropPoint.
 
     private async void InsertTemplateButton_Click(object sender, RoutedEventArgs e)
 {
-        if (sender is Button button && button.Tag is DrawingTemplate template)
+      if (sender is Button button && button.Tag is DrawingTemplate template)
    {
        // Insert at center of canvas
           var centerPoint = new Point(ViewModel.CanvasWidth / 2, ViewModel.CanvasHeight / 2);
   await InsertTemplateAtPosition(template.Id, centerPoint);
+        }
+    }
+
+    private async void TemplatePreview_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is DrawingTemplate template)
+        {
+   // Insert at center of canvas when clicking preview
+     var centerPoint = new Point(ViewModel.CanvasWidth / 2, ViewModel.CanvasHeight / 2);
+     await InsertTemplateAtPosition(template.Id, centerPoint);
         }
     }
 
