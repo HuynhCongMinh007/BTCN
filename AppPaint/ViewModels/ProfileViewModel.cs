@@ -44,7 +44,22 @@ public partial class ProfileViewModel : BaseViewModel
     public override async void OnNavigatedTo(object? parameter = null)
     {
         base.OnNavigatedTo(parameter);
-        await LoadProfilesAsync();
+        
+        // ✅ Handle profileId parameter from MainPage Edit button
+        int? profileIdToSelect = null;
+        
+        if (parameter is int profileId)
+        {
+            profileIdToSelect = profileId;
+            System.Diagnostics.Debug.WriteLine($"📍 ProfilePage received profileId: {profileId}");
+        }
+        else if (parameter is string pageName && pageName == "Profiles")
+        {
+            // Just navigate to Profiles without selecting specific one
+            System.Diagnostics.Debug.WriteLine("📍 ProfilePage navigated without specific profile");
+        }
+
+        await LoadProfilesAsync(profileIdToSelect);
     }
 
     partial void OnSelectedProfileChanged(Profile? value)
@@ -70,7 +85,7 @@ public partial class ProfileViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private async Task LoadProfilesAsync()
+    private async Task LoadProfilesAsync(int? profileIdToSelect = null)
     {
         try
         {
@@ -83,6 +98,8 @@ public partial class ProfileViewModel : BaseViewModel
             Profiles.Clear();
 
             Profile? activeProfile = null;
+            Profile? profileToSelect = null;
+            
             foreach (var profile in profiles)
             {
                 Profiles.Add(profile);
@@ -90,10 +107,22 @@ public partial class ProfileViewModel : BaseViewModel
                 {
                     activeProfile = profile;
                 }
+                
+                // ✅ Check if this is the profile to select from parameter
+                if (profileIdToSelect.HasValue && profile.Id == profileIdToSelect.Value)
+                {
+                    profileToSelect = profile;
+                    System.Diagnostics.Debug.WriteLine($"✅ Found profile to select: {profile.Name}");
+                }
             }
 
-            // Auto-select active profile or first profile
-            SelectedProfile = activeProfile ?? Profiles.FirstOrDefault();
+            // ✅ Priority: 1. Profile from parameter, 2. Active profile, 3. First profile
+            SelectedProfile = profileToSelect ?? activeProfile ?? Profiles.FirstOrDefault();
+
+            if (profileToSelect != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"✅ Auto-selected profile from parameter: {profileToSelect.Name}");
+            }
 
             System.Diagnostics.Debug.WriteLine($"✅ Loaded {Profiles.Count} profiles");
         }
@@ -167,7 +196,7 @@ public partial class ProfileViewModel : BaseViewModel
 
             SaveProfileSuccess?.Invoke(this, SelectedProfile.Name);
 
-            await LoadProfilesAsync();
+            await LoadProfilesAsync(); // Will use default null parameter
         }
         catch (Exception ex)
         {
@@ -255,7 +284,7 @@ public partial class ProfileViewModel : BaseViewModel
             SetActiveProfileSuccess?.Invoke(this, SelectedProfile.Name);
 
             // Reload to refresh UI
-            await LoadProfilesAsync();
+            await LoadProfilesAsync(); // Will use default null parameter
         }
         catch (Exception ex)
         {
