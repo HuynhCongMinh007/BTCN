@@ -39,11 +39,17 @@ namespace AppPaint
             // Navigate to ShellPage (main layout)
             RootFrame.Navigate(typeof(ShellPage));
 
-            // Set window size
+            // Set window to maximize (fullscreen) on startup
             var appWindow = GetAppWindowForCurrentWindow();
             if (appWindow != null)
             {
-                appWindow.Resize(new Windows.Graphics.SizeInt32(1400, 900));
+                // Set presenter to OverlappedPresenter to enable maximize
+                var presenter = appWindow.Presenter as OverlappedPresenter;
+                if (presenter != null)
+                {
+                    // Maximize window on startup
+                    presenter.Maximize();
+                }
             }
         }
 

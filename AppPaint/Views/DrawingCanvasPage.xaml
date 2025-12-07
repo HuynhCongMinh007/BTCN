@@ -165,146 +165,185 @@
                             <ThemeShadow />
                         </Border.Shadow>
                         <StackPanel Spacing="12">
-                            <TextBlock
-                                FontSize="11"
-                                FontWeight="SemiBold"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Text="SHAPE TOOLS" />
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <!--  Select/Edit Button  -->
+                            <!--  Select Tool (Separate from shapes)  -->
+                            <StackPanel Spacing="8">
+                                <TextBlock
+                                    FontSize="10"
+                                    FontWeight="SemiBold"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Text="SELECTION" />
                                 <ToggleButton
                                     x:Name="SelectButton"
-                                    Width="40"
-                                    Height="40"
+                                    Width="48"
+                                    Height="48"
                                     Click="SelectButton_Click"
-                                    CornerRadius="6"
+                                    CornerRadius="8"
                                     Tag="Select"
-                                    ToolTipService.ToolTip="Select">
+                                    ToolTipService.ToolTip="Select and Edit">
                                     <FontIcon
                                         FontFamily="{StaticResource FluentIconsFontFamily}"
-                                        FontSize="18"
+                                        FontSize="20"
                                         Glyph="&#xE71C;" />
                                 </ToggleButton>
+                            </StackPanel>
 
-                                <ToggleButton
-                                    x:Name="LineButton"
-                                    Width="40"
-                                    Height="40"
-                                    Click="ShapeButton_Click"
-                                    CornerRadius="6"
-                                    Tag="Line"
-                                    ToolTipService.ToolTip="Line">
-                                    <Viewbox Width="20" Height="20">
-                                        <Canvas Width="24" Height="24">
-                                            <Line
-                                                Stroke="{ThemeResource TextFillColorPrimaryBrush}"
-                                                StrokeThickness="2"
-                                                X1="4"
-                                                X2="20"
-                                                Y1="20"
-                                                Y2="4" />
-                                        </Canvas>
-                                    </Viewbox>
-                                </ToggleButton>
+                            <!--  Divider  -->
+                            <Border
+                                Height="1"
+                                Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
-                                <ToggleButton
-                                    x:Name="RectangleButton"
-                                    Width="40"
-                                    Height="40"
-                                    Click="ShapeButton_Click"
-                                    CornerRadius="6"
-                                    Tag="Rectangle"
-                                    ToolTipService.ToolTip="Rectangle">
-                                    <Viewbox Width="20" Height="20">
-                                        <Canvas Width="24" Height="24">
-                                            <Rectangle
-                                                Canvas.Left="4"
-                                                Canvas.Top="6"
-                                                Width="16"
-                                                Height="12"
-                                                Stroke="{ThemeResource TextFillColorPrimaryBrush}"
-                                                StrokeThickness="2" />
-                                        </Canvas>
-                                    </Viewbox>
-                                </ToggleButton>
+                            <!--  Shape Tools Grid (3x2)  -->
+                            <StackPanel Spacing="8">
+                                <TextBlock
+                                    FontSize="10"
+                                    FontWeight="SemiBold"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Text="DRAW SHAPES" />
+                                <Grid ColumnSpacing="8" RowSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
 
-                                <ToggleButton
-                                    x:Name="OvalButton"
-                                    Width="40"
-                                    Height="40"
-                                    Click="ShapeButton_Click"
-                                    CornerRadius="6"
-                                    Tag="Oval"
-                                    ToolTipService.ToolTip="Oval">
-                                    <Viewbox Width="20" Height="20">
-                                        <Canvas Width="24" Height="24">
-                                            <Ellipse
-                                                Canvas.Left="4"
-                                                Canvas.Top="7"
-                                                Width="16"
-                                                Height="10"
-                                                Stroke="{ThemeResource TextFillColorPrimaryBrush}"
-                                                StrokeThickness="2" />
-                                        </Canvas>
-                                    </Viewbox>
-                                </ToggleButton>
+                                    <!--  Row 1  -->
+                                    <ToggleButton
+                                        x:Name="LineButton"
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        Width="48"
+                                        Height="48"
+                                        Click="ShapeButton_Click"
+                                        CornerRadius="8"
+                                        Tag="Line"
+                                        ToolTipService.ToolTip="Line">
+                                        <Viewbox Width="24" Height="24">
+                                            <Canvas Width="24" Height="24">
+                                                <Line
+                                                    Stroke="{ThemeResource TextFillColorPrimaryBrush}"
+                                                    StrokeThickness="2"
+                                                    X1="4"
+                                                    X2="20"
+                                                    Y1="20"
+                                                    Y2="4" />
+                                            </Canvas>
+                                        </Viewbox>
+                                    </ToggleButton>
 
-                                <ToggleButton
-                                    x:Name="CircleButton"
-                                    Width="40"
-                                    Height="40"
-                                    Click="ShapeButton_Click"
-                                    CornerRadius="6"
-                                    Tag="Circle"
-                                    ToolTipService.ToolTip="Circle">
-                                    <Viewbox Width="20" Height="20">
-                                        <Canvas Width="24" Height="24">
-                                            <Ellipse
-                                                Canvas.Left="5"
-                                                Canvas.Top="5"
-                                                Width="14"
-                                                Height="14"
-                                                Stroke="{ThemeResource TextFillColorPrimaryBrush}"
-                                                StrokeThickness="2" />
-                                        </Canvas>
-                                    </Viewbox>
-                                </ToggleButton>
+                                    <ToggleButton
+                                        x:Name="RectangleButton"
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        Width="48"
+                                        Height="48"
+                                        Click="ShapeButton_Click"
+                                        CornerRadius="8"
+                                        Tag="Rectangle"
+                                        ToolTipService.ToolTip="Rectangle">
+                                        <Viewbox Width="24" Height="24">
+                                            <Canvas Width="24" Height="24">
+                                                <Rectangle
+                                                    Canvas.Left="4"
+                                                    Canvas.Top="6"
+                                                    Width="16"
+                                                    Height="12"
+                                                    Stroke="{ThemeResource TextFillColorPrimaryBrush}"
+                                                    StrokeThickness="2" />
+                                            </Canvas>
+                                        </Viewbox>
+                                    </ToggleButton>
 
-                                <ToggleButton
-                                    x:Name="TriangleButton"
-                                    Width="40"
-                                    Height="40"
-                                    Click="ShapeButton_Click"
-                                    CornerRadius="6"
-                                    Tag="Triangle"
-                                    ToolTipService.ToolTip="Triangle">
-                                    <Viewbox Width="20" Height="20">
-                                        <Canvas Width="24" Height="24">
-                                            <Polygon
-                                                Points="12,4 4,20 20,20"
-                                                Stroke="{ThemeResource TextFillColorPrimaryBrush}"
-                                                StrokeThickness="2" />
-                                        </Canvas>
-                                    </Viewbox>
-                                </ToggleButton>
+                                    <ToggleButton
+                                        x:Name="OvalButton"
+                                        Grid.Row="0"
+                                        Grid.Column="2"
+                                        Width="48"
+                                        Height="48"
+                                        Click="ShapeButton_Click"
+                                        CornerRadius="8"
+                                        Tag="Oval"
+                                        ToolTipService.ToolTip="Oval">
+                                        <Viewbox Width="24" Height="24">
+                                            <Canvas Width="24" Height="24">
+                                                <Ellipse
+                                                    Canvas.Left="4"
+                                                    Canvas.Top="7"
+                                                    Width="16"
+                                                    Height="10"
+                                                    Stroke="{ThemeResource TextFillColorPrimaryBrush}"
+                                                    StrokeThickness="2" />
+                                            </Canvas>
+                                        </Viewbox>
+                                    </ToggleButton>
 
-                                <ToggleButton
-                                    x:Name="PolygonButton"
-                                    Width="40"
-                                    Height="40"
-                                    Click="ShapeButton_Click"
-                                    CornerRadius="6"
-                                    Tag="Polygon"
-                                    ToolTipService.ToolTip="Polygon">
-                                    <Viewbox Width="20" Height="20">
-                                        <Canvas Width="24" Height="24">
-                                            <Polygon
-                                                Points="12,3 20,8 18,18 6,18 4,8"
-                                                Stroke="{ThemeResource TextFillColorPrimaryBrush}"
-                                                StrokeThickness="2" />
-                                        </Canvas>
-                                    </Viewbox>
-                                </ToggleButton>
+                                    <!--  Row 2  -->
+                                    <ToggleButton
+                                        x:Name="CircleButton"
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        Width="48"
+                                        Height="48"
+                                        Click="ShapeButton_Click"
+                                        CornerRadius="8"
+                                        Tag="Circle"
+                                        ToolTipService.ToolTip="Circle">
+                                        <Viewbox Width="24" Height="24">
+                                            <Canvas Width="24" Height="24">
+                                                <Ellipse
+                                                    Canvas.Left="5"
+                                                    Canvas.Top="5"
+                                                    Width="14"
+                                                    Height="14"
+                                                    Stroke="{ThemeResource TextFillColorPrimaryBrush}"
+                                                    StrokeThickness="2" />
+                                            </Canvas>
+                                        </Viewbox>
+                                    </ToggleButton>
+
+                                    <ToggleButton
+                                        x:Name="TriangleButton"
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Width="48"
+                                        Height="48"
+                                        Click="ShapeButton_Click"
+                                        CornerRadius="8"
+                                        Tag="Triangle"
+                                        ToolTipService.ToolTip="Triangle">
+                                        <Viewbox Width="24" Height="24">
+                                            <Canvas Width="24" Height="24">
+                                                <Polygon
+                                                    Points="12,4 4,20 20,20"
+                                                    Stroke="{ThemeResource TextFillColorPrimaryBrush}"
+                                                    StrokeThickness="2" />
+                                            </Canvas>
+                                        </Viewbox>
+                                    </ToggleButton>
+
+                                    <ToggleButton
+                                        x:Name="PolygonButton"
+                                        Grid.Row="1"
+                                        Grid.Column="2"
+                                        Width="48"
+                                        Height="48"
+                                        Click="ShapeButton_Click"
+                                        CornerRadius="8"
+                                        Tag="Polygon"
+                                        ToolTipService.ToolTip="Polygon">
+                                        <Viewbox Width="24" Height="24">
+                                            <Canvas Width="24" Height="24">
+                                                <Polygon
+                                                    Points="12,3 20,8 18,18 6,18 4,8"
+                                                    Stroke="{ThemeResource TextFillColorPrimaryBrush}"
+                                                    StrokeThickness="2" />
+                                            </Canvas>
+                                        </Viewbox>
+                                    </ToggleButton>
+                                </Grid>
                             </StackPanel>
                         </StackPanel>
                     </Border>
