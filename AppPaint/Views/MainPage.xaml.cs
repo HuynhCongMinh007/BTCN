@@ -415,13 +415,24 @@ public sealed partial class MainPage : Page
     {
         if (sender is Button button && button.Tag is Profile profile)
         {
-            // Navigate to Management > Profiles tab
+            System.Diagnostics.Debug.WriteLine($"✏️ Edit Profile clicked: {profile.Name} (ID: {profile.Id})");
+
+            // Navigate to Management > Profiles with profile ID
             if (App.MainWindow is MainWindow mainWindow)
             {
-                if (mainWindow.Content is Frame rootFrame && rootFrame.Content is ShellPage shellPage)
+                var rootFrame = mainWindow.Content as Grid;
+                if (rootFrame != null)
                 {
-                    // Navigate to ManagementPage
-                    rootFrame.Navigate(typeof(ManagementPage));
+                    var frameElement = rootFrame.FindName("RootFrame") as Frame;
+                    if (frameElement != null)
+                    {
+                        // Navigate to ManagementPage with profile navigation info
+                        // Format: "Profiles:{profileId}"
+                        string navigationParam = $"Profiles:{profile.Id}";
+                        frameElement.Navigate(typeof(ManagementPage), navigationParam);
+
+                        System.Diagnostics.Debug.WriteLine($"✅ Navigating to Management with: {navigationParam}");
+                    }
                 }
             }
         }
