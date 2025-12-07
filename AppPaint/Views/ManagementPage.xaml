@@ -43,6 +43,18 @@
 
             <!-- Menu Items -->
             <NavigationView.MenuItems>
+                <!-- Dashboard -->
+                <NavigationViewItem Tag="Dashboard"
+                                    Content="Dashboard"
+                                    ToolTipService.ToolTip="View statistics and charts">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource FluentIconsFontFamily}"
+                                  Glyph="&#xE9D9;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItemSeparator/>
+
                 <!-- Profiles -->
                 <NavigationViewItem Icon="Contact"
                                     Content="Profiles"
