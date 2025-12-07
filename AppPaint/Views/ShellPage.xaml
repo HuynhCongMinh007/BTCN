@@ -50,11 +50,11 @@
                 </BreadcrumbBar.ItemTemplate>
             </BreadcrumbBar>
 
-            <!-- Theme Toggle with Icon -->
+            <!-- Theme Toggle with Windows 11 Fluent Icons -->
             <StackPanel Grid.Column="1" 
                         Orientation="Horizontal" 
                         Spacing="12">
-                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                <FontIcon FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                           Glyph="&#xE793;"
                           FontSize="16"
                           VerticalAlignment="Center"
@@ -69,7 +69,7 @@
                     <ToggleSwitch.OnContentTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                <FontIcon FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                                           Glyph="&#xE708;"
                                           FontSize="14"/>
                                 <TextBlock Text="Dark"/>
@@ -79,7 +79,7 @@
                     <ToggleSwitch.OffContentTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                <FontIcon FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                                           Glyph="&#xE706;"
                                           FontSize="14"/>
                                 <TextBlock Text="Light"/>
@@ -90,7 +90,7 @@
             </StackPanel>
         </Grid>
 
-        <!-- NavigationView with Fluent Icons -->
+        <!-- NavigationView with Windows 11 Fluent Icons -->
         <NavigationView x:Name="NavView"
                         Grid.Row="1"
                         IsBackButtonVisible="Auto"
@@ -103,24 +103,24 @@
                         CompactPaneLength="48">
 
             <NavigationView.MenuItems>
-                <!-- Home -->
+                <!-- Home with Windows 11 Fluent Icon -->
                 <NavigationViewItem Content="Home" 
                                     Tag="Home"
                                     ToolTipService.ToolTip="Go to Home Dashboard">
                     <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                        <FontIcon FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                                   Glyph="&#xE80F;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
                 <NavigationViewItemSeparator/>
 
-                <!-- Management (Profiles, Drawings, Templates) -->
+                <!-- Management with Windows 11 Fluent Icon -->
                 <NavigationViewItem Content="Management" 
                                     Tag="Management"
                                     ToolTipService.ToolTip="Manage profiles, drawings, and templates">
                     <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                        <FontIcon FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                                   Glyph="&#xE8F1;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
