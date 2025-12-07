@@ -61,7 +61,7 @@ public partial class DashboardViewModel : BaseViewModel
 
             // Filter: Only count DRAWINGS (IsTemplate = false), NOT shape templates
             var drawings = allTemplates.Where(t => !t.IsTemplate).ToList();
-            
+
             // Only count shapes that belong to drawings (not templates)
             var drawingIds = drawings.Select(d => d.Id).ToHashSet();
             var drawingShapes = allShapes.Where(s => s.TemplateId.HasValue && drawingIds.Contains(s.TemplateId.Value)).ToList();
@@ -71,12 +71,7 @@ public partial class DashboardViewModel : BaseViewModel
             TotalShapes = drawingShapes.Count;
             TotalProfiles = profiles.Count;
 
-            System.Diagnostics.Debug.WriteLine($"📊 Dashboard Stats:");
-            System.Diagnostics.Debug.WriteLine($"   Total templates in DB: {allTemplates.Count}");
-            System.Diagnostics.Debug.WriteLine($"   Drawings (IsTemplate=false): {drawings.Count}");
-            System.Diagnostics.Debug.WriteLine($"   Shape Templates (IsTemplate=true): {allTemplates.Count(t => t.IsTemplate)}");
-            System.Diagnostics.Debug.WriteLine($"   Total shapes: {allShapes.Count}");
-            System.Diagnostics.Debug.WriteLine($"   Shapes in drawings: {drawingShapes.Count}");
+           
 
             // Average shapes per drawing
             if (TotalDrawings > 0)
@@ -98,13 +93,10 @@ public partial class DashboardViewModel : BaseViewModel
             {
                 RecentDrawings.Add(drawing);
             }
-
-            System.Diagnostics.Debug.WriteLine($"✅ Dashboard loaded: {TotalDrawings} drawings, {TotalShapes} shapes, {TotalProfiles} profiles");
         }
         catch (Exception ex)
         {
             ErrorMessage = $"Error loading dashboard: {ex.Message}";
-            System.Diagnostics.Debug.WriteLine($"❌ Error loading dashboard: {ex}");
         }
         finally
         {
@@ -144,20 +136,17 @@ public partial class DashboardViewModel : BaseViewModel
     {
         return shapeType switch
         {
-            ShapeType.Line => "📏 Line",
-            ShapeType.Rectangle => "▭ Rectangle",
-            ShapeType.Circle => "⭕ Circle",
-            ShapeType.Oval => "⬭ Oval",
-            ShapeType.Triangle => "△ Triangle",
-            ShapeType.Polygon => "⬡ Polygon",
+            ShapeType.Line => "Line",
+            ShapeType.Rectangle => "Rectangle",
+            ShapeType.Circle => "Circle",
+            ShapeType.Oval => "Oval",
+            ShapeType.Triangle => "Triangle",
+            ShapeType.Polygon => "Polygon",
             _ => shapeType.ToString()
         };
     }
 }
 
-/// <summary>
-/// Statistics for each shape type
-/// </summary>
 public class ShapeTypeStat
 {
     public string ShapeTypeName { get; set; } = "";
