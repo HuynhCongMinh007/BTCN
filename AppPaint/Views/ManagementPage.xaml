@@ -1,82 +1,88 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <Page
     x:Class="AppPaint.Views.ManagementPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:AppPaint.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:AppPaint.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    mc:Ignorable="d">
 
     <Grid>
-        <!-- NavigationView with sub-menu for Management -->
-        <NavigationView x:Name="ManagementNav"
-                        PaneDisplayMode="Left"
-                        IsBackButtonVisible="Collapsed"
-                        IsSettingsVisible="False"
-                        SelectionChanged="ManagementNav_SelectionChanged"
-                        OpenPaneLength="240"
-                        CompactPaneLength="48">
+        <!--  NavigationView with sub-menu for Management  -->
+        <NavigationView
+            x:Name="ManagementNav"
+            CompactPaneLength="48"
+            IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="False"
+            OpenPaneLength="240"
+            PaneDisplayMode="Left"
+            SelectionChanged="ManagementNav_SelectionChanged">
 
-            <!-- Header -->
+            <!--  Header  -->
             <NavigationView.Header>
                 <Grid Height="Auto" Padding="16,12">
                     <StackPanel Spacing="8">
                         <StackPanel Orientation="Horizontal" Spacing="12">
-                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                      Glyph="&#xE8F1;"
-                                      FontSize="28"
-                                      Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                      VerticalAlignment="Center"/>
-                            <TextBlock Text="Management"
-                                       Style="{StaticResource TitleTextBlockStyle}"
-                                       FontWeight="Bold"
-                                       VerticalAlignment="Center"/>
+                            <FontIcon
+                                VerticalAlignment="Center"
+                                FontFamily="{StaticResource FluentIconsFontFamily}"
+                                FontSize="28"
+                                Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                Glyph="&#xE8F1;" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontWeight="Bold"
+                                Style="{StaticResource TitleTextBlockStyle}"
+                                Text="Management" />
                         </StackPanel>
-                        <TextBlock Text="Manage profiles, drawings, and templates"
-                                   Style="{StaticResource CaptionTextBlockStyle}"
-                                   Opacity="0.7"/>
+                        <TextBlock
+                            Opacity="0.7"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Manage profiles, drawings, templates, and view dashboard" />
                     </StackPanel>
                 </Grid>
             </NavigationView.Header>
 
-            <!-- Menu Items -->
+            <!--  Menu Items  -->
             <NavigationView.MenuItems>
-                <!-- Dashboard -->
-                <NavigationViewItem Tag="Dashboard"
-                                    Content="Dashboard"
-                                    ToolTipService.ToolTip="View statistics and charts">
+                <!--  Dashboard  -->
+                <NavigationViewItem
+                    Content="Dashboard"
+                    Tag="Dashboard"
+                    ToolTipService.ToolTip="View statistics and charts">
                     <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="{StaticResource FluentIconsFontFamily}"
-                                  Glyph="&#xE9D9;"/>
+                        <FontIcon FontFamily="{StaticResource FluentIconsFontFamily}" Glyph="&#xE9D9;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
-                <NavigationViewItemSeparator/>
+                <NavigationViewItemSeparator />
 
-                <!-- Profiles -->
-                <NavigationViewItem Icon="Contact"
-                                    Content="Profiles"
-                                    Tag="Profiles"
-                                    ToolTipService.ToolTip="Manage your profiles and settings"/>
+                <!--  Profiles  -->
+                <NavigationViewItem
+                    Content="Profiles"
+                    Icon="Contact"
+                    Tag="Profiles"
+                    ToolTipService.ToolTip="Manage your profiles and settings" />
 
-                <!-- Drawings -->
-                <NavigationViewItem Icon="Library"
-                                    Content="Drawings"
-                                    Tag="Drawings"
-                                    ToolTipService.ToolTip="Manage saved drawings"/>
+                <!--  Drawings  -->
+                <NavigationViewItem
+                    Content="Drawings"
+                    Icon="Library"
+                    Tag="Drawings"
+                    ToolTipService.ToolTip="Manage saved drawings" />
 
-                <!-- Templates -->
-                <NavigationViewItem Icon="Favorite"
-                                    Content="Templates"
-                                    Tag="Templates"
-                                    ToolTipService.ToolTip="Manage shape templates"/>
+                <!--  Templates  -->
+                <NavigationViewItem
+                    Content="Templates"
+                    Icon="Favorite"
+                    Tag="Templates"
+                    ToolTipService.ToolTip="Manage shape templates" />
             </NavigationView.MenuItems>
 
-            <!-- Content Frame -->
-            <Frame x:Name="ContentFrame"
-                   Navigated="ContentFrame_Navigated"/>
+            <!--  Content Frame  -->
+            <Frame x:Name="ContentFrame" Navigated="ContentFrame_Navigated" />
         </NavigationView>
     </Grid>
 </Page>
