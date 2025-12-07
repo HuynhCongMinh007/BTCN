@@ -48,26 +48,26 @@ public sealed partial class DrawingCanvasPage : Page
         _renderingService = new ShapeRenderingService(drawingService);
         _saveService = new TemplateSaveService(App.Services, _renderingService);
         _insertionHandler = new TemplateInsertionHandler(App.Services);
-        
+
         // Initialize event handlers
-    _canvasEventHandler = new CanvasEventHandler(
-  _creationHandler, 
-     _selectionHandler, 
-   _editHandler, 
-            _insertionHandler,
-       ViewModel);
+        _canvasEventHandler = new CanvasEventHandler(
+      _creationHandler,
+         _selectionHandler,
+       _editHandler,
+                _insertionHandler,
+           ViewModel);
         _uiEventHandler = new UIEventHandler(ViewModel, _selectionHandler, _editHandler, _creationHandler);
         _templateUIHandler = new TemplateUIHandler();
 
         // Subscribe to handler events
-      _creationHandler.PolygonFinished += OnPolygonFinished;
+        _creationHandler.PolygonFinished += OnPolygonFinished;
         _selectionHandler.ShapeSelected += OnShapeSelected;
         _selectionHandler.SelectionCleared += OnSelectionCleared;
-     _selectionHandler.ResizeHandlePressed += OnResizeHandlePressed;
+        _selectionHandler.ResizeHandlePressed += OnResizeHandlePressed;
 
-      // Subscribe to ViewModel events
+        // Subscribe to ViewModel events
         ViewModel.NavigateBackRequested += OnNavigateBackRequested;
-ViewModel.ClearCanvasRequested += OnClearCanvasRequested;
+        ViewModel.ClearCanvasRequested += OnClearCanvasRequested;
         ViewModel.PropertyChanged += ViewModel_PropertyChanged;
 
         this.InitializeComponent();
@@ -78,8 +78,8 @@ ViewModel.ClearCanvasRequested += OnClearCanvasRequested;
         DrawingCanvas.PointerReleased += DrawingCanvas_PointerReleased;
 
         // Keyboard events
-      this.KeyDown += DrawingCanvasPage_KeyDown;
-   this.KeyUp += DrawingCanvasPage_KeyUp;
+        this.KeyDown += DrawingCanvasPage_KeyDown;
+        this.KeyUp += DrawingCanvasPage_KeyUp;
 
         // UI events
         StrokeThicknessSlider.ValueChanged += StrokeThicknessSlider_ValueChanged;
@@ -88,39 +88,39 @@ ViewModel.ClearCanvasRequested += OnClearCanvasRequested;
     #region Navigation
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
-{
+    {
         System.Diagnostics.Debug.WriteLine($"📍 DrawingCanvasPage.OnNavigatedTo");
 
         base.OnNavigatedTo(e);
         ViewModel.OnNavigatedTo(e.Parameter);
 
         // Subscribe to shape collection changes
-     ViewModel.Shapes.CollectionChanged += Shapes_CollectionChanged;
+        ViewModel.Shapes.CollectionChanged += Shapes_CollectionChanged;
         ViewModel.PropertyChanged += ViewModel_BackgroundChanged;
 
         // Apply background and render shapes
         ApplyBackgroundColor();
-   _renderingService.RenderAllShapes(ViewModel.Shapes, DrawingCanvas);
+        _renderingService.RenderAllShapes(ViewModel.Shapes, DrawingCanvas);
     }
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
     {
         base.OnNavigatedFrom(e);
 
-     // Unsubscribe
-     ViewModel.Shapes.CollectionChanged -= Shapes_CollectionChanged;
+        // Unsubscribe
+        ViewModel.Shapes.CollectionChanged -= Shapes_CollectionChanged;
         ViewModel.PropertyChanged -= ViewModel_BackgroundChanged;
         ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
         ViewModel.NavigateBackRequested -= OnNavigateBackRequested;
         ViewModel.ClearCanvasRequested -= OnClearCanvasRequested;
 
         ViewModel.OnNavigatedFrom();
- }
+    }
 
     private void OnNavigateBackRequested(object? sender, EventArgs e)
     {
         if (Frame.CanGoBack)
-  {
+        {
             Frame.GoBack();
         }
     }
@@ -132,11 +132,11 @@ ViewModel.ClearCanvasRequested += OnClearCanvasRequested;
     private void Shapes_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && e.NewItems != null)
-     {
+        {
             foreach (Data.Models.Shape shape in e.NewItems)
-     {
-     _renderingService.RenderShape(shape, DrawingCanvas);
-      }
+            {
+                _renderingService.RenderShape(shape, DrawingCanvas);
+            }
         }
         else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
         {
@@ -150,10 +150,10 @@ ViewModel.ClearCanvasRequested += OnClearCanvasRequested;
 
     private void DrawingCanvas_PointerPressed(object sender, PointerRoutedEventArgs e)
     {
-        _canvasEventHandler.HandlePointerPressed(DrawingCanvas, e, () => 
+        _canvasEventHandler.HandlePointerPressed(DrawingCanvas, e, () =>
         {
-   FinishPolygonButton.Visibility = Visibility.Visible;
- });
+            FinishPolygonButton.Visibility = Visibility.Visible;
+        });
     }
 
     private void DrawingCanvas_PointerMoved(object sender, PointerRoutedEventArgs e)
@@ -164,25 +164,25 @@ ViewModel.ClearCanvasRequested += OnClearCanvasRequested;
     private void DrawingCanvas_PointerReleased(object sender, PointerRoutedEventArgs e)
     {
         var result = _canvasEventHandler.HandlePointerReleased(DrawingCanvas, e);
-        
-    if (result.shouldSave)
+
+        if (result.shouldSave)
         {
-  SaveShapeToDatabase(result.start, result.end, result.shapeType);
-  }
+            SaveShapeToDatabase(result.start, result.end, result.shapeType);
+        }
     }
 
     #endregion
 
     #region Keyboard Events
 
-  private void DrawingCanvasPage_KeyDown(object sender, KeyRoutedEventArgs e)
-{
+    private void DrawingCanvasPage_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
         _uiEventHandler.HandleKeyDown(e.Key, DrawingCanvas);
     }
 
     private void DrawingCanvasPage_KeyUp(object sender, KeyRoutedEventArgs e)
     {
-   _uiEventHandler.HandleKeyUp(e.Key);
+        _uiEventHandler.HandleKeyUp(e.Key);
     }
 
     #endregion
@@ -191,27 +191,27 @@ ViewModel.ClearCanvasRequested += OnClearCanvasRequested;
 
     private void ShapeButton_Click(object sender, RoutedEventArgs e)
     {
-      if (sender is ToggleButton button && button.Tag is string tag)
-      {
+        if (sender is ToggleButton button && button.Tag is string tag)
+        {
             _uiEventHandler.HandleShapeButtonClick(
      button, tag,
-             SelectButton, LineButton, RectangleButton, 
+             SelectButton, LineButton, RectangleButton,
      OvalButton, CircleButton, TriangleButton, PolygonButton);
- 
+
             _canvasEventHandler.IsSelectMode = false;
         }
     }
 
     private void SelectButton_Click(object sender, RoutedEventArgs e)
     {
-if (sender is ToggleButton button)
+        if (sender is ToggleButton button)
         {
-  _uiEventHandler.HandleSelectButtonClick(
-         button,
-       LineButton, RectangleButton, OvalButton, 
- CircleButton, TriangleButton, PolygonButton);
-    
-   _canvasEventHandler.IsSelectMode = true;
+            _uiEventHandler.HandleSelectButtonClick(
+                   button,
+                 LineButton, RectangleButton, OvalButton,
+           CircleButton, TriangleButton, PolygonButton);
+
+            _canvasEventHandler.IsSelectMode = true;
         }
     }
 
@@ -223,36 +223,36 @@ if (sender is ToggleButton button)
     private void FillColorPicker_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
     {
         _uiEventHandler.HandleFillColorChanged(args.NewColor, FillColorPreview);
-}
+    }
 
     private void StrokeThicknessSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
-{
+    {
         _uiEventHandler.HandleStrokeThicknessChanged(e.NewValue);
     }
 
- private void StrokeStyleComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void StrokeStyleComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
- if (sender is ComboBox comboBox && comboBox.SelectedItem is ComboBoxItem item)
+        if (sender is ComboBox comboBox && comboBox.SelectedItem is ComboBoxItem item)
         {
             var style = item.Tag?.ToString() ?? "Solid";
-_uiEventHandler.HandleStrokeStyleChanged(style);
-     }
+            _uiEventHandler.HandleStrokeStyleChanged(style);
+        }
     }
 
     private void ToggleToolbarButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button button && button.Content is FontIcon icon)
-     {
-       _isToolbarExpanded = _uiEventHandler.HandleToolbarToggle(_isToolbarExpanded, ToolbarContent, icon);
+        {
+            _isToolbarExpanded = _uiEventHandler.HandleToolbarToggle(_isToolbarExpanded, ToolbarContent, icon);
         }
     }
 
     private async void FinishPolygonButton_Click(object sender, RoutedEventArgs e)
     {
-        await _uiEventHandler.HandleFinishPolygonAsync(DrawingCanvas, () => 
+        await _uiEventHandler.HandleFinishPolygonAsync(DrawingCanvas, () =>
      {
-     FinishPolygonButton.Visibility = Visibility.Collapsed;
-});
+         FinishPolygonButton.Visibility = Visibility.Collapsed;
+     });
     }
 
     #endregion
@@ -261,61 +261,61 @@ _uiEventHandler.HandleStrokeStyleChanged(style);
 
     private void OnPolygonFinished(object? sender, EventArgs e)
     {
-  FinishPolygonButton.Visibility = Visibility.Collapsed;
+        FinishPolygonButton.Visibility = Visibility.Collapsed;
     }
 
     private void OnShapeSelected(object? sender, ShapeSelectedEventArgs e)
     {
         var props = _selectionHandler.GetSelectedShapeProperties();
-if (props != null)
+        if (props != null)
         {
             ViewModel.SelectedColor = props.StrokeColor;
-     ViewModel.StrokeThickness = props.StrokeThickness;
-         ViewModel.IsFilled = props.IsFilled;
+            ViewModel.StrokeThickness = props.StrokeThickness;
+            ViewModel.IsFilled = props.IsFilled;
             if (props.IsFilled)
-  {
-      ViewModel.FillColor = props.FillColor;
+            {
+                ViewModel.FillColor = props.FillColor;
             }
         }
     }
 
- private void OnSelectionCleared(object? sender, EventArgs e)
+    private void OnSelectionCleared(object? sender, EventArgs e)
     {
         // Reset toolbar to defaults if needed
     }
 
     private void OnResizeHandlePressed(object? sender, PointerRoutedEventArgs e)
     {
-      if (_selectionHandler.SelectedShape != null)
+        if (_selectionHandler.SelectedShape != null)
         {
             var point = e.GetCurrentPoint(DrawingCanvas).Position;
-    _editHandler.StartResizing(point, DrawingCanvas, e);
-          e.Handled = true;
+            _editHandler.StartResizing(point, DrawingCanvas, e);
+            e.Handled = true;
         }
     }
 
-  private async void SaveShapeToDatabase(Point start, Point end, ShapeType shapeType)
+    private async void SaveShapeToDatabase(Point start, Point end, ShapeType shapeType)
     {
-      var points = new System.Collections.Generic.List<Point> { start, end };
-   var pointsJson = DrawingService.PointsToJson(points);
+        var points = new System.Collections.Generic.List<Point> { start, end };
+        var pointsJson = DrawingService.PointsToJson(points);
 
-    var shape = new Data.Models.Shape
+        var shape = new Data.Models.Shape
         {
-        ShapeType = shapeType,
-      PointsData = pointsJson,
-        Color = ViewModel.SelectedColor,
-        StrokeThickness = ViewModel.StrokeThickness,
-        StrokeStyle = ViewModel.StrokeStyle, // ✅ Fixed: Save stroke style
-        IsFilled = ViewModel.IsFilled,
-   FillColor = ViewModel.IsFilled ? ViewModel.FillColor : null,
+            ShapeType = shapeType,
+            PointsData = pointsJson,
+            Color = ViewModel.SelectedColor,
+            StrokeThickness = ViewModel.StrokeThickness,
+            StrokeStyle = ViewModel.StrokeStyle, // ✅ Fixed: Save stroke style
+            IsFilled = ViewModel.IsFilled,
+            FillColor = ViewModel.IsFilled ? ViewModel.FillColor : null,
             TemplateId = ViewModel.CurrentTemplateId,
-CreatedAt = DateTime.Now
+            CreatedAt = DateTime.Now
         };
 
-      await ViewModel.AddShapeCommand.ExecuteAsync(shape);
+        await ViewModel.AddShapeCommand.ExecuteAsync(shape);
     }
 
-  #endregion
+    #endregion
 
     #region Save & Template Management
 
@@ -325,156 +325,156 @@ CreatedAt = DateTime.Now
         bool isUpdating = ViewModel.CurrentTemplateId.HasValue;
 
         string dialogTitle = isUpdating ? "Update Drawing" : "Save Drawing";
-    string dialogMessage = isUpdating
-            ? $"Update '{ViewModel.TemplateName}'?"
-   : "Enter a name for your drawing:";
+        string dialogMessage = isUpdating
+                ? $"Update '{ViewModel.TemplateName}'?"
+       : "Enter a name for your drawing:";
 
         var dialog = new ContentDialog
         {
-  XamlRoot = this.XamlRoot,
-  Title = dialogTitle,
-        PrimaryButtonText = isUpdating ? "Update" : "Save",
+            XamlRoot = this.XamlRoot,
+            Title = dialogTitle,
+            PrimaryButtonText = isUpdating ? "Update" : "Save",
             CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Primary
         };
 
-   var stackPanel = new StackPanel { Spacing = 12 };
-      stackPanel.Children.Add(new TextBlock
+        var stackPanel = new StackPanel { Spacing = 12 };
+        stackPanel.Children.Add(new TextBlock
         {
             Text = dialogMessage,
-         FontWeight = Microsoft.UI.Text.FontWeights.SemiBold
+            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold
         });
 
         TextBox? nameTextBox = null;
         if (!isUpdating)
         {
-          nameTextBox = new TextBox
-     {
- PlaceholderText = "My Drawing",
-        Text = ViewModel.TemplateName == "New Drawing"
-     ? $"Drawing {DateTime.Now:yyyy-MM-dd HH-mm}"
-     : ViewModel.TemplateName,
-           MaxLength = 200
+            nameTextBox = new TextBox
+            {
+                PlaceholderText = "My Drawing",
+                Text = ViewModel.TemplateName == "New Drawing"
+       ? $"Drawing {DateTime.Now:yyyy-MM-dd HH-mm}"
+       : ViewModel.TemplateName,
+                MaxLength = 200
             };
-     stackPanel.Children.Add(nameTextBox);
+            stackPanel.Children.Add(nameTextBox);
         }
- else
+        else
         {
- stackPanel.Children.Add(new TextBlock
-          {
-      Text = $"Name: {ViewModel.TemplateName}",
-    Opacity = 0.7
-   });
+            stackPanel.Children.Add(new TextBlock
+            {
+                Text = $"Name: {ViewModel.TemplateName}",
+                Opacity = 0.7
+            });
         }
 
- stackPanel.Children.Add(new TextBlock
+        stackPanel.Children.Add(new TextBlock
         {
-  Text = $"Canvas Size: {ViewModel.CanvasWidth}x{ViewModel.CanvasHeight}",
+            Text = $"Canvas Size: {ViewModel.CanvasWidth}x{ViewModel.CanvasHeight}",
             FontSize = 12,
-          Opacity = 0.7
+            Opacity = 0.7
         });
 
-     stackPanel.Children.Add(new TextBlock
+        stackPanel.Children.Add(new TextBlock
         {
-  Text = $"Shapes on canvas: {canvasShapeCount}",
- FontSize = 12,
-Opacity = 0.7
+            Text = $"Shapes on canvas: {canvasShapeCount}",
+            FontSize = 12,
+            Opacity = 0.7
         });
 
         if (isUpdating)
-  {
-       stackPanel.Children.Add(new TextBlock
-   {
-      Text = "Warning: This will overwrite the existing drawing.",
-  Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange),
-    FontSize = 12,
-FontWeight = Microsoft.UI.Text.FontWeights.SemiBold
-     });
+        {
+            stackPanel.Children.Add(new TextBlock
+            {
+                Text = "Warning: This will overwrite the existing drawing.",
+                Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange),
+                FontSize = 12,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold
+            });
         }
 
         dialog.Content = stackPanel;
- var result = await dialog.ShowAsync();
+        var result = await dialog.ShowAsync();
 
         if (result == ContentDialogResult.Primary)
         {
             string name = ViewModel.TemplateName;
 
             if (!isUpdating && nameTextBox != null)
-   {
-          name = nameTextBox.Text.Trim();
-    if (string.IsNullOrEmpty(name))
             {
-            await ShowErrorDialog("Please enter a name for your drawing.");
-        return;
-   }
-         ViewModel.TemplateName = name;
-     }
+                name = nameTextBox.Text.Trim();
+                if (string.IsNullOrEmpty(name))
+                {
+                    await ShowErrorDialog("Please enter a name for your drawing.");
+                    return;
+                }
+                ViewModel.TemplateName = name;
+            }
 
             await SaveTemplateWithCanvasShapes(name, canvasShapeCount, isUpdating);
-     }
+        }
     }
 
     private async Task SaveTemplateWithCanvasShapes(string name, int shapeCount, bool isUpdating)
     {
-  try
-    {
-    ViewModel.IsBusy = true;
+        try
+        {
+            ViewModel.IsBusy = true;
 
-    var template = await _saveService.SaveTemplateWithShapes(
-     ViewModel.CurrentTemplateId,
-     name,
-     (int)ViewModel.CanvasWidth,
-      (int)ViewModel.CanvasHeight,
-      ViewModel.BackgroundColor,
-      DrawingCanvas,
-    ViewModel.CurrentProfileId // ✅ Pass ProfileId to link drawing with profile
-            );
+            var template = await _saveService.SaveTemplateWithShapes(
+             ViewModel.CurrentTemplateId,
+             name,
+             (int)ViewModel.CanvasWidth,
+              (int)ViewModel.CanvasHeight,
+              ViewModel.BackgroundColor,
+              DrawingCanvas,
+            ViewModel.CurrentProfileId // ✅ Pass ProfileId to link drawing with profile
+                    );
 
             if (template != null)
-       {
-      ViewModel.CurrentTemplateId = template.Id;
+            {
+                ViewModel.CurrentTemplateId = template.Id;
 
-     string successMessage = isUpdating
-           ? $"'{name}' updated successfully with {shapeCount} shapes!"
-         : $"'{name}' saved successfully with {shapeCount} shapes!";
+                string successMessage = isUpdating
+                      ? $"'{name}' updated successfully with {shapeCount} shapes!"
+                    : $"'{name}' saved successfully with {shapeCount} shapes!";
 
-   await ShowSuccessDialog(successMessage);
+                await ShowSuccessDialog(successMessage);
+            }
         }
-   }
         catch (Exception ex)
         {
-  ViewModel.ErrorMessage = $"Error saving: {ex.Message}";
-        await ShowErrorDialog($"Failed to save drawing:\n{ex.Message}");
-    }
+            ViewModel.ErrorMessage = $"Error saving: {ex.Message}";
+            await ShowErrorDialog($"Failed to save drawing:\n{ex.Message}");
+        }
         finally
         {
-        ViewModel.IsBusy = false;
-  }
+            ViewModel.IsBusy = false;
+        }
     }
 
     private async void SaveAsTemplateButton_Click(object sender, RoutedEventArgs e)
     {
- if (_selectionHandler.SelectedShape == null)
- {
+        if (_selectionHandler.SelectedShape == null)
+        {
             await ShowErrorDialog("Please select a shape first (click the Select button, then click on a shape).");
-     return;
-  }
+            return;
+        }
 
         var dialog = new ContentDialog
- {
-         XamlRoot = this.XamlRoot,
+        {
+            XamlRoot = this.XamlRoot,
             Title = "Save as Template",
- PrimaryButtonText = "Save",
-      CloseButtonText = "Cancel",
+            PrimaryButtonText = "Save",
+            CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Primary
         };
 
-   var stackPanel = new StackPanel { Spacing = 12 };
- stackPanel.Children.Add(new TextBlock
-     {
+        var stackPanel = new StackPanel { Spacing = 12 };
+        stackPanel.Children.Add(new TextBlock
+        {
             Text = "Template Name:",
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold
-  });
+        });
 
         var nameTextBox = new TextBox
         {
@@ -484,53 +484,53 @@ FontWeight = Microsoft.UI.Text.FontWeights.SemiBold
         };
         stackPanel.Children.Add(nameTextBox);
 
- stackPanel.Children.Add(new TextBlock
+        stackPanel.Children.Add(new TextBlock
         {
-      Text = "This template can be quickly inserted into any drawing.",
-         FontSize = 12,
-   Opacity = 0.7,
-         TextWrapping = TextWrapping.Wrap
+            Text = "This template can be quickly inserted into any drawing.",
+            FontSize = 12,
+            Opacity = 0.7,
+            TextWrapping = TextWrapping.Wrap
         });
 
-      dialog.Content = stackPanel;
+        dialog.Content = stackPanel;
         var result = await dialog.ShowAsync();
 
-   if (result == ContentDialogResult.Primary)
-      {
-     var templateName = nameTextBox.Text.Trim();
-  if (string.IsNullOrEmpty(templateName))
-     {
-          await ShowErrorDialog("Please enter a template name.");
-        return;
-  }
+        if (result == ContentDialogResult.Primary)
+        {
+            var templateName = nameTextBox.Text.Trim();
+            if (string.IsNullOrEmpty(templateName))
+            {
+                await ShowErrorDialog("Please enter a template name.");
+                return;
+            }
 
             await SaveShapeAsTemplate(templateName);
-     }
+        }
     }
 
     private async Task SaveShapeAsTemplate(string templateName)
     {
         if (_selectionHandler.SelectedShape == null) return;
 
- try
-   {
+        try
+        {
             ViewModel.IsBusy = true;
 
-          var template = await _saveService.SaveShapeAsTemplate(templateName, _selectionHandler.SelectedShape);
+            var template = await _saveService.SaveShapeAsTemplate(templateName, _selectionHandler.SelectedShape);
 
-  if (template != null)
-      {
-       await ShowSuccessDialog($"'{templateName}' saved successfully!\n\nYou can now find it in Management > Templates.");
+            if (template != null)
+            {
+                await ShowSuccessDialog($"'{templateName}' saved successfully!\n\nYou can now find it in Management > Templates.");
                 _selectionHandler.ClearSelection(DrawingCanvas);
-      }
+            }
         }
-      catch (Exception ex)
+        catch (Exception ex)
         {
-      await ShowErrorDialog($"Failed to save template:\n{ex.Message}");
+            await ShowErrorDialog($"Failed to save template:\n{ex.Message}");
         }
         finally
-      {
-      ViewModel.IsBusy = false;
+        {
+            ViewModel.IsBusy = false;
         }
     }
 
@@ -541,38 +541,38 @@ FontWeight = Microsoft.UI.Text.FontWeights.SemiBold
     private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ViewModel.IsFilled) && _selectionHandler.SelectedShape != null && _uiEventHandler.IsSelectMode)
-    {
-        _editHandler.UpdateShapeFillColor(_selectionHandler.SelectedShape, ViewModel.FillColor, ViewModel.IsFilled);
+        {
+            _editHandler.UpdateShapeFillColor(_selectionHandler.SelectedShape, ViewModel.FillColor, ViewModel.IsFilled);
         }
     }
 
     private void ViewModel_BackgroundChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-if (e.PropertyName == nameof(ViewModel.BackgroundColor))
-      {
-        ApplyBackgroundColor();
+        if (e.PropertyName == nameof(ViewModel.BackgroundColor))
+        {
+            ApplyBackgroundColor();
         }
     }
 
     private void ApplyBackgroundColor()
     {
-      try
+        try
         {
-     var color = DrawingService.ParseColor(ViewModel.BackgroundColor);
+            var color = DrawingService.ParseColor(ViewModel.BackgroundColor);
             CanvasBackgroundBrush.Color = color;
-     BackgroundColorPreview.Color = color;
+            BackgroundColorPreview.Color = color;
         }
-    catch (Exception ex)
+        catch (Exception ex)
         {
-       System.Diagnostics.Debug.WriteLine($"❌ Error applying background color: {ex.Message}");
-      }
+            System.Diagnostics.Debug.WriteLine($"❌ Error applying background color: {ex.Message}");
+        }
     }
 
     private void OnClearCanvasRequested(object? sender, EventArgs e)
     {
         DrawingCanvas.Children.Clear();
         _creationHandler.ClearPolygon(DrawingCanvas);
-  FinishPolygonButton.Visibility = Visibility.Collapsed;
+        FinishPolygonButton.Visibility = Visibility.Collapsed;
         _selectionHandler.ClearSelection(DrawingCanvas);
     }
 
@@ -581,30 +581,30 @@ if (e.PropertyName == nameof(ViewModel.BackgroundColor))
     #region Helper Methods
 
     private async Task ShowErrorDialog(string message)
-{
-    var dialog = new ContentDialog
+    {
+        var dialog = new ContentDialog
         {
             XamlRoot = this.XamlRoot,
             Title = "Error",
-     Content = message,
-    CloseButtonText = "OK"
+            Content = message,
+            CloseButtonText = "OK"
         };
         await dialog.ShowAsync();
     }
 
     private async Task ShowSuccessDialog(string message)
     {
-   var dialog = new ContentDialog
+        var dialog = new ContentDialog
         {
-     XamlRoot = this.XamlRoot,
-   Title = "Success",
+            XamlRoot = this.XamlRoot,
+            Title = "Success",
             Content = message,
-   CloseButtonText = "OK"
+            CloseButtonText = "OK"
         };
         await dialog.ShowAsync();
     }
 
-  #endregion
+    #endregion
 
     #region Template Panel
 
@@ -617,16 +617,16 @@ if (e.PropertyName == nameof(ViewModel.BackgroundColor))
     {
         if (sender is Canvas canvas && canvas.Tag is DrawingTemplate template)
         {
-   _renderingService.RenderShapesWithAutoFit(template.Shapes, canvas, padding: 10);
-   }
+            _renderingService.RenderShapesWithAutoFit(template.Shapes, canvas, padding: 10);
+        }
     }
 
     private void Template_DragStarting(Microsoft.UI.Xaml.UIElement sender, Microsoft.UI.Xaml.DragStartingEventArgs args)
     {
         if (sender is Border border && border.DataContext is DrawingTemplate template)
         {
- _templateUIHandler.HandleDragStarting(template, args);
-      }
+            _templateUIHandler.HandleDragStarting(template, args);
+        }
     }
 
     private void DrawingCanvas_DragOver(object sender, DragEventArgs e)
@@ -635,58 +635,58 @@ if (e.PropertyName == nameof(ViewModel.BackgroundColor))
     }
 
     private async void DrawingCanvas_Drop(object sender, DragEventArgs e)
-  {
+    {
         ViewModel.IsBusy = true;
-        
+
         var result = await _canvasEventHandler.HandleDropAsync(DrawingCanvas, e);
-        
+
         if (!result.success && !string.IsNullOrEmpty(result.error))
         {
-     await ShowErrorDialog($"Failed to insert template: {result.error}");
-     }
- 
+            await ShowErrorDialog($"Failed to insert template: {result.error}");
+        }
+
         ViewModel.IsBusy = false;
     }
 
     private async void InsertTemplateButton_Click(object sender, RoutedEventArgs e)
-  {
-    if (sender is Button button && button.Tag is DrawingTemplate template)
+    {
+        if (sender is Button button && button.Tag is DrawingTemplate template)
         {
-     ViewModel.IsBusy = true;
-            
+            ViewModel.IsBusy = true;
+
             var result = await _canvasEventHandler.InsertTemplateAtCenterAsync(template.Id);
-      
-   if (!result.success && !string.IsNullOrEmpty(result.error))
-  {
+
+            if (!result.success && !string.IsNullOrEmpty(result.error))
+            {
                 await ShowErrorDialog($"Failed to insert template: {result.error}");
-       }
-        
-     ViewModel.IsBusy = false;
- }
+            }
+
+            ViewModel.IsBusy = false;
+        }
     }
 
     private async void TemplatePreview_Click(object sender, RoutedEventArgs e)
     {
-   if (sender is Button button && button.Tag is DrawingTemplate template)
- {
+        if (sender is Button button && button.Tag is DrawingTemplate template)
+        {
             ViewModel.IsBusy = true;
-            
+
             var result = await _canvasEventHandler.InsertTemplateAtCenterAsync(template.Id);
 
-  if (!result.success && !string.IsNullOrEmpty(result.error))
-   {
-      await ShowErrorDialog($"Failed to insert template: {result.error}");
-         }
-   
+            if (!result.success && !string.IsNullOrEmpty(result.error))
+            {
+                await ShowErrorDialog($"Failed to insert template: {result.error}");
+            }
+
             ViewModel.IsBusy = false;
         }
- }
+    }
 
     private void TemplateCard_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-{
+    {
         if (sender is Border border)
         {
-    _templateUIHandler.HandleCardPointerEntered(border);
+            _templateUIHandler.HandleCardPointerEntered(border);
         }
     }
 
@@ -694,7 +694,7 @@ if (e.PropertyName == nameof(ViewModel.BackgroundColor))
     {
         if (sender is Border border)
         {
-        _templateUIHandler.HandleCardPointerExited(border);
+            _templateUIHandler.HandleCardPointerExited(border);
         }
     }
 
