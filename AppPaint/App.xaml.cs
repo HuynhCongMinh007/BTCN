@@ -60,7 +60,8 @@ namespace AppPaint
             services.AddScoped<ITemplateService, TemplateService>();
             services.AddScoped<IShapeService, ShapeService>();
             services.AddScoped<IProfileService, ProfileService>();
-            services.AddScoped<IThemeService, ThemeService>(); // Changed from Singleton to Scoped
+            services.AddScoped<IThemeService, ThemeService>();
+            services.AddScoped<DrawingService>(); // Add DrawingService
 
             // ViewModels
             services.AddTransient<MainViewModel>();
