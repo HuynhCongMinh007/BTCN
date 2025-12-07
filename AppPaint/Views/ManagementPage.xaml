@@ -16,33 +16,51 @@
             CompactPaneLength="48"
             IsBackButtonVisible="Collapsed"
             IsSettingsVisible="False"
-            OpenPaneLength="240"
+            OpenPaneLength="260"
             PaneDisplayMode="Left"
             SelectionChanged="ManagementNav_SelectionChanged">
 
             <!--  Header  -->
             <NavigationView.Header>
-                <Grid Height="Auto" Padding="16,12">
-                    <StackPanel Spacing="8">
-                        <StackPanel Orientation="Horizontal" Spacing="12">
-                            <FontIcon
-                                VerticalAlignment="Center"
-                                FontFamily="{StaticResource FluentIconsFontFamily}"
-                                FontSize="28"
-                                Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                Glyph="&#xE8F1;" />
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                FontWeight="Bold"
-                                Style="{StaticResource TitleTextBlockStyle}"
-                                Text="Management" />
+                <Border
+                    Padding="24,16"
+                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="0,0,0,1">
+
+                    <Border.Shadow>
+                        <ThemeShadow />
+                    </Border.Shadow>
+
+                    <StackPanel Spacing="12">
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <Border
+                                Width="48"
+                                Height="48"
+                                Background="{ThemeResource AccentFillColorSecondaryBrush}"
+                                CornerRadius="8">
+                                <FontIcon
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource FluentIconsFontFamily}"
+                                    FontSize="24"
+                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                    Glyph="&#xE8F1;" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center" Spacing="4">
+                                <TextBlock
+                                    FontSize="24"
+                                    FontWeight="Bold"
+                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                    Text="Management" />
+                                <TextBlock
+                                    FontSize="13"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Text="Manage profiles, drawings, templates, and view dashboard" />
+                            </StackPanel>
                         </StackPanel>
-                        <TextBlock
-                            Opacity="0.7"
-                            Style="{StaticResource CaptionTextBlockStyle}"
-                            Text="Manage profiles, drawings, templates, and view dashboard" />
                     </StackPanel>
-                </Grid>
+                </Border>
             </NavigationView.Header>
 
             <!--  Menu Items  -->
@@ -62,23 +80,32 @@
                 <!--  Profiles  -->
                 <NavigationViewItem
                     Content="Profiles"
-                    Icon="Contact"
                     Tag="Profiles"
-                    ToolTipService.ToolTip="Manage your profiles and settings" />
+                    ToolTipService.ToolTip="Manage your profiles and settings">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource FluentIconsFontFamily}" Glyph="&#xE77B;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
 
                 <!--  Drawings  -->
                 <NavigationViewItem
                     Content="Drawings"
-                    Icon="Library"
                     Tag="Drawings"
-                    ToolTipService.ToolTip="Manage saved drawings" />
+                    ToolTipService.ToolTip="Manage saved drawings">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource FluentIconsFontFamily}" Glyph="&#xE8F1;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
 
                 <!--  Templates  -->
                 <NavigationViewItem
                     Content="Templates"
-                    Icon="Favorite"
                     Tag="Templates"
-                    ToolTipService.ToolTip="Manage shape templates" />
+                    ToolTipService.ToolTip="Manage shape templates">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource FluentIconsFontFamily}" Glyph="&#xE8B7;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
             </NavigationView.MenuItems>
 
             <!--  Content Frame  -->
