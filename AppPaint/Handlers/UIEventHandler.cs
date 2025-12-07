@@ -17,7 +17,7 @@ namespace AppPaint.Handlers;
 public class UIEventHandler
 {
     private readonly DrawingCanvasViewModel _viewModel;
-  private readonly ShapeSelectionHandler _selectionHandler;
+    private readonly ShapeSelectionHandler _selectionHandler;
     private readonly ShapeEditHandler _editHandler;
     private readonly ShapeCreationHandler _creationHandler;
 
@@ -30,7 +30,7 @@ DrawingCanvasViewModel viewModel,
     ShapeCreationHandler creationHandler)
     {
         _viewModel = viewModel;
-  _selectionHandler = selectionHandler;
+        _selectionHandler = selectionHandler;
         _editHandler = editHandler;
         _creationHandler = creationHandler;
     }
@@ -46,28 +46,28 @@ DrawingCanvasViewModel viewModel,
         ToggleButton circleButton,
         ToggleButton triangleButton,
         ToggleButton polygonButton)
-{
+    {
         // Uncheck all buttons
         selectButton.IsChecked = false;
         lineButton.IsChecked = false;
         rectangleButton.IsChecked = false;
         ovalButton.IsChecked = false;
         circleButton.IsChecked = false;
-      triangleButton.IsChecked = false;
-    polygonButton.IsChecked = false;
+        triangleButton.IsChecked = false;
+        polygonButton.IsChecked = false;
 
         button.IsChecked = true;
-   _isSelectMode = false;
+        _isSelectMode = false;
 
-      _viewModel.SelectedShapeType = tag switch
+        _viewModel.SelectedShapeType = tag switch
         {
-         "Line" => ShapeType.Line,
-   "Rectangle" => ShapeType.Rectangle,
+            "Line" => ShapeType.Line,
+            "Rectangle" => ShapeType.Rectangle,
             "Oval" => ShapeType.Oval,
-      "Circle" => ShapeType.Circle,
+            "Circle" => ShapeType.Circle,
             "Triangle" => ShapeType.Triangle,
             "Polygon" => ShapeType.Polygon,
-  _ => ShapeType.Line
+            _ => ShapeType.Line
         };
     }
 
@@ -85,12 +85,12 @@ DrawingCanvasViewModel viewModel,
         // Uncheck all shape buttons
         lineButton.IsChecked = false;
         rectangleButton.IsChecked = false;
-   ovalButton.IsChecked = false;
+        ovalButton.IsChecked = false;
         circleButton.IsChecked = false;
-     triangleButton.IsChecked = false;
+        triangleButton.IsChecked = false;
         polygonButton.IsChecked = false;
 
-     button.IsChecked = true;
+        button.IsChecked = true;
         _isSelectMode = true;
         System.Diagnostics.Debug.WriteLine("Select mode enabled");
     }
@@ -110,29 +110,29 @@ DrawingCanvasViewModel viewModel,
         if (previewBrush != null)
         {
             previewBrush.Color = color;
-      }
+        }
 
         if (_selectionHandler.SelectedShape != null && _isSelectMode)
         {
-_editHandler.UpdateShapeStrokeColor(_selectionHandler.SelectedShape, _viewModel.SelectedColor);
+            _editHandler.UpdateShapeStrokeColor(_selectionHandler.SelectedShape, _viewModel.SelectedColor);
         }
     }
 
     /// <summary>
-  /// Handle fill color changed
+    /// Handle fill color changed
     /// </summary>
     public void HandleFillColorChanged(Windows.UI.Color color, SolidColorBrush? previewBrush)
- {
+    {
         _viewModel.FillColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
 
-  if (previewBrush != null)
+        if (previewBrush != null)
         {
             previewBrush.Color = color;
         }
 
         if (_selectionHandler.SelectedShape != null && _isSelectMode)
-  {
-    _editHandler.UpdateShapeFillColor(_selectionHandler.SelectedShape, _viewModel.FillColor, _viewModel.IsFilled);
+        {
+            _editHandler.UpdateShapeFillColor(_selectionHandler.SelectedShape, _viewModel.FillColor, _viewModel.IsFilled);
         }
     }
 
@@ -143,8 +143,8 @@ _editHandler.UpdateShapeStrokeColor(_selectionHandler.SelectedShape, _viewModel.
     {
         if (_selectionHandler.SelectedShape != null && _isSelectMode)
         {
-       _editHandler.UpdateShapeThickness(_selectionHandler.SelectedShape, newValue);
-      }
+            _editHandler.UpdateShapeThickness(_selectionHandler.SelectedShape, newValue);
+        }
     }
 
     /// <summary>
@@ -152,23 +152,23 @@ _editHandler.UpdateShapeStrokeColor(_selectionHandler.SelectedShape, _viewModel.
     /// </summary>
     public void HandleStrokeStyleChanged(string style)
     {
-      _viewModel.StrokeStyle = style;
+        _viewModel.StrokeStyle = style;
 
-      if (_selectionHandler.SelectedShape != null && _isSelectMode)
+        if (_selectionHandler.SelectedShape != null && _isSelectMode)
         {
-   _editHandler.UpdateShapeStrokeStyle(_selectionHandler.SelectedShape, style);
+            _editHandler.UpdateShapeStrokeStyle(_selectionHandler.SelectedShape, style);
         }
     }
 
     /// <summary>
     /// Handle toolbar toggle
     /// </summary>
-  public bool HandleToolbarToggle(bool currentState, FrameworkElement content, FontIcon icon)
+    public bool HandleToolbarToggle(bool currentState, FrameworkElement content, FontIcon icon)
     {
         bool newState = !currentState;
         content.Visibility = newState ? Visibility.Visible : Visibility.Collapsed;
         icon.Glyph = newState ? "\uE76C" : "\uE700";
-  return newState;
+        return newState;
     }
 
     /// <summary>
@@ -177,23 +177,23 @@ _editHandler.UpdateShapeStrokeColor(_selectionHandler.SelectedShape, _viewModel.
     public async Task<bool> HandleFinishPolygonAsync(Canvas canvas, Action hideButton)
     {
         var points = _creationHandler.FinishPolygon(canvas);
-      if (points != null && points.Count >= 3)
-     {
+        if (points != null && points.Count >= 3)
+        {
             var shape = new Data.Models.Shape
             {
-        ShapeType = ShapeType.Polygon,
-   PointsData = DrawingService.PointsToJson(points),
-         Color = _viewModel.SelectedColor,
-  StrokeThickness = _viewModel.StrokeThickness,
-   StrokeStyle = _viewModel.StrokeStyle, // ✅ Fixed: Save stroke style for polygon
-        IsFilled = _viewModel.IsFilled,
-            FillColor = _viewModel.IsFilled ? _viewModel.FillColor : null,
-           TemplateId = _viewModel.CurrentTemplateId,
-           CreatedAt = DateTime.Now
-   };
+                ShapeType = ShapeType.Polygon,
+                PointsData = DrawingService.PointsToJson(points),
+                Color = _viewModel.SelectedColor,
+                StrokeThickness = _viewModel.StrokeThickness,
+                StrokeStyle = _viewModel.StrokeStyle, // ✅ Fixed: Save stroke style for polygon
+                IsFilled = _viewModel.IsFilled,
+                FillColor = _viewModel.IsFilled ? _viewModel.FillColor : null,
+                TemplateId = _viewModel.CurrentTemplateId,
+                CreatedAt = DateTime.Now
+            };
 
             await _viewModel.AddShapeCommand.ExecuteAsync(shape);
-      hideButton();
+            hideButton();
             return true;
         }
 
@@ -203,23 +203,23 @@ _editHandler.UpdateShapeStrokeColor(_selectionHandler.SelectedShape, _viewModel.
 
     /// <summary>
     /// Handle keyboard down events
-/// </summary>
+    /// </summary>
     public void HandleKeyDown(Windows.System.VirtualKey key, Canvas canvas)
     {
         if (key == Windows.System.VirtualKey.Shift)
-   {
+        {
             _creationHandler.SetShiftPressed(true);
         }
         else if (key == Windows.System.VirtualKey.Delete && _selectionHandler.HasSelection)
         {
             if (_selectionHandler.SelectedShape != null)
- {
-         _editHandler.DeleteShape(_selectionHandler.SelectedShape, canvas);
+            {
+                _editHandler.DeleteShape(_selectionHandler.SelectedShape, canvas);
                 _selectionHandler.ClearSelection(canvas);
-        }
+            }
         }
         else if (key == Windows.System.VirtualKey.Escape)
-   {
+        {
             _selectionHandler.ClearSelection(canvas);
         }
     }
@@ -227,11 +227,11 @@ _editHandler.UpdateShapeStrokeColor(_selectionHandler.SelectedShape, _viewModel.
     /// <summary>
     /// Handle keyboard up events
     /// </summary>
- public void HandleKeyUp(Windows.System.VirtualKey key)
+    public void HandleKeyUp(Windows.System.VirtualKey key)
     {
-      if (key == Windows.System.VirtualKey.Shift)
+        if (key == Windows.System.VirtualKey.Shift)
         {
-        _creationHandler.SetShiftPressed(false);
-    }
+            _creationHandler.SetShiftPressed(false);
+        }
     }
 }

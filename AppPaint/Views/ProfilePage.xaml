@@ -206,6 +206,7 @@
                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                         Text="Stroke Color" />
                                     <ColorPicker
+                                        x:Name="StrokeColorPicker"
                                         ColorChanged="StrokeColor_Changed"
                                         ColorSpectrumShape="Ring"
                                         IsAlphaEnabled="False"
@@ -220,6 +221,7 @@
                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                         Text="Fill Color" />
                                     <ColorPicker
+                                        x:Name="FillColorPicker"
                                         ColorChanged="FillColor_Changed"
                                         ColorSpectrumShape="Ring"
                                         IsAlphaEnabled="False"
@@ -234,6 +236,7 @@
                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                         Text="Background" />
                                     <ColorPicker
+                                        x:Name="BackgroundColorPicker"
                                         ColorChanged="BackgroundColor_Changed"
                                         ColorSpectrumShape="Ring"
                                         IsAlphaEnabled="False"

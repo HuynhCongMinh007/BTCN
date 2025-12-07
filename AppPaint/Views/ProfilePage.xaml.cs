@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using AppPaint.ViewModels;
@@ -15,69 +15,117 @@ public sealed partial class ProfilePage : Page
 
     public ProfilePage()
     {
-   ViewModel = App.Services.GetRequiredService<ProfileViewModel>();
+        ViewModel = App.Services.GetRequiredService<ProfileViewModel>();
         this.DataContext = ViewModel;
 
-     // Subscribe to events
+        // Initialize component FIRST
+        this.InitializeComponent();
+
+        // Subscribe to events AFTER InitializeComponent
         ViewModel.NavigateBackRequested += OnNavigateBackRequested;
         ViewModel.SaveProfileSuccess += OnSaveProfileSuccess;
         ViewModel.SetActiveProfileSuccess += OnSetActiveProfileSuccess;
         ViewModel.DeleteProfileSuccess += OnDeleteProfileSuccess;
-        
-     this.InitializeComponent();
+        ViewModel.PropertyChanged += ViewModel_PropertyChanged; // ✅ Subscribe to property changes
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-   ViewModel.OnNavigatedTo(e.Parameter);
+        ViewModel.OnNavigatedTo(e.Parameter);
+
+        // ✅ Update ColorPickers after navigation is complete and UI is loaded
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            UpdateColorPickers();
+        });
     }
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
     {
-  base.OnNavigatedFrom(e);
-    
+        base.OnNavigatedFrom(e);
+
         // Unsubscribe
         ViewModel.NavigateBackRequested -= OnNavigateBackRequested;
-      ViewModel.SaveProfileSuccess -= OnSaveProfileSuccess;
+        ViewModel.SaveProfileSuccess -= OnSaveProfileSuccess;
         ViewModel.SetActiveProfileSuccess -= OnSetActiveProfileSuccess;
         ViewModel.DeleteProfileSuccess -= OnDeleteProfileSuccess;
-  
+        ViewModel.PropertyChanged -= ViewModel_PropertyChanged; // ✅ Unsubscribe
+
         ViewModel.OnNavigatedFrom();
     }
 
- private void OnNavigateBackRequested(object? sender, System.EventArgs e)
+    // ✅ NEW: Update ColorPickers when SelectedProfile changes
+    private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ViewModel.SelectedProfile) && ViewModel.SelectedProfile != null)
+        {
+            UpdateColorPickers();
+        }
+    }
+
+    // ✅ NEW: Load colors from profile and apply to ColorPickers
+    private void UpdateColorPickers()
+    {
+        if (ViewModel.SelectedProfile == null) return;
+
+        try
+        {
+            // Parse and set Stroke Color
+            var strokeColor = DrawingService.ParseColor(ViewModel.SelectedProfile.DefaultStrokeColor);
+            StrokeColorPicker.Color = strokeColor;
+
+            // Parse and set Fill Color
+            var fillColor = DrawingService.ParseColor(ViewModel.SelectedProfile.DefaultFillColor);
+            FillColorPicker.Color = fillColor;
+
+            // Parse and set Background Color
+            var bgColor = DrawingService.ParseColor(ViewModel.SelectedProfile.DefaultBackgroundColor);
+            BackgroundColorPicker.Color = bgColor;
+
+            System.Diagnostics.Debug.WriteLine($"✅ Updated ColorPickers for profile: {ViewModel.SelectedProfile.Name}");
+            System.Diagnostics.Debug.WriteLine($"   Stroke: {ViewModel.SelectedProfile.DefaultStrokeColor}");
+            System.Diagnostics.Debug.WriteLine($"   Fill: {ViewModel.SelectedProfile.DefaultFillColor}");
+            System.Diagnostics.Debug.WriteLine($"   Background: {ViewModel.SelectedProfile.DefaultBackgroundColor}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Error updating ColorPickers: {ex.Message}");
+        }
+    }
+
+    private void OnNavigateBackRequested(object? sender, System.EventArgs e)
     {
         if (Frame.CanGoBack)
         {
-      Frame.GoBack();
+            Frame.GoBack();
         }
-}
+    }
 
     private async void CreateProfile_Click(object sender, RoutedEventArgs e)
     {
-  var dialog = new ContentDialog
+        var dialog = new ContentDialog
         {
             XamlRoot = this.XamlRoot,
             Title = "Create New Profile",
-     PrimaryButtonText = "Create",
-   CloseButtonText = "Cancel",
-      DefaultButton = ContentDialogButton.Primary
+            PrimaryButtonText = "Create",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary
         };
 
         var stackPanel = new StackPanel { Spacing = 12 };
-      
-    stackPanel.Children.Add(new TextBlock 
-        { 
-   Text = "Profile Name:", 
-    FontWeight = Microsoft.UI.Text.FontWeights.SemiBold 
-    });
 
-  var nameTextBox = new TextBox
-  {
-  PlaceholderText = "My Workspace",
-    MaxLength = 200
-     };
+        stackPanel.Children.Add(new TextBlock
+        {
+            Text = "Profile Name:",
+            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold
+        });
+
+        var nameTextBox = new TextBox
+        {
+            PlaceholderText = "My Workspace",
+            MaxLength = 200
+        };
         stackPanel.Children.Add(nameTextBox);
 
         dialog.Content = stackPanel;
@@ -86,22 +134,22 @@ public sealed partial class ProfilePage : Page
 
         if (result == ContentDialogResult.Primary)
         {
-        var name = nameTextBox.Text.Trim();
-       
-  if (string.IsNullOrEmpty(name))
-{
-       var errorDialog = new ContentDialog
-    {
-          XamlRoot = this.XamlRoot,
-   Title = "Error",
-       Content = "Please enter a profile name.",
-     CloseButtonText = "OK"
-       };
-    await errorDialog.ShowAsync();
-   return;
-  }
+            var name = nameTextBox.Text.Trim();
 
-      await ViewModel.CreateProfileAsync(name);
+            if (string.IsNullOrEmpty(name))
+            {
+                var errorDialog = new ContentDialog
+                {
+                    XamlRoot = this.XamlRoot,
+                    Title = "Error",
+                    Content = "Please enter a profile name.",
+                    CloseButtonText = "OK"
+                };
+                await errorDialog.ShowAsync();
+                return;
+            }
+
+            await ViewModel.CreateProfileAsync(name);
         }
     }
 
@@ -109,36 +157,36 @@ public sealed partial class ProfilePage : Page
     {
         if (ViewModel.SelectedProfile != null)
         {
-       var color = args.NewColor;
-   ViewModel.SelectedProfile.DefaultStrokeColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+            var color = args.NewColor;
+            ViewModel.SelectedProfile.DefaultStrokeColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
         }
     }
 
     private void FillColor_Changed(ColorPicker sender, ColorChangedEventArgs args)
     {
         if (ViewModel.SelectedProfile != null)
- {
-      var color = args.NewColor;
+        {
+            var color = args.NewColor;
             ViewModel.SelectedProfile.DefaultFillColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
-     }
+        }
     }
 
     private void BackgroundColor_Changed(ColorPicker sender, ColorChangedEventArgs args)
     {
         if (ViewModel.SelectedProfile != null)
         {
-       var color = args.NewColor;
-         ViewModel.SelectedProfile.DefaultBackgroundColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+            var color = args.NewColor;
+            ViewModel.SelectedProfile.DefaultBackgroundColor = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
         }
     }
 
     private async void OnSaveProfileSuccess(object? sender, string profileName)
     {
         var dialog = new ContentDialog
-     {
+        {
             XamlRoot = this.XamlRoot,
             Title = "Profile Saved Successfully",
-   CloseButtonText = "OK",
+            CloseButtonText = "OK",
             DefaultButton = ContentDialogButton.Close
         };
 
@@ -146,86 +194,86 @@ public sealed partial class ProfilePage : Page
 
         stackPanel.Children.Add(new TextBlock
         {
-         Text = $"Profile '{profileName}' has been saved successfully!",
-   FontSize = 14,
+            Text = $"Profile '{profileName}' has been saved successfully!",
+            FontSize = 14,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green),
             TextWrapping = TextWrapping.Wrap
         });
 
         var infoPanel = new StackPanel { Spacing = 8 };
- 
+
         infoPanel.Children.Add(new TextBlock
         {
-         Text = "What happens next:",
-       FontSize = 13,
-         FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
-   Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DarkSlateGray)
+            Text = "What happens next:",
+            FontSize = 13,
+            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+            Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DarkSlateGray)
         });
 
         var info1 = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-        info1.Children.Add(new FontIcon 
-     { 
-   FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
-          Glyph = "\uE73E",
-   FontSize = 16,
-    Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DodgerBlue)
+        info1.Children.Add(new FontIcon
+        {
+            FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
+            Glyph = "\uE73E",
+            FontSize = 16,
+            Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DodgerBlue)
         });
         info1.Children.Add(new TextBlock
         {
             Text = "New drawings will use these updated settings",
-       FontSize = 12,
-      TextWrapping = TextWrapping.Wrap,
-   VerticalAlignment = VerticalAlignment.Center
-});
+            FontSize = 12,
+            TextWrapping = TextWrapping.Wrap,
+            VerticalAlignment = VerticalAlignment.Center
+        });
         infoPanel.Children.Add(info1);
 
         var info2 = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-        info2.Children.Add(new FontIcon 
-        { 
+        info2.Children.Add(new FontIcon
+        {
             FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
-          Glyph = "\uE8B7",
-        FontSize = 16,
-     Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange)
+            Glyph = "\uE8B7",
+            FontSize = 16,
+            Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange)
         });
-    info2.Children.Add(new TextBlock
+        info2.Children.Add(new TextBlock
         {
             Text = "Existing drawings linked to this profile will reload with updated settings",
             FontSize = 12,
             TextWrapping = TextWrapping.Wrap,
-  VerticalAlignment = VerticalAlignment.Center
-     });
+            VerticalAlignment = VerticalAlignment.Center
+        });
         infoPanel.Children.Add(info2);
 
         var info3 = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-        info3.Children.Add(new FontIcon 
-        { 
-     FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
-          Glyph = "\uE946",
+        info3.Children.Add(new FontIcon
+        {
+            FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
+            Glyph = "\uE946",
             FontSize = 16,
-   Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Gray)
-      });
+            Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Gray)
+        });
         info3.Children.Add(new TextBlock
         {
-       Text = "Already drawn shapes will keep their colors",
-      FontSize = 12,
-    TextWrapping = TextWrapping.Wrap,
-   VerticalAlignment = VerticalAlignment.Center
+            Text = "Already drawn shapes will keep their colors",
+            FontSize = 12,
+            TextWrapping = TextWrapping.Wrap,
+            VerticalAlignment = VerticalAlignment.Center
         });
         infoPanel.Children.Add(info3);
 
-stackPanel.Children.Add(infoPanel);
-   dialog.Content = stackPanel;
+        stackPanel.Children.Add(infoPanel);
+        dialog.Content = stackPanel;
         await dialog.ShowAsync();
     }
 
- private async void OnSetActiveProfileSuccess(object? sender, string profileName)
+    private async void OnSetActiveProfileSuccess(object? sender, string profileName)
     {
-   var dialog = new ContentDialog
+        var dialog = new ContentDialog
         {
-  XamlRoot = this.XamlRoot,
-  Title = "Active Profile Updated",
-         CloseButtonText = "OK",
+            XamlRoot = this.XamlRoot,
+            Title = "Active Profile Updated",
+            CloseButtonText = "OK",
             DefaultButton = ContentDialogButton.Close
         };
 
@@ -233,12 +281,12 @@ stackPanel.Children.Add(infoPanel);
 
         stackPanel.Children.Add(new TextBlock
         {
-   Text = $"Profile '{profileName}' is now your active profile!",
+            Text = $"Profile '{profileName}' is now your active profile!",
             FontSize = 14,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
-        Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green),
-          TextWrapping = TextWrapping.Wrap
-   });
+            Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green),
+            TextWrapping = TextWrapping.Wrap
+        });
 
         var infoPanel = new StackPanel { Spacing = 8 };
 
@@ -247,54 +295,54 @@ stackPanel.Children.Add(infoPanel);
             Text = "What this means:",
             FontSize = 13,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
-        Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DarkSlateGray)
+            Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DarkSlateGray)
         });
 
         var info1 = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-      info1.Children.Add(new FontIcon
+        info1.Children.Add(new FontIcon
         {
-        FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
-         Glyph = "\uE768",
+            FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
+            Glyph = "\uE768",
             FontSize = 16,
-     Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DodgerBlue)
+            Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DodgerBlue)
         });
         info1.Children.Add(new TextBlock
-      {
-     Text = "All new drawings will use this profile's settings",
-     FontSize = 12,
-      TextWrapping = TextWrapping.Wrap,
+        {
+            Text = "All new drawings will use this profile's settings",
+            FontSize = 12,
+            TextWrapping = TextWrapping.Wrap,
             VerticalAlignment = VerticalAlignment.Center
         });
- infoPanel.Children.Add(info1);
+        infoPanel.Children.Add(info1);
 
         var info2 = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-     info2.Children.Add(new FontIcon
+        info2.Children.Add(new FontIcon
         {
- FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
-     Glyph = "\uE793",
-      FontSize = 16,
+            FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
+            Glyph = "\uE793",
+            FontSize = 16,
             Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Purple)
-     });
+        });
         info2.Children.Add(new TextBlock
-    {
+        {
             Text = $"Theme: {profileName}'s theme settings will be applied",
-     FontSize = 12,
-  TextWrapping = TextWrapping.Wrap,
-   VerticalAlignment = VerticalAlignment.Center
+            FontSize = 12,
+            TextWrapping = TextWrapping.Wrap,
+            VerticalAlignment = VerticalAlignment.Center
         });
         infoPanel.Children.Add(info2);
 
         var info3 = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         info3.Children.Add(new FontIcon
         {
-       FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
-   Glyph = "\uE8F1",
-     FontSize = 16,
+            FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
+            Glyph = "\uE8F1",
+            FontSize = 16,
             Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange)
-    });
+        });
         info3.Children.Add(new TextBlock
         {
-         Text = "Canvas size, colors, and brush settings from this profile",
+            Text = "Canvas size, colors, and brush settings from this profile",
             FontSize = 12,
             TextWrapping = TextWrapping.Wrap,
             VerticalAlignment = VerticalAlignment.Center
@@ -308,47 +356,47 @@ stackPanel.Children.Add(infoPanel);
 
     private async void OnDeleteProfileSuccess(object? sender, string profileName)
     {
-    var dialog = new ContentDialog
+        var dialog = new ContentDialog
         {
-      XamlRoot = this.XamlRoot,
-  Title = "Profile Deleted",
+            XamlRoot = this.XamlRoot,
+            Title = "Profile Deleted",
             CloseButtonText = "OK",
-     DefaultButton = ContentDialogButton.Close
+            DefaultButton = ContentDialogButton.Close
         };
 
         var stackPanel = new StackPanel { Spacing = 16 };
 
-   stackPanel.Children.Add(new TextBlock
-      {
-  Text = $"Profile '{profileName}' has been deleted successfully!",
-       FontSize = 14,
-      FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
-        Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.OrangeRed),
-         TextWrapping = TextWrapping.Wrap
+        stackPanel.Children.Add(new TextBlock
+        {
+            Text = $"Profile '{profileName}' has been deleted successfully!",
+            FontSize = 14,
+            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+            Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.OrangeRed),
+            TextWrapping = TextWrapping.Wrap
         });
 
-      var warningPanel = new Border
-     {
-     Padding = new Thickness(12),
-          Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.LightYellow),
+        var warningPanel = new Border
+        {
+            Padding = new Thickness(12),
+            Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.LightYellow),
             BorderBrush = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange),
             BorderThickness = new Thickness(1),
-     CornerRadius = new CornerRadius(6)
+            CornerRadius = new CornerRadius(6)
         };
 
-     var warningContent = new StackPanel { Spacing = 8 };
+        var warningContent = new StackPanel { Spacing = 8 };
 
         var warningHeader = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-     warningHeader.Children.Add(new FontIcon
+        warningHeader.Children.Add(new FontIcon
         {
             FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
             Glyph = "\uE7BA",
             FontSize = 16,
             Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DarkOrange)
         });
- warningHeader.Children.Add(new TextBlock
-     {
-    Text = "Important:",
+        warningHeader.Children.Add(new TextBlock
+        {
+            Text = "Important:",
             FontSize = 13,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DarkOrange)
@@ -356,25 +404,25 @@ stackPanel.Children.Add(infoPanel);
         warningContent.Children.Add(warningHeader);
 
         warningContent.Children.Add(new TextBlock
-   {
-            Text = "� Drawings linked to this profile will no longer have profile settings",
+        {
+            Text = "• Drawings linked to this profile will no longer have profile settings",
             FontSize = 12,
             TextWrapping = TextWrapping.Wrap,
-         Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DarkSlateGray)
+            Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DarkSlateGray)
         });
 
-warningContent.Children.Add(new TextBlock
+        warningContent.Children.Add(new TextBlock
         {
-       Text = "� Those drawings will use their saved canvas and color settings",
+            Text = "• Those drawings will use their saved canvas and color settings",
             FontSize = 12,
             TextWrapping = TextWrapping.Wrap,
-    Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DarkSlateGray)
-    });
+            Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DarkSlateGray)
+        });
 
-     warningPanel.Child = warningContent;
-      stackPanel.Children.Add(warningPanel);
+        warningPanel.Child = warningContent;
+        stackPanel.Children.Add(warningPanel);
 
-   dialog.Content = stackPanel;
-  await dialog.ShowAsync();
+        dialog.Content = stackPanel;
+        await dialog.ShowAsync();
     }
 }
