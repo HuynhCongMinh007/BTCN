@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
@@ -43,7 +43,7 @@ DrawingCanvasViewModel viewModel,
         ToggleButton lineButton,
         ToggleButton rectangleButton,
         ToggleButton ovalButton,
- ToggleButton circleButton,
+        ToggleButton circleButton,
         ToggleButton triangleButton,
         ToggleButton polygonButton)
 {
@@ -177,22 +177,23 @@ _editHandler.UpdateShapeStrokeColor(_selectionHandler.SelectedShape, _viewModel.
     public async Task<bool> HandleFinishPolygonAsync(Canvas canvas, Action hideButton)
     {
         var points = _creationHandler.FinishPolygon(canvas);
-        if (points != null && points.Count >= 3)
-    {
-    var shape = new Data.Models.Shape
-         {
-          ShapeType = ShapeType.Polygon,
-    PointsData = DrawingService.PointsToJson(points),
-          Color = _viewModel.SelectedColor,
-        StrokeThickness = _viewModel.StrokeThickness,
-                IsFilled = _viewModel.IsFilled,
-     FillColor = _viewModel.IsFilled ? _viewModel.FillColor : null,
-      TemplateId = _viewModel.CurrentTemplateId,
-  CreatedAt = DateTime.Now
-            };
+      if (points != null && points.Count >= 3)
+     {
+            var shape = new Data.Models.Shape
+            {
+        ShapeType = ShapeType.Polygon,
+   PointsData = DrawingService.PointsToJson(points),
+         Color = _viewModel.SelectedColor,
+  StrokeThickness = _viewModel.StrokeThickness,
+   StrokeStyle = _viewModel.StrokeStyle, // ✅ Fixed: Save stroke style for polygon
+        IsFilled = _viewModel.IsFilled,
+            FillColor = _viewModel.IsFilled ? _viewModel.FillColor : null,
+           TemplateId = _viewModel.CurrentTemplateId,
+           CreatedAt = DateTime.Now
+   };
 
-    await _viewModel.AddShapeCommand.ExecuteAsync(shape);
-            hideButton();
+            await _viewModel.AddShapeCommand.ExecuteAsync(shape);
+      hideButton();
             return true;
         }
 
