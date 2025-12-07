@@ -303,9 +303,10 @@ if (props != null)
         {
         ShapeType = shapeType,
       PointsData = pointsJson,
-  Color = ViewModel.SelectedColor,
-       StrokeThickness = ViewModel.StrokeThickness,
-         IsFilled = ViewModel.IsFilled,
+        Color = ViewModel.SelectedColor,
+        StrokeThickness = ViewModel.StrokeThickness,
+        StrokeStyle = ViewModel.StrokeStyle, // ✅ Fixed: Save stroke style
+        IsFilled = ViewModel.IsFilled,
    FillColor = ViewModel.IsFilled ? ViewModel.FillColor : null,
             TemplateId = ViewModel.CurrentTemplateId,
 CreatedAt = DateTime.Now
