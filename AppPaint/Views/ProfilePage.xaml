@@ -63,7 +63,7 @@
                                             Text="{x:Bind Name}" />
                                         <Border
                                             Padding="6,2"
-                                            Background="{ThemeResource AccentFillColorBrush}"
+                                            Background="{ThemeResource AccentFillColorDefaultBrush}"
                                             CornerRadius="4"
                                             Visibility="{x:Bind IsActive, Mode=OneWay}">
                                             <TextBlock
@@ -109,7 +109,6 @@
 
                             <TextBox
                                 Header="Profile Name"
-                                HeaderTemplate="{StaticResource LabelStyle}"
                                 IsEnabled="{x:Bind ViewModel.HasSelectedProfile, Mode=OneWay}"
                                 PlaceholderText="Enter profile name"
                                 Text="{x:Bind ViewModel.SelectedProfile.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
