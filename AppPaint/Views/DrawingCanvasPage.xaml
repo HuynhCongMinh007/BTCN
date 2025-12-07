@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:AppPaint.Views"
+    xmlns:models="using:Data.Models"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d">
@@ -502,54 +503,223 @@
         </Border>
 
         <!--  Canvas Area  -->
-        <ScrollViewer
-            Grid.Row="1"
-            Padding="24"
-            HorizontalScrollBarVisibility="Auto"
-            VerticalScrollBarVisibility="Auto">
-            <Border
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Style="{StaticResource AppCardStyle}">
-                <Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!--  Main Canvas Area  -->
+            <ScrollViewer
+                Grid.Column="0"
+    Padding="24"
+          HorizontalScrollBarVisibility="Auto"
+     VerticalScrollBarVisibility="Auto">
+                <Border
+            HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+            Style="{StaticResource AppCardStyle}">
+                    <Grid>
                     <!--  Canvas Background with Fixed Size  -->
-                    <Border
-                        x:Name="CanvasBackground"
-                        Width="{x:Bind ViewModel.CanvasWidth, Mode=OneWay}"
-                        Height="{x:Bind ViewModel.CanvasHeight, Mode=OneWay}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="1"
-                        CornerRadius="4">
-                        <Border.Background>
-                            <SolidColorBrush x:Name="CanvasBackgroundBrush" Color="White" />
-                        </Border.Background>
+          <Border
+         x:Name="CanvasBackground"
+Width="{x:Bind ViewModel.CanvasWidth, Mode=OneWay}"
+         Height="{x:Bind ViewModel.CanvasHeight, Mode=OneWay}"
+ BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+      BorderThickness="1"
+           CornerRadius="4">
+  <Border.Background>
+    <SolidColorBrush x:Name="CanvasBackgroundBrush" Color="White" />
+         </Border.Background>
 
-                        <!--  Drawing Canvas - Fixed Size  -->
-                        <Canvas
-                            x:Name="DrawingCanvas"
-                            Width="{x:Bind ViewModel.CanvasWidth, Mode=OneWay}"
-                            Height="{x:Bind ViewModel.CanvasHeight, Mode=OneWay}"
-                            Background="Transparent" />
-                    </Border>
+       <!--  Drawing Canvas - Fixed Size  -->
+       <Canvas
+ x:Name="DrawingCanvas"
+         Width="{x:Bind ViewModel.CanvasWidth, Mode=OneWay}"
+           Height="{x:Bind ViewModel.CanvasHeight, Mode=OneWay}"
+          AllowDrop="True"
+        Background="Transparent"
+   DragOver="DrawingCanvas_DragOver"
+           Drop="DrawingCanvas_Drop" />
+     </Border>
 
-                    <!--  Empty State  -->
-                    <StackPanel
-                        x:Name="EmptyState"
-                        Style="{StaticResource EmptyStateStyle}"
-                        Visibility="Collapsed">
-                        <FontIcon
-                            FontFamily="{StaticResource FluentIconsFontFamily}"
-                            FontSize="64"
-                            Glyph="&#xE70F;"
-                            Opacity="0.3" />
-                        <TextBlock
-                            Opacity="0.6"
-                            Style="{StaticResource SubtitleTextBlockStyle}"
-                            Text="Select a tool and start drawing" />
-                        <TextBlock Opacity="0.5" Text="Choose a shape from the toolbar above" />
-                    </StackPanel>
-                </Grid>
+   <!--  Empty State  -->
+            <StackPanel
+x:Name="EmptyState"
+   Style="{StaticResource EmptyStateStyle}"
+           Visibility="Collapsed">
+      <FontIcon
+           FontFamily="{StaticResource FluentIconsFontFamily}"
+   FontSize="64"
+           Glyph="&#xE70F;"
+         Opacity="0.3" />
+            <TextBlock
+             Opacity="0.6"
+ Style="{StaticResource SubtitleTextBlockStyle}"
+   Text="Select a tool and start drawing" />
+         <TextBlock Opacity="0.5" Text="Choose a shape from the toolbar above" />
+  </StackPanel>
+                    </Grid>
+                </Border>
+            </ScrollViewer>
+
+            <!--  Template Panel (Right Side)  -->
+            <Border
+     x:Name="TemplatePanel"
+ Grid.Column="1"
+    Width="280"
+         Background="{ThemeResource LayerFillColorDefaultBrush}"
+     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+   BorderThickness="1,0,0,0">
+            <Grid>
+     <Grid.RowDefinitions>
+    <RowDefinition Height="Auto" />
+     <RowDefinition Height="*" />
+                  </Grid.RowDefinitions>
+
+   <!--  Header  -->
+   <Grid
+   Grid.Row="0"
+         Padding="16,12"
+     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+     BorderThickness="0,0,0,1">
+        <Grid.ColumnDefinitions>
+         <ColumnDefinition Width="*" />
+             <ColumnDefinition Width="Auto" />
+    </Grid.ColumnDefinitions>
+
+    <StackPanel Grid.Column="0" Spacing="4">
+    <TextBlock
+                   FontSize="14"
+           FontWeight="SemiBold"
+         Text="Templates" />
+       <TextBlock
+         FontSize="11"
+            Opacity="0.6"
+       Text="Drag to canvas or click Insert" />
+   </StackPanel>
+
+         <Button
+ x:Name="ToggleTemplatePanelButton"
+       Grid.Column="1"
+       Width="32"
+    Height="32"
+       Padding="0"
+               Click="ToggleTemplatePanel_Click"
+     ToolTipService.ToolTip="Hide Templates">
+         <FontIcon
+             FontFamily="{StaticResource FluentIconsFontFamily}"
+        FontSize="16"
+    Glyph="&#xE76C;" />
+    </Button>
+       </Grid>
+
+             <!--  Templates List  -->
+         <ScrollViewer Grid.Row="1" Padding="8">
+         <ItemsRepeater
+    x:Name="TemplatesRepeater"
+    ItemsSource="{x:Bind ViewModel.AvailableTemplates, Mode=OneWay}">
+        <ItemsRepeater.Layout>
+               <StackLayout Spacing="8" />
+     </ItemsRepeater.Layout>
+      <ItemsRepeater.ItemTemplate>
+         <DataTemplate x:DataType="models:DrawingTemplate">
+        <Border
+        Padding="12"
+  Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+  BorderThickness="1"
+     CanDrag="True"
+           CornerRadius="6"
+      DragStarting="Template_DragStarting">
+   <Grid>
+                   <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+       <RowDefinition Height="80" />
+        <RowDefinition Height="Auto" />
+       <RowDefinition Height="Auto" />
+     </Grid.RowDefinitions>
+
+    <!--  Name  -->
+            <TextBlock
+            Grid.Row="0"
+       Margin="0,0,0,8"
+       FontSize="13"
+ FontWeight="SemiBold"
+         Text="{x:Bind Name}"
+ TextTrimming="CharacterEllipsis" />
+
+              <!--  Preview  -->
+     <Border
+           Grid.Row="1"
+          Margin="0,0,0,8"
+         Background="{ThemeResource LayerOnMicaBaseAltFillColorDefaultBrush}"
+        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+   CornerRadius="4">
+    <Canvas
+        x:Name="TemplatePreviewCanvas"
+     Width="220"
+          Height="60"
+    HorizontalAlignment="Center"
+              Loaded="TemplatePreviewCanvas_Loaded"
+            Tag="{x:Bind}"
+        VerticalAlignment="Center" />
+   </Border>
+
+      <!--  Info  -->
+  <TextBlock
+  Grid.Row="2"
+              Margin="0,0,0,8"
+    FontSize="11"
+       Opacity="0.6">
+          <Run Text="{x:Bind Shapes.Count}" />
+             <Run Text="shape(s)" />
+  </TextBlock>
+
+          <!--Insert Button  -->
+     <Button
+          Grid.Row="3"
+       Click="InsertTemplateButton_Click"
+               Content="Insert to Center"
+      FontSize="11"
+     HorizontalAlignment="Stretch"
+        Style="{StaticResource AccentButtonStyle}"
+ Tag="{x:Bind}" />
+            </Grid>
+         </Border>
+  </DataTemplate>
+         </ItemsRepeater.ItemTemplate>
+     </ItemsRepeater>
+         </ScrollViewer>
+     </Grid>
             </Border>
-        </ScrollViewer>
+
+            <!--  Show Template Panel Button (when hidden)  -->
+<Button
+         x:Name="ShowTemplatePanelButton"
+           Grid.Column="1"
+     Width="40"
+    Height="80"
+     Margin="0,20,0,0"
+      Padding="0"
+             Click="ToggleTemplatePanel_Click"
+         HorizontalAlignment="Right"
+         ToolTipService.ToolTip="Show Templates"
+                VerticalAlignment="Top"
+         Visibility="Collapsed">
+           <StackPanel Spacing="4">
+    <FontIcon
+ FontFamily="{StaticResource FluentIconsFontFamily}"
+          FontSize="16"
+    Glyph="&#xE76B;" />
+   <TextBlock
+FontSize="10"
+           Text="Templates"
+    TextWrapping="Wrap" />
+          </StackPanel>
+ </Button>
+     </Grid>
     </Grid>
 </Page>
