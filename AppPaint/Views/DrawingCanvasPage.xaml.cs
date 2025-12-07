@@ -381,13 +381,13 @@ Opacity = 0.7
         });
 
         if (isUpdating)
-        {
+  {
        stackPanel.Children.Add(new TextBlock
    {
-      Text = "⚠️ This will overwrite the existing drawing.",
-                Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange),
+      Text = "Warning: This will overwrite the existing drawing.",
+  Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange),
     FontSize = 12,
-          FontWeight = Microsoft.UI.Text.FontWeights.SemiBold
+FontWeight = Microsoft.UI.Text.FontWeights.SemiBold
      });
         }
 
